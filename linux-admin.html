@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Linux Admin Interview Guide — StudyHub</title>
+<title>Linux Admin Interview Guide — RootReady</title>
 <link rel="stylesheet" href="studyhub.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
@@ -188,12 +188,27 @@ tr:hover td { background:rgba(255,255,255,.025); }
 }
 
 
+/* ── Linux Admin source content styles ── */
+.qa-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin:10px 0;overflow:hidden}
+.qa-q{display:flex;gap:10px;align-items:flex-start;padding:.85rem 1rem;cursor:pointer}
+.qa-q:hover{background:rgba(255,255,255,.02)}
+.q-badge{font-family:var(--font-mono);font-size:10px;font-weight:700;background:rgba(74,159,213,.12);color:var(--sky);border:1px solid rgba(74,159,213,.22);padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:2px}
+.q-text{font-family:var(--font-head);font-weight:600;color:var(--text);font-size:.95rem;line-height:1.4}
+.qa-a{display:none;padding:.85rem 1rem 1rem 2.7rem;border-top:1px solid var(--border);background:rgba(0,0,0,.15)}
+.qa-item.open .qa-a{display:block}
+.a-badge{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--accent);margin-bottom:6px;display:block}
+.note,.info-box{background:rgba(74,159,213,.07);border:1px solid rgba(74,159,213,.2);border-left:3px solid var(--sky);border-radius:10px;padding:.85rem 1rem;margin:.7rem 0 1.2rem;font-size:14px;color:var(--text2)}
+.warn-box,.warning{background:rgba(240,165,0,.07);border:1px solid rgba(240,165,0,.2);border-left:3px solid var(--accent);border-radius:10px;padding:.85rem 1rem;margin:.7rem 0 1.2rem;font-size:14px;color:var(--text2)}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+@media(max-width:640px){.card-grid{grid-template-columns:1fr!important}}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+
 </style>
 </head>
 <body>
 
 <div id="site-topbar">
-  <a href="index.html" class="logo">Study<span>Hub</span></a>
+  <a href="index.html" class="logo">Root<span>Ready</span></a>
   <span class="page-title-bar">Linux & Unix SysAdmin Reference</span>
   <div class="topbar-spacer"></div>
   <button id="menu-btn" onclick="toggleNav()">☰</button>
@@ -221,33 +236,34 @@ tr:hover td { background:rgba(255,255,255,.025); }
     
 <div class="page-hero">
   <h1>💻 Linux Admin Interview Guide</h1>
-  <p>Linux &amp; Unix SysAdmin Command Reference — 10 Topics · Commands · Q&amp;A · Real-world Scenarios</p>
+  <p>Linux &amp; Unix SysAdmin Command Reference — 10 Topics · Commands · Q&amp;A · Real-world Scenarios · Best Practices</p>
   <div class="hero-badges">
     <span class="badge badge-blue">10 Topics</span>
     <span class="badge badge-green">Commands &amp; Q&amp;As</span>
-    <span class="badge badge-gold">Best Practices</span>
+    <span class="badge badge-gold">LVM · SAN · Security · Performance</span>
+    <span class="badge badge-purple">Best Practices</span>
   </div>
 </div>
-<div class="main __wrap __content">
-<!-- ==================== SECTION 1: LVM & FS ==================== -->
-<div class="section s1 active" id="s1">
-<div class="section-header">
-<div class="section-icon">💾</div>
-<div>
-<div class="section-title">LVM &amp; Filesystem Management</div>
-<div class="section-desc">Logical Volume Manager — create, extend, reduce, and manage filesystems in enterprise Linux</div>
-</div>
-</div>
-<!-- Topic 1 -->
-<div class="topic-card" id="lvm1">
-<div class="topic-header" onclick="toggleCard('lvm1')">
-<div class="topic-title-row">
-<span class="topic-num">01</span>
-<span class="topic-title">PV → VG → LV Creation Workflow</span>
-</div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s1" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">💾</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">LVM & Filesystem Management</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">Logical Volume Manager — create, extend, reduce, and manage filesystems in enterprise Linux</p>
+    </div>
+  </div>
+
+  <div id="lvm1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">PV → VG → LV Creation Workflow</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <p class="body-text">The fundamental LVM hierarchy: Physical Volumes (PV) → Volume Groups (VG) → Logical Volumes (LV). Always follow this sequence when provisioning new storage.</p>
 <div class="cmd-label">Step-by-step commands</div>
 <div class="cmd-block"><span class="comment"># Step 1: Identify available disks</span>
@@ -308,17 +324,19 @@ df -kh</div>
 </div>
 </div>
 </div>
-</div>
-<!-- Topic 2 -->
-<div class="topic-card" id="lvm2">
-<div class="topic-header" onclick="toggleCard('lvm2')">
-<div class="topic-title-row">
-<span class="topic-num">02</span>
-<span class="topic-title">LV Extension Commands &amp; Resize Scenarios</span>
-</div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="lvm2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">LV Extension Commands & Resize Scenarios</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Extend by adding size, auto-resize FS (-r)</span>
 lvextend -L +100G /dev/mapper/datavg-lib -r
 lvextend -L +500G /dev/mapper/vg_splunk-lv_splunk -r
@@ -351,17 +369,19 @@ free -h</div>
 </div>
 </div>
 </div>
-</div>
-<!-- Topic 3 -->
-<div class="topic-card" id="lvm3">
-<div class="topic-header" onclick="toggleCard('lvm3')">
-<div class="topic-title-row">
-<span class="topic-num">03</span>
-<span class="topic-title">fstab Management &amp; Mount Operations</span>
-</div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="lvm3" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">fstab Management & Mount Operations</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Always backup fstab before changes</span>
 cp -rp /etc/fstab /etc/fstab_bkp-`date +%Y%m%d`
 
@@ -389,23 +409,29 @@ df -kh</div>
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 2: SAN & Multipath ==================== -->
-<div class="section s2" id="s2">
-<div class="section-header">
-<div class="section-icon">🔌</div>
-<div>
-<div class="section-title">SAN &amp; Multipath Storage</div>
-<div class="section-desc">Storage Area Network management, multipath I/O, FC HBAs, and disk migration procedures</div>
-</div>
-</div>
-<div class="topic-card" id="san1">
-<div class="topic-header" onclick="toggleCard('san1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">SAN Pre/Post Check Commands</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s2" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🔌</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">SAN & Multipath Storage</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">Storage Area Network management, multipath I/O, FC HBAs, and disk migration procedures</p>
+    </div>
+  </div>
+
+  <div id="san1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SAN Pre/Post Check Commands</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Pre-migration checks</span>
 date; cat /etc/redhat-release; uname -a
 multipath -ll              <span class="comment"># show all multipath devices</span>
@@ -451,13 +477,19 @@ done</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="san2">
-<div class="topic-header" onclick="toggleCard('san2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">FC HBA Troubleshooting &amp; Path Management</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="san2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">FC HBA Troubleshooting & Path Management</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Check FC port states</span>
 cat /sys/class/fc_host/host*/port_state
 
@@ -483,23 +515,29 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 3: Backup & NetBackup ==================== -->
-<div class="section s3" id="s3">
-<div class="section-header">
-<div class="section-icon">🗄️</div>
-<div>
-<div class="section-title">Backup &amp; NetBackup (Veritas)</div>
-<div class="section-desc">NetBackup client troubleshooting, certificate management, and service control</div>
-</div>
-</div>
-<div class="topic-card" id="nb1">
-<div class="topic-header" onclick="toggleCard('nb1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">NetBackup Error 7641 — Certificate &amp; Host Cache Fix</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s3" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🗄️</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Backup & NetBackup (Veritas)</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">NetBackup client troubleshooting, certificate management, and service control</p>
+    </div>
+  </div>
+
+  <div id="nb1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">NetBackup Error 7641 — Certificate & Host Cache Fix</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="warn-box"><strong>⚠ Error 7641</strong> — SSL certificate / host cache mismatch. Follow these steps in sequence.</div>
 <div class="cmd-block"><span class="comment"># Step 1: Clear host cache</span>
 /usr/openv/bin/bpclntcmd -clear_host_cache
@@ -533,13 +571,19 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="nb2">
-<div class="topic-header" onclick="toggleCard('nb2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">Log Compression &amp; Archival (find + gzip/bzip2)</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="nb2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Log Compression & Archival (find + gzip/bzip2)</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <p class="body-text">A critical operational task — compressing old logs to reclaim disk space. The standard pattern uses <code>find</code> to identify, filter, and compress in a pipeline.</p>
 <div class="cmd-block"><span class="comment"># Compress files older than 31 days, excluding already compressed</span>
 find /DAPlogs/Citi/Logs -mtime +31 -type f \
@@ -574,23 +618,29 @@ find . -xdev -size +1000000c -exec ls -lh {} \; | sort -nrk 5 | head -15</div>
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 4: HP/IBM Hardware ==================== -->
-<div class="section s4" id="s4">
-<div class="section-header">
-<div class="section-icon">🖥️</div>
-<div>
-<div class="section-title">HP &amp; IBM Server Hardware Management</div>
-<div class="section-desc">RAID controllers, MegaRAID/HPSSACLI, ILO management, firmware checks, LED control</div>
-</div>
-</div>
-<div class="topic-card" id="hw1">
-<div class="topic-header" onclick="toggleCard('hw1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">HP HPSSACLI / HPACUCLI — Smart Array Commands</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s4" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🖥️</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">HP & IBM Server Hardware Management</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">RAID controllers, MegaRAID/HPSSACLI, ILO management, firmware checks, LED control</p>
+    </div>
+  </div>
+
+  <div id="hw1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">HP HPSSACLI / HPACUCLI — Smart Array Commands</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Show full controller config</span>
 hpssacli ctrl all show config
 hpssacli ctrl all show config | egrep -i 'reb|rec'  <span class="comment"># rebuilding/recovery</span>
@@ -647,13 +697,19 @@ ssacli ctrl slot=0 pd 1I:1:14 show detail</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="hw2">
-<div class="topic-header" onclick="toggleCard('hw2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">IBM MegaRAID storcli &amp; MegaCli Commands</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="hw2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">IBM MegaRAID storcli & MegaCli Commands</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Show controller info</span>
 /opt/MegaRAID/storcli/storcli64 /c0 show all
 
@@ -681,13 +737,19 @@ dmidecode -t 0 | grep Firmware</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="hw3">
-<div class="topic-header" onclick="toggleCard('hw3')">
-<div class="topic-title-row"><span class="topic-num">03</span><span class="topic-title">HP ILO — Out-of-Band Management</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="hw3" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">HP ILO — Out-of-Band Management</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Find ILO IP address</span>
 hponcfg -w /tmp/ilo.out
 cat /tmp/ilo.out
@@ -717,23 +779,29 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 5: Sed & Shell Scripting ==================== -->
-<div class="section s5" id="s5">
-<div class="section-header">
-<div class="section-icon">⚙️</div>
-<div>
-<div class="section-title">sed, awk &amp; Shell Scripting</div>
-<div class="section-desc">Text processing, in-place file editing, loop constructs, and automation patterns</div>
-</div>
-</div>
-<div class="topic-card" id="sed1">
-<div class="topic-header" onclick="toggleCard('sed1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">sed — In-place File Editing Patterns</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s5" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">⚙️</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">sed, awk & Shell Scripting</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">Text processing, in-place file editing, loop constructs, and automation patterns</p>
+    </div>
+  </div>
+
+  <div id="sed1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">sed — In-place File Editing Patterns</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Add line at TOP of file</span>
 sed -i '1i SERVER = sg3lixnbirmed02' bp.conf
 
@@ -780,13 +848,19 @@ cat /tmp/jointmp &gt; /opt/admin/join</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="sed2">
-<div class="topic-header" onclick="toggleCard('sed2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">Shell Loops — For Loops Over Server Lists</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="sed2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Shell Loops — For Loops Over Server Lists</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Run command on multiple servers via SSH</span>
 for i in `cat /var/tmp/serverlist.txt`; do
   ssh $i 'command here'
@@ -830,13 +904,19 @@ done</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="sed3">
-<div class="topic-header" onclick="toggleCard('sed3')">
-<div class="topic-title-row"><span class="topic-num">03</span><span class="topic-title">ACL Management — setfacl / nfs4_setfacl</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="sed3" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">ACL Management — setfacl / nfs4_setfacl</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Set ACL for a user on a directory</span>
 setfacl -m user:user1:rwx /dir/name
 setfacl -R -m u:colleague:rwX .   <span class="comment"># recursive, X=execute on dirs only</span>
@@ -859,23 +939,29 @@ sed -i '/apps/ s/defaults/defaults,acl/' /etc/fstab</div>
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 6: Solaris & LDOM ==================== -->
-<div class="section s6" id="s6">
-<div class="section-header">
-<div class="section-icon">☀️</div>
-<div>
-<div class="section-title">Solaris &amp; LDOM (Logical Domains)</div>
-<div class="section-desc">Solaris LDom management, live migration, SVM disk mirroring, ZFS, health checks</div>
-</div>
-</div>
-<div class="topic-card" id="sol1">
-<div class="topic-header" onclick="toggleCard('sol1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">LDOM Live Migration Steps</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s6" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">☀️</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Solaris & LDOM (Logical Domains)</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">Solaris LDom management, live migration, SVM disk mirroring, ZFS, health checks</p>
+    </div>
+  </div>
+
+  <div id="sol1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">LDOM Live Migration Steps</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Pre-migration checks</span>
 cat /opt/IHSldmcfg/etc/pod_hosts  <span class="comment"># Verify source/dest frames in hosts</span>
 /opt/IHSldmcfg/bin/check_pod_disk all  <span class="comment"># Disk status check</span>
@@ -910,13 +996,19 @@ ldm start -a</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="sol2">
-<div class="topic-header" onclick="toggleCard('sol2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">Solaris SVM Disk Mirroring Procedure</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="sol2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Solaris SVM Disk Mirroring Procedure</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <p class="body-text">Solaris Volume Manager (SVM) mirroring steps for root + swap + data partitions. Essential for HA on legacy SPARC systems.</p>
 <ol class="step-list">
 <li><span class="step-n">1</span>Backup <code>/etc/vfstab</code>: <code>cp /etc/vfstab /etc/vfstab.orig</code></li>
@@ -937,13 +1029,19 @@ ldm start -a</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="sol3">
-<div class="topic-header" onclick="toggleCard('sol3')">
-<div class="topic-title-row"><span class="topic-num">03</span><span class="topic-title">Solaris Health Check Commands</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="sol3" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Solaris Health Check Commands</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># System info</span>
 uname -a; uptime; date; who -r
 prtdiag -v                         <span class="comment"># hardware diagnostics</span>
@@ -972,23 +1070,29 @@ vxprint -Aht; vxdg list; vxdisk list; vxtask list
 cat /var/adm/messages
 dmesg</div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 7: Performance & SAR ==================== -->
-<div class="section s7" id="s7">
-<div class="section-header">
-<div class="section-icon">📊</div>
-<div>
-<div class="section-title">Performance Monitoring &amp; SAR</div>
-<div class="section-desc">System Activity Reporter, CPU/memory/IO analysis, process troubleshooting</div>
-</div>
-</div>
-<div class="topic-card" id="perf1">
-<div class="topic-header" onclick="toggleCard('perf1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">SAR — System Activity Reporter Commands</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s7" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">📊</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Performance Monitoring & SAR</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">System Activity Reporter, CPU/memory/IO analysis, process troubleshooting</p>
+    </div>
+  </div>
+
+  <div id="perf1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SAR — System Activity Reporter Commands</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Navigate to SAR data directory</span>
 cd /var/log/sa/
 
@@ -1033,13 +1137,19 @@ echo "PFA" | mail -s "SAR REPORT From `uname -n`" \
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="perf2">
-<div class="topic-header" onclick="toggleCard('perf2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">Reboot Reason Investigation</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="perf2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Reboot Reason Investigation</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Find reboot/shutdown reason in logs</span>
 grep -iv ': starting\|kernel: .*: Power Button\|watching system buttons\|Stopped Cleaning Up' \
   /var/log/messages /var/log/syslog \
@@ -1062,23 +1172,29 @@ cat receiver.archive.log | grep reboo</div>
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 8: Security & PAM ==================== -->
-<div class="section s8" id="s8">
-<div class="section-header">
-<div class="section-icon">🔒</div>
-<div>
-<div class="section-title">Security, SELinux &amp; PAM</div>
-<div class="section-desc">PAM configuration, SELinux modes, crontab access control, RPM database repair</div>
-</div>
-</div>
-<div class="topic-card" id="sec1">
-<div class="topic-header" onclick="toggleCard('sec1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">SELinux Management</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s8" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🔒</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Security, SELinux & PAM</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">PAM configuration, SELinux modes, crontab access control, RPM database repair</p>
+    </div>
+  </div>
+
+  <div id="sec1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SELinux Management</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Check current SELinux mode</span>
 getenforce                         <span class="comment"># Enforcing / Permissive / Disabled</span>
 sestatus                           <span class="comment"># detailed status</span>
@@ -1103,13 +1219,19 @@ audit2why &lt; /var/log/audit/audit.log</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="sec2">
-<div class="topic-header" onclick="toggleCard('sec2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">PAM Configuration — Crontab Access Control</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="sec2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">PAM Configuration — Crontab Access Control</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="info-box"><strong>Issue:</strong> In RHEL 7, user FIDs cannot access crontab due to PAM configuration changes from RHEL 5/6.</div>
 <div class="cmd-block"><span class="comment"># Step 1: Add user to /etc/security/access.conf</span>
 +:USER_Name:cron crond :0 tty1 tty2 tty3 tty4 tty5 tty6
@@ -1130,13 +1252,19 @@ crontab -l</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="sec3">
-<div class="topic-header" onclick="toggleCard('sec3')">
-<div class="topic-title-row"><span class="topic-num">03</span><span class="topic-title">RPM Database Rebuild Procedure</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="sec3" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">RPM Database Rebuild Procedure</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Step 1: Backup RPM database</span>
 mkdir /root/backups.rpm.`date +"%Y-%m-%d"`/
 cp -avr /var/lib/rpm/ /root/backups.rpm.`date +"%Y-%m-%d"`/
@@ -1159,23 +1287,29 @@ yum clean all</div>
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 9: SSH & Keytabs ==================== -->
-<div class="section s9" id="s9">
-<div class="section-header">
-<div class="section-icon">🔑</div>
-<div>
-<div class="section-title">SSH Key Management &amp; Kerberos Keytabs</div>
-<div class="section-desc">SSH key setup, bulk deployment scripts, keytab management, NSCD troubleshooting</div>
-</div>
-</div>
-<div class="topic-card" id="ssh1">
-<div class="topic-header" onclick="toggleCard('ssh1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">SSH Key Conversion &amp; Deployment</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s9" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🔑</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">SSH Key Management & Kerberos Keytabs</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">SSH key setup, bulk deployment scripts, keytab management, NSCD troubleshooting</p>
+    </div>
+  </div>
+
+  <div id="ssh1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SSH Key Conversion & Deployment</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># SSH with specific cipher (for legacy systems)</span>
 ssh -t --ciphers=aes256-ctr relww-cob1935 bash
 
@@ -1210,13 +1344,19 @@ for j in `cat fid`; do setperm $j; done</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="ssh2">
-<div class="topic-header" onclick="toggleCard('ssh2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">NSCD Troubleshooting — Name Service Cache Daemon</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="ssh2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">NSCD Troubleshooting — Name Service Cache Daemon</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># NSCD cache database files</span>
 ls /var/db/nscd/
 <span class="comment"># Should see 3 files: passwd, group, hosts</span>
@@ -1243,23 +1383,29 @@ getent group prv_hac_sd-2cad-109d | grep oracle</div>
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-<!-- ==================== SECTION 10: Kernel & System ==================== -->
-<div class="section s10" id="s10">
-<div class="section-header">
-<div class="section-icon">🧠</div>
-<div>
-<div class="section-title">Kernel Parameters &amp; System Configuration</div>
-<div class="section-desc">sysctl tuning, GRUB management, Dracut issues, VCS clustering, Tanium management</div>
-</div>
-</div>
-<div class="topic-card" id="kern1">
-<div class="topic-header" onclick="toggleCard('kern1')">
-<div class="topic-title-row"><span class="topic-num">01</span><span class="topic-title">Kernel Parameter Tuning — sysctl</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+
+<div class="content-section" id="s10" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🧠</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Kernel Parameters & System Configuration</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">sysctl tuning, GRUB management, Dracut issues, VCS clustering, Tanium management</p>
+    </div>
+  </div>
+
+  <div id="kern1" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Kernel Parameter Tuning — sysctl</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Set kernel parameters (persistent via sysctl.conf)</span>
 <span class="comment"># Thread and process limits</span>
 sed -i '/kernel.threads-max/d' /etc/sysctl.conf
@@ -1298,13 +1444,19 @@ echo 8000000 &gt; /proc/sys/vm/max_map_count
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="kern2">
-<div class="topic-header" onclick="toggleCard('kern2')">
-<div class="topic-title-row"><span class="topic-num">02</span><span class="topic-title">GRUB2 — Boot Kernel Management (Dracut Issue Fix)</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="kern2" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">GRUB2 — Boot Kernel Management (Dracut Issue Fix)</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="info-box"><strong>Dracut Prompt Issue:</strong> Server drops to dracut emergency shell at boot. Cause: grubenv missing/null or wrong default kernel set.</div>
 <div class="cmd-block"><span class="comment"># Check current grubenv (default kernel)</span>
 ls -lrt /boot/grub2/grubenv
@@ -1330,13 +1482,19 @@ package-cleanup --oldkernels --count=2</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="kern3">
-<div class="topic-header" onclick="toggleCard('kern3')">
-<div class="topic-title-row"><span class="topic-num">03</span><span class="topic-title">VCS (Veritas Cluster Server) — Cluster Management</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="kern3" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">VCS (Veritas Cluster Server) — Cluster Management</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># VCS command directory</span>
 cd /opt/VRTS/bin/
 
@@ -1377,13 +1535,19 @@ done | grep -i servername</div>
 </div>
 </div>
 </div>
-</div>
-<div class="topic-card" id="kern4">
-<div class="topic-header" onclick="toggleCard('kern4')">
-<div class="topic-title-row"><span class="topic-num">04</span><span class="topic-title">Tanium Client Troubleshooting</span></div>
-<span class="chevron">▾</span>
-</div>
-<div class="topic-body">
+    </div>
+  </div>
+
+  <div id="kern4" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none" onclick="toggleCard(this)">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">04</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Tanium Client Troubleshooting</span>
+      </div>
+      <span class="chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.75rem">▾</span>
+    </div>
+    <div class="card-body" style="display:block;padding:4px 18px 18px;border-top:1px solid var(--border)">
+      <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Stop Tanium client</span>
 service TaniumClient stop
 
@@ -1411,19 +1575,20 @@ find /opt/Tanium/TaniumClient/tmp -mtime +30 -type f \
 </div>
 </div>
 </div>
+    </div>
+  </div>
 </div>
-</div>
-</div>
+
 
   </main>
 
-  <nav id="toc-nav"><div class="toc-head">Contents</div></nav>
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#s1" class="toc-link">💾 LVM & Filesystem Management</a><a href="#lvm1" class="toc-link h3">01 PV → VG → LV Creation Workflow</a><a href="#lvm2" class="toc-link h3">02 LV Extension Commands & Resize Scenarios</a><a href="#lvm3" class="toc-link h3">03 fstab Management & Mount Operations</a><a href="#s2" class="toc-link">🔌 SAN & Multipath Storage</a><a href="#san1" class="toc-link h3">01 SAN Pre/Post Check Commands</a><a href="#san2" class="toc-link h3">02 FC HBA Troubleshooting & Path Management</a><a href="#s3" class="toc-link">🗄️ Backup & NetBackup (Veritas)</a><a href="#nb1" class="toc-link h3">01 NetBackup Error 7641 — Certificate & Host Cache Fix</a><a href="#nb2" class="toc-link h3">02 Log Compression & Archival (find + gzip/bzip2)</a><a href="#s4" class="toc-link">🖥️ HP & IBM Server Hardware Management</a><a href="#hw1" class="toc-link h3">01 HP HPSSACLI / HPACUCLI — Smart Array Commands</a><a href="#hw2" class="toc-link h3">02 IBM MegaRAID storcli & MegaCli Commands</a><a href="#hw3" class="toc-link h3">03 HP ILO — Out-of-Band Management</a><a href="#s5" class="toc-link">⚙️ sed, awk & Shell Scripting</a><a href="#sed1" class="toc-link h3">01 sed — In-place File Editing Patterns</a><a href="#sed2" class="toc-link h3">02 Shell Loops — For Loops Over Server Lists</a><a href="#sed3" class="toc-link h3">03 ACL Management — setfacl / nfs4_setfacl</a><a href="#s6" class="toc-link">☀️ Solaris & LDOM (Logical Domains)</a><a href="#sol1" class="toc-link h3">01 LDOM Live Migration Steps</a><a href="#sol2" class="toc-link h3">02 Solaris SVM Disk Mirroring Procedure</a><a href="#sol3" class="toc-link h3">03 Solaris Health Check Commands</a><a href="#s7" class="toc-link">📊 Performance Monitoring & SAR</a><a href="#perf1" class="toc-link h3">01 SAR — System Activity Reporter Commands</a><a href="#perf2" class="toc-link h3">02 Reboot Reason Investigation</a><a href="#s8" class="toc-link">🔒 Security, SELinux & PAM</a><a href="#sec1" class="toc-link h3">01 SELinux Management</a><a href="#sec2" class="toc-link h3">02 PAM Configuration — Crontab Access Control</a><a href="#sec3" class="toc-link h3">03 RPM Database Rebuild Procedure</a><a href="#s9" class="toc-link">🔑 SSH Key Management & Kerberos Keytabs</a><a href="#ssh1" class="toc-link h3">01 SSH Key Conversion & Deployment</a><a href="#ssh2" class="toc-link h3">02 NSCD Troubleshooting — Name Service Cache Daemon</a><a href="#s10" class="toc-link">🧠 Kernel Parameters & System Configuration</a><a href="#kern1" class="toc-link h3">01 Kernel Parameter Tuning — sysctl</a><a href="#kern2" class="toc-link h3">02 GRUB2 — Boot Kernel Management (Dracut Issue Fix)</a><a href="#kern3" class="toc-link h3">03 VCS (Veritas Cluster Server) — Cluster Management</a><a href="#kern4" class="toc-link h3">04 Tanium Client Troubleshooting</a></nav>
 </div>
 
 <button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <footer id="site-footer">
-  <span>StudyHub — Technical Reference Library</span>
+  <span>RootReady — Technical Reference Library</span>
   <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
 </footer>
 
@@ -1460,6 +1625,21 @@ function updateToc() {
 }
 if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
 
+
+function toggleCard(header) {
+  const body = header.nextElementSibling;
+  const chev = header.querySelector('.chev');
+  const isOpen = body.style.display === 'none';
+  body.style.display = isOpen ? 'block' : 'none';
+  if (chev) chev.style.transform = isOpen ? 'rotate(180deg)' : '';
+}
+function toggleQA(el) {
+  el.closest('.qa-item').classList.toggle('open');
+}
+// Wire up QA items
+document.querySelectorAll('.qa-q').forEach(q => {
+  q.addEventListener('click', () => q.closest('.qa-item').classList.toggle('open'));
+});
 
 </script>
 </body>
