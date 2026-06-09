@@ -188,35 +188,50 @@ tr:hover td { background:rgba(255,255,255,.025); }
 }
 
 
-/* ── accordion cards ── */
-.acc-header:hover { background: rgba(255,255,255,.025); }
-.acc-card.open .acc-chev { transform: rotate(180deg); }
-.acc-card.open .acc-body { display: block !important; }
+/* ── Accordion — CSS-only open/close, NO inline display styles ── */
+.acc-body {
+  display: none;
+  overflow: hidden;
+}
+.acc-card.is-open .acc-body {
+  display: block;
+  animation: accFadeIn .2s ease;
+}
+.acc-card.is-open .acc-chev {
+  transform: rotate(180deg);
+}
+.acc-header:hover {
+  background: rgba(255,255,255,.03);
+}
+@keyframes accFadeIn {
+  from { opacity:0; transform:translateY(-4px); }
+  to   { opacity:1; transform:translateY(0); }
+}
 
-/* ── source content components ── */
-.qa-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin:10px 0;overflow:hidden}
-.qa-q{display:flex;gap:10px;align-items:flex-start;padding:.85rem 1rem;cursor:pointer}
-.qa-q:hover{background:rgba(255,255,255,.025)}
-.q-badge{font-family:var(--font-mono);font-size:10px;font-weight:700;background:rgba(74,159,213,.12);color:var(--sky);border:1px solid rgba(74,159,213,.22);padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:2px}
-.q-text{font-family:var(--font-head);font-weight:600;color:var(--text);font-size:.95rem;line-height:1.4}
-.qa-a{display:none;padding:.85rem 1rem 1rem 2.7rem;border-top:1px solid var(--border);background:rgba(0,0,0,.18)}
-.qa-item.open .qa-a{display:block}
-.a-badge{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--accent);margin-bottom:6px;display:block}
-.note,.info-box{background:rgba(74,159,213,.07);border:1px solid rgba(74,159,213,.2);border-left:3px solid var(--sky);border-radius:10px;padding:.85rem 1rem;margin:.7rem 0 1.2rem;font-size:14px;color:var(--text2)}
-.warn-box,.warning{background:rgba(240,165,0,.07);border:1px solid rgba(240,165,0,.2);border-left:3px solid var(--accent);border-radius:10px;padding:.85rem 1rem;margin:.7rem 0 1.2rem;font-size:14px;color:var(--text2)}
-.note strong,.info-box strong{color:var(--sky)}
-.warn-box strong,.warning strong{color:var(--accent)}
-.cmd-block,.code-block{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--sky);border-radius:8px;padding:1rem 1.1rem;font-family:var(--font-mono);font-size:13px;color:var(--code-fg);overflow-x:auto;line-height:1.6;margin:.7rem 0 1.2rem;white-space:pre}
-.comment{color:#5c7a5c;font-style:italic}
-.cmd-label{font-family:var(--font-mono);font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;margin-top:12px}
-.step-list{list-style:none;padding:0;margin:.6rem 0 1rem}
-.step-list li{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border);font-size:.88rem;color:var(--text2)}
-.step-list li:last-child{border-bottom:none}
-.step-n{font-family:var(--font-mono);font-size:.65rem;font-weight:700;color:var(--accent);background:rgba(240,165,0,.1);border-radius:4px;padding:2px 6px;flex-shrink:0;min-width:22px;text-align:center;margin-top:1px}
-.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
-@media(max-width:640px){.card-grid{grid-template-columns:1fr!important}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
-.acc-body.animating{animation:fadeIn .2s ease}
+/* ── Q&A items ── */
+.qa-item { background:var(--surface2); border:1px solid var(--border); border-radius:8px; margin:10px 0; overflow:hidden; }
+.qa-q    { display:flex; gap:10px; align-items:flex-start; padding:.85rem 1rem; cursor:pointer; }
+.qa-q:hover { background:rgba(255,255,255,.025); }
+.q-badge { font-family:var(--font-mono); font-size:10px; font-weight:700; background:rgba(74,159,213,.12); color:var(--sky); border:1px solid rgba(74,159,213,.22); padding:2px 6px; border-radius:3px; flex-shrink:0; margin-top:2px; }
+.q-text  { font-family:var(--font-head); font-weight:600; color:var(--text); font-size:.95rem; line-height:1.4; }
+.qa-a    { display:none; padding:.85rem 1rem 1rem 2.7rem; border-top:1px solid var(--border); background:rgba(0,0,0,.18); }
+.qa-item.is-open .qa-a { display:block; }
+.a-badge { font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--accent); margin-bottom:6px; display:block; }
+
+/* ── Source content components ── */
+.note,.info-box { background:rgba(74,159,213,.07); border:1px solid rgba(74,159,213,.2); border-left:3px solid var(--sky); border-radius:10px; padding:.85rem 1rem; margin:.7rem 0 1.2rem; font-size:14px; color:var(--text2); }
+.warn-box,.warning { background:rgba(240,165,0,.07); border:1px solid rgba(240,165,0,.2); border-left:3px solid var(--accent); border-radius:10px; padding:.85rem 1rem; margin:.7rem 0 1.2rem; font-size:14px; color:var(--text2); }
+.note strong,.info-box strong { color:var(--sky); }
+.warn-box strong,.warning strong { color:var(--accent); }
+.cmd-block,.code-block { background:var(--code-bg); border:1px solid var(--border); border-left:3px solid var(--sky); border-radius:8px; padding:1rem 1.1rem; font-family:var(--font-mono); font-size:13px; color:var(--code-fg); overflow-x:auto; line-height:1.6; margin:.7rem 0 1.2rem; white-space:pre; display:block; }
+.comment { color:#5c7a5c; font-style:italic; }
+.cmd-label { font-family:var(--font-mono); font-size:.65rem; color:var(--text3); text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; margin-top:12px; display:block; }
+.step-list { list-style:none; padding:0; margin:.6rem 0 1rem; }
+.step-list li { display:flex; gap:10px; align-items:flex-start; padding:6px 0; border-bottom:1px solid var(--border); font-size:.88rem; color:var(--text2); }
+.step-list li:last-child { border-bottom:none; }
+.step-n { font-family:var(--font-mono); font-size:.65rem; font-weight:700; color:var(--accent); background:rgba(240,165,0,.1); border-radius:4px; padding:2px 6px; flex-shrink:0; min-width:22px; text-align:center; margin-top:1px; }
+.card-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1rem 0; }
+@media(max-width:640px){ .card-grid{ grid-template-columns:1fr !important; } }
 
 </style>
 </head>
@@ -275,10 +290,11 @@ tr:hover td { background:rgba(255,255,255,.025); }
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">PV → VG → LV Creation Workflow</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <p class="body-text">The fundamental LVM hierarchy: Physical Volumes (PV) → Volume Groups (VG) → Logical Volumes (LV). Always follow this sequence when provisioning new storage.</p>
 <div class="cmd-label">Step-by-step commands</div>
 <div class="cmd-block"><span class="comment"># Step 1: Identify available disks</span>
@@ -339,6 +355,7 @@ df -kh</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -348,10 +365,11 @@ df -kh</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">LV Extension Commands & Resize Scenarios</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Extend by adding size, auto-resize FS (-r)</span>
 lvextend -L +100G /dev/mapper/datavg-lib -r
 lvextend -L +500G /dev/mapper/vg_splunk-lv_splunk -r
@@ -384,6 +402,7 @@ free -h</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -393,10 +412,11 @@ free -h</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">fstab Management & Mount Operations</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Always backup fstab before changes</span>
 cp -rp /etc/fstab /etc/fstab_bkp-`date +%Y%m%d`
 
@@ -424,6 +444,7 @@ df -kh</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -443,10 +464,11 @@ df -kh</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SAN Pre/Post Check Commands</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Pre-migration checks</span>
 date; cat /etc/redhat-release; uname -a
 multipath -ll              <span class="comment"># show all multipath devices</span>
@@ -492,6 +514,7 @@ done</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -501,10 +524,11 @@ done</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">FC HBA Troubleshooting & Path Management</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Check FC port states</span>
 cat /sys/class/fc_host/host*/port_state
 
@@ -530,6 +554,7 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -549,10 +574,11 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">NetBackup Error 7641 — Certificate & Host Cache Fix</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="warn-box"><strong>⚠ Error 7641</strong> — SSL certificate / host cache mismatch. Follow these steps in sequence.</div>
 <div class="cmd-block"><span class="comment"># Step 1: Clear host cache</span>
 /usr/openv/bin/bpclntcmd -clear_host_cache
@@ -586,6 +612,7 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -595,10 +622,11 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Log Compression & Archival (find + gzip/bzip2)</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <p class="body-text">A critical operational task — compressing old logs to reclaim disk space. The standard pattern uses <code>find</code> to identify, filter, and compress in a pipeline.</p>
 <div class="cmd-block"><span class="comment"># Compress files older than 31 days, excluding already compressed</span>
 find /DAPlogs/Citi/Logs -mtime +31 -type f \
@@ -633,6 +661,7 @@ find . -xdev -size +1000000c -exec ls -lh {} \; | sort -nrk 5 | head -15</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -652,10 +681,11 @@ find . -xdev -size +1000000c -exec ls -lh {} \; | sort -nrk 5 | head -15</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">HP HPSSACLI / HPACUCLI — Smart Array Commands</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Show full controller config</span>
 hpssacli ctrl all show config
 hpssacli ctrl all show config | egrep -i 'reb|rec'  <span class="comment"># rebuilding/recovery</span>
@@ -712,6 +742,7 @@ ssacli ctrl slot=0 pd 1I:1:14 show detail</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -721,10 +752,11 @@ ssacli ctrl slot=0 pd 1I:1:14 show detail</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">IBM MegaRAID storcli & MegaCli Commands</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Show controller info</span>
 /opt/MegaRAID/storcli/storcli64 /c0 show all
 
@@ -752,6 +784,7 @@ dmidecode -t 0 | grep Firmware</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -761,10 +794,11 @@ dmidecode -t 0 | grep Firmware</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">HP ILO — Out-of-Band Management</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Find ILO IP address</span>
 hponcfg -w /tmp/ilo.out
 cat /tmp/ilo.out
@@ -794,6 +828,7 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -813,10 +848,11 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">sed — In-place File Editing Patterns</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Add line at TOP of file</span>
 sed -i '1i SERVER = sg3lixnbirmed02' bp.conf
 
@@ -863,6 +899,7 @@ cat /tmp/jointmp &gt; /opt/admin/join</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -872,10 +909,11 @@ cat /tmp/jointmp &gt; /opt/admin/join</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Shell Loops — For Loops Over Server Lists</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Run command on multiple servers via SSH</span>
 for i in `cat /var/tmp/serverlist.txt`; do
   ssh $i 'command here'
@@ -919,6 +957,7 @@ done</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -928,10 +967,11 @@ done</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">ACL Management — setfacl / nfs4_setfacl</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Set ACL for a user on a directory</span>
 setfacl -m user:user1:rwx /dir/name
 setfacl -R -m u:colleague:rwX .   <span class="comment"># recursive, X=execute on dirs only</span>
@@ -954,6 +994,7 @@ sed -i '/apps/ s/defaults/defaults,acl/' /etc/fstab</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -973,10 +1014,11 @@ sed -i '/apps/ s/defaults/defaults,acl/' /etc/fstab</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">LDOM Live Migration Steps</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Pre-migration checks</span>
 cat /opt/IHSldmcfg/etc/pod_hosts  <span class="comment"># Verify source/dest frames in hosts</span>
 /opt/IHSldmcfg/bin/check_pod_disk all  <span class="comment"># Disk status check</span>
@@ -1011,6 +1053,7 @@ ldm start -a</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1020,10 +1063,11 @@ ldm start -a</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Solaris SVM Disk Mirroring Procedure</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <p class="body-text">Solaris Volume Manager (SVM) mirroring steps for root + swap + data partitions. Essential for HA on legacy SPARC systems.</p>
 <ol class="step-list">
 <li><span class="step-n">1</span>Backup <code>/etc/vfstab</code>: <code>cp /etc/vfstab /etc/vfstab.orig</code></li>
@@ -1044,6 +1088,7 @@ ldm start -a</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1053,10 +1098,11 @@ ldm start -a</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Solaris Health Check Commands</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># System info</span>
 uname -a; uptime; date; who -r
 prtdiag -v                         <span class="comment"># hardware diagnostics</span>
@@ -1085,6 +1131,7 @@ vxprint -Aht; vxdg list; vxdisk list; vxtask list
 cat /var/adm/messages
 dmesg</div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1104,10 +1151,11 @@ dmesg</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SAR — System Activity Reporter Commands</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Navigate to SAR data directory</span>
 cd /var/log/sa/
 
@@ -1152,6 +1200,7 @@ echo "PFA" | mail -s "SAR REPORT From `uname -n`" \
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1161,10 +1210,11 @@ echo "PFA" | mail -s "SAR REPORT From `uname -n`" \
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Reboot Reason Investigation</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Find reboot/shutdown reason in logs</span>
 grep -iv ': starting\|kernel: .*: Power Button\|watching system buttons\|Stopped Cleaning Up' \
   /var/log/messages /var/log/syslog \
@@ -1187,6 +1237,7 @@ cat receiver.archive.log | grep reboo</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1206,10 +1257,11 @@ cat receiver.archive.log | grep reboo</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SELinux Management</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Check current SELinux mode</span>
 getenforce                         <span class="comment"># Enforcing / Permissive / Disabled</span>
 sestatus                           <span class="comment"># detailed status</span>
@@ -1234,6 +1286,7 @@ audit2why &lt; /var/log/audit/audit.log</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1243,10 +1296,11 @@ audit2why &lt; /var/log/audit/audit.log</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">PAM Configuration — Crontab Access Control</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="info-box"><strong>Issue:</strong> In RHEL 7, user FIDs cannot access crontab due to PAM configuration changes from RHEL 5/6.</div>
 <div class="cmd-block"><span class="comment"># Step 1: Add user to /etc/security/access.conf</span>
 +:USER_Name:cron crond :0 tty1 tty2 tty3 tty4 tty5 tty6
@@ -1267,6 +1321,7 @@ crontab -l</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1276,10 +1331,11 @@ crontab -l</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">RPM Database Rebuild Procedure</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Step 1: Backup RPM database</span>
 mkdir /root/backups.rpm.`date +"%Y-%m-%d"`/
 cp -avr /var/lib/rpm/ /root/backups.rpm.`date +"%Y-%m-%d"`/
@@ -1302,6 +1358,7 @@ yum clean all</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1321,10 +1378,11 @@ yum clean all</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SSH Key Conversion & Deployment</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># SSH with specific cipher (for legacy systems)</span>
 ssh -t --ciphers=aes256-ctr relww-cob1935 bash
 
@@ -1359,6 +1417,7 @@ for j in `cat fid`; do setperm $j; done</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1368,10 +1427,11 @@ for j in `cat fid`; do setperm $j; done</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">NSCD Troubleshooting — Name Service Cache Daemon</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># NSCD cache database files</span>
 ls /var/db/nscd/
 <span class="comment"># Should see 3 files: passwd, group, hosts</span>
@@ -1398,6 +1458,7 @@ getent group prv_hac_sd-2cad-109d | grep oracle</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1417,10 +1478,11 @@ getent group prv_hac_sd-2cad-109d | grep oracle</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Kernel Parameter Tuning — sysctl</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Set kernel parameters (persistent via sysctl.conf)</span>
 <span class="comment"># Thread and process limits</span>
 sed -i '/kernel.threads-max/d' /etc/sysctl.conf
@@ -1459,6 +1521,7 @@ echo 8000000 &gt; /proc/sys/vm/max_map_count
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1468,10 +1531,11 @@ echo 8000000 &gt; /proc/sys/vm/max_map_count
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">GRUB2 — Boot Kernel Management (Dracut Issue Fix)</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="info-box"><strong>Dracut Prompt Issue:</strong> Server drops to dracut emergency shell at boot. Cause: grubenv missing/null or wrong default kernel set.</div>
 <div class="cmd-block"><span class="comment"># Check current grubenv (default kernel)</span>
 ls -lrt /boot/grub2/grubenv
@@ -1497,6 +1561,7 @@ package-cleanup --oldkernels --count=2</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1506,10 +1571,11 @@ package-cleanup --oldkernels --count=2</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">VCS (Veritas Cluster Server) — Cluster Management</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># VCS command directory</span>
 cd /opt/VRTS/bin/
 
@@ -1550,6 +1616,7 @@ done | grep -i servername</div>
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 
@@ -1559,10 +1626,11 @@ done | grep -i servername</div>
         <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">04</span>
         <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Tanium Client Troubleshooting</span>
       </div>
-      <span class="acc-chev" style="color:var(--text3);transition:transform .22s;flex-shrink:0;font-size:.85rem">▾</span>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
     </div>
-    <div class="acc-body" style="display:none;padding:4px 18px 18px;border-top:1px solid var(--border)">
-      <div class="topic-body">
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
 <div class="cmd-block"><span class="comment"># Stop Tanium client</span>
 service TaniumClient stop
 
@@ -1590,6 +1658,7 @@ find /opt/Tanium/TaniumClient/tmp -mtime +30 -type f \
 </div>
 </div>
 </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1641,31 +1710,15 @@ function updateToc() {
 if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
 
 
-// ── Accordion cards ──────────────────────────────────────
 document.querySelectorAll('.acc-header').forEach(function(header) {
   header.addEventListener('click', function() {
-    var card = this.closest('.acc-card');
-    var body = card.querySelector('.acc-body');
-    var chev = card.querySelector('.acc-chev');
-    var isOpen = card.classList.contains('open');
-    if (isOpen) {
-      card.classList.remove('open');
-      body.style.display = 'none';
-      chev.style.transform = '';
-    } else {
-      card.classList.add('open');
-      body.style.display = 'block';
-      body.classList.add('animating');
-      setTimeout(function(){ body.classList.remove('animating'); }, 220);
-      chev.style.transform = 'rotate(180deg)';
-    }
+    this.closest('.acc-card').classList.toggle('is-open');
   });
 });
 
-// ── Q&A items ────────────────────────────────────────────
 document.querySelectorAll('.qa-q').forEach(function(q) {
   q.addEventListener('click', function() {
-    this.closest('.qa-item').classList.toggle('open');
+    this.closest('.qa-item').classList.toggle('is-open');
   });
 });
 
