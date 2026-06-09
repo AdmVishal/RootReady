@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Admin Interview Guide — StudyHub</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* ── site-wide overrides ── */
+:root { --topbar-h:58px; --sidebar-w:240px; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* topbar */
+#site-topbar {
+  position:fixed; top:0; left:0; right:0; z-index:9000;
+  height:var(--topbar-h); background:var(--navy);
+  display:flex; align-items:center; padding:0 20px; gap:14px;
+  border-bottom:2px solid var(--blue);
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo span { color:var(--accent); }
+.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.topbar-spacer { flex:1; }
+#menu-btn { display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
+
+/* progress bar */
+#prog { position:fixed; top:var(--topbar-h); left:0; height:3px; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--sky)); z-index:8999;
+  transition:width .08s linear; pointer-events:none; }
+
+/* back-to-top */
+#btt { position:fixed; bottom:24px; right:20px; width:42px; height:42px;
+  background:var(--blue); color:#fff; border:none; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; z-index:8998; opacity:0; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(27,79,138,.45); transition:opacity .2s,transform .2s; }
+#btt.vis { opacity:1; pointer-events:auto; }
+#btt:hover { background:var(--mid); transform:translateY(-2px); }
+
+/* layout */
+.site-body { display:flex; margin-top:var(--topbar-h); flex:1; min-height:calc(100vh - var(--topbar-h)); }
+
+/* left sidebar (page nav) */
+#site-nav {
+  width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.nav-sec { padding:10px 16px 2px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); }
+.nav-link { display:flex; align-items:center; gap:8px; padding:9px 16px;
+  color:var(--text2); text-decoration:none; font-size:.84rem; border-left:3px solid transparent;
+  transition:all .12s; }
+.nav-link:hover { background:rgba(255,255,255,.05); color:var(--text); border-left-color:var(--border2); }
+.nav-link.active { background:rgba(240,165,0,.09); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
+
+/* right toc sidebar */
+#toc-nav {
+  width:220px; flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  padding:16px 0; display:flex; flex-direction:column;
+}
+.toc-head { padding:0 16px 8px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); border-bottom:1px solid var(--border); margin-bottom:4px; }
+.toc-link { display:block; padding:6px 16px; color:var(--text3); text-decoration:none;
+  font-size:.78rem; line-height:1.35; transition:color .12s;
+  border-left:2px solid transparent; }
+.toc-link:hover { color:var(--sky); border-left-color:var(--sky); }
+.toc-link.h3 { padding-left:26px; font-size:.72rem; }
+
+/* main content */
+#main-content {
+  flex:1; padding:32px 40px; overflow-x:hidden; min-width:0;
+}
+.page-hero {
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.page-hero h1 { margin-bottom:6px; }
+.page-hero p { color:var(--text2); font-size:.95rem; margin:0; }
+.hero-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; }
+.badge-blue { background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:var(--green); border:1px solid rgba(16,185,129,.25); }
+.badge-gold { background:rgba(240,165,0,.15); color:var(--accent); border:1px solid rgba(240,165,0,.25); }
+.badge-purple { background:rgba(139,92,246,.15); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+
+/* content sections */
+.content-section { margin-bottom:40px; scroll-margin-top:calc(var(--topbar-h) + 16px); }
+.section-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px; margin-bottom:20px;
+}
+.section-card h2 { margin-top:0; }
+
+/* code blocks */
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; margin:12px 0 16px; }
+code { font-family:var(--font-mono); font-size:.82rem; color:var(--code-fg); }
+pre code { color:var(--code-fg); }
+:not(pre) > code { background:rgba(121,192,255,.1); color:var(--code-fg);
+  padding:2px 6px; border-radius:4px; font-size:.8em; }
+
+/* tables */
+table { width:100%; border-collapse:collapse; margin:12px 0 16px; font-size:.875rem; }
+th { background:rgba(27,79,138,.35); color:var(--sky); padding:9px 12px;
+  text-align:left; font-weight:600; border-bottom:2px solid var(--border2); font-size:.78rem; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,.025); }
+.tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid var(--border); margin:12px 0 16px; }
+.tbl-wrap table { margin:0; border:none; }
+
+/* Q&A cards */
+.qa-card {
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:12px; overflow:hidden;
+}
+.qa-q { padding:12px 16px; background:rgba(27,79,138,.2);
+  color:var(--text); font-weight:600; font-size:.9rem;
+  display:flex; gap:10px; align-items:flex-start; }
+.qa-q::before { content:"Q"; font-family:var(--font-mono); color:var(--accent);
+  font-size:.7rem; font-weight:700; background:rgba(240,165,0,.1);
+  border-radius:4px; padding:2px 6px; flex-shrink:0; margin-top:1px; }
+.qa-a { padding:12px 16px 14px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.qa-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+  font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-family:var(--font-mono); margin-left:8px; }
+.qa-badge-concept { background:rgba(74,159,213,.15); color:var(--sky); }
+.qa-badge-cmd { background:rgba(16,185,129,.15); color:var(--green); }
+.qa-badge-crit { background:rgba(239,68,68,.15); color:var(--red); }
+.qa-badge-task { background:rgba(240,165,0,.15); color:var(--accent); }
+.qa-badge-scenario { background:rgba(139,92,246,.15); color:var(--purple); }
+
+/* callout boxes */
+.callout { border-left:4px solid; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0; }
+.callout-note { border-color:var(--sky); background:rgba(74,159,213,.08); }
+.callout-warn { border-color:var(--accent); background:rgba(240,165,0,.08); }
+.callout-danger { border-color:var(--red); background:rgba(239,68,68,.08); }
+.callout-tip { border-color:var(--green); background:rgba(16,185,129,.08); }
+.callout-title { font-weight:700; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:4px; }
+
+/* topic tag */
+.topic-tag { display:inline-flex; align-items:center; padding:3px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:600; margin-bottom:10px; }
+
+/* section divider */
+.section-divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* version badges in RHEL */
+.ver-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem;
+  font-weight:700; font-family:var(--font-mono); margin-right:4px;
+  background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.2); }
+
+/* footer */
+#site-footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:20px 40px; display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--text3);
+}
+#site-footer a { color:var(--sky); text-decoration:none; }
+
+/* mobile overlay */
+#mob-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8800; }
+#mob-ov.on { display:block; }
+
+@media (max-width:1100px) {
+  #toc-nav { display:none; }
+}
+@media (max-width:768px) {
+  #site-nav { position:fixed; left:0; top:var(--topbar-h);
+    bottom:0; transform:translateX(-100%); z-index:8900;
+    transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  #site-nav.open { transform:translateX(0); }
+  #menu-btn { display:block; }
+  #main-content { padding:20px 16px; }
+  #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
+}
+
+
+/* ── Accordion — CSS-only open/close, NO inline display styles ── */
+.acc-body {
+  display: none;
+  overflow: hidden;
+}
+.acc-card.is-open .acc-body {
+  display: block;
+  animation: accFadeIn .2s ease;
+}
+.acc-card.is-open .acc-chev {
+  transform: rotate(180deg);
+}
+.acc-header:hover {
+  background: rgba(255,255,255,.03);
+}
+@keyframes accFadeIn {
+  from { opacity:0; transform:translateY(-4px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Q&A items ── */
+.qa-item { background:var(--surface2); border:1px solid var(--border); border-radius:8px; margin:10px 0; overflow:hidden; }
+.qa-q    { display:flex; gap:10px; align-items:flex-start; padding:.85rem 1rem; cursor:pointer; }
+.qa-q:hover { background:rgba(255,255,255,.025); }
+.q-badge { font-family:var(--font-mono); font-size:10px; font-weight:700; background:rgba(74,159,213,.12); color:var(--sky); border:1px solid rgba(74,159,213,.22); padding:2px 6px; border-radius:3px; flex-shrink:0; margin-top:2px; }
+.q-text  { font-family:var(--font-head); font-weight:600; color:var(--text); font-size:.95rem; line-height:1.4; }
+.qa-a    { display:none; padding:.85rem 1rem 1rem 2.7rem; border-top:1px solid var(--border); background:rgba(0,0,0,.18); }
+.qa-item.is-open .qa-a { display:block; }
+.a-badge { font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--accent); margin-bottom:6px; display:block; }
+
+/* ── Source content components ── */
+.note,.info-box { background:rgba(74,159,213,.07); border:1px solid rgba(74,159,213,.2); border-left:3px solid var(--sky); border-radius:10px; padding:.85rem 1rem; margin:.7rem 0 1.2rem; font-size:14px; color:var(--text2); }
+.warn-box,.warning { background:rgba(240,165,0,.07); border:1px solid rgba(240,165,0,.2); border-left:3px solid var(--accent); border-radius:10px; padding:.85rem 1rem; margin:.7rem 0 1.2rem; font-size:14px; color:var(--text2); }
+.note strong,.info-box strong { color:var(--sky); }
+.warn-box strong,.warning strong { color:var(--accent); }
+.cmd-block,.code-block { background:var(--code-bg); border:1px solid var(--border); border-left:3px solid var(--sky); border-radius:8px; padding:1rem 1.1rem; font-family:var(--font-mono); font-size:13px; color:var(--code-fg); overflow-x:auto; line-height:1.6; margin:.7rem 0 1.2rem; white-space:pre; display:block; }
+.comment { color:#5c7a5c; font-style:italic; }
+.cmd-label { font-family:var(--font-mono); font-size:.65rem; color:var(--text3); text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; margin-top:12px; display:block; }
+.step-list { list-style:none; padding:0; margin:.6rem 0 1rem; }
+.step-list li { display:flex; gap:10px; align-items:flex-start; padding:6px 0; border-bottom:1px solid var(--border); font-size:.88rem; color:var(--text2); }
+.step-list li:last-child { border-bottom:none; }
+.step-n { font-family:var(--font-mono); font-size:.65rem; font-weight:700; color:var(--accent); background:rgba(240,165,0,.1); border-radius:4px; padding:2px 6px; flex-shrink:0; min-width:22px; text-align:center; margin-top:1px; }
+.card-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1rem 0; }
+@media(max-width:640px){ .card-grid{ grid-template-columns:1fr !important; } }
+
+</style>
+</head>
+<body>
+
+<div id="site-topbar">
+  <a href="index.html" class="logo">Study<span>Hub</span></a>
+  <span class="page-title-bar">Linux & Unix SysAdmin Reference</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn" onclick="toggleNav()">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link ">🏠 Home</a>
+<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link active">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
+
+  </nav>
+
+  <main id="main-content">
+    
+<div class="page-hero">
+  <h1>💻 Linux Admin Interview Guide</h1>
+  <p>Linux &amp; Unix SysAdmin Command Reference — 10 Topics · Commands · Q&amp;A · Real-world Scenarios · Best Practices</p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">10 Topics</span>
+    <span class="badge badge-green">Commands &amp; Q&amp;As</span>
+    <span class="badge badge-gold">LVM · SAN · Security · Performance</span>
+    <span class="badge badge-purple">Best Practices</span>
+  </div>
+</div>
+
+<div class="content-section" id="s1" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">💾</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">LVM & Filesystem Management</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">Logical Volume Manager — create, extend, reduce, and manage filesystems in enterprise Linux</p>
+    </div>
+  </div>
+
+  <div id="lvm1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">PV → VG → LV Creation Workflow</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<p class="body-text">The fundamental LVM hierarchy: Physical Volumes (PV) → Volume Groups (VG) → Logical Volumes (LV). Always follow this sequence when provisioning new storage.</p>
+<div class="cmd-label">Step-by-step commands</div>
+<div class="cmd-block"><span class="comment"># Step 1: Identify available disks</span>
+fdisk -l | grep -i sd
+
+<span class="comment"># Step 2: Create Physical Volumes</span>
+pvcreate /dev/sdb
+pvcreate /dev/sdc /dev/sdd /dev/sde
+pvs                        <span class="comment"># verify</span>
+<span class="comment"># Step 3: Create Volume Groups</span>
+vgcreate datavg /dev/sdb
+vgcreate nnvg   /dev/sdc
+vgcreate jnvg   /dev/sdd
+vgcreate zkvg   /dev/sde
+vgs                        <span class="comment"># verify</span>
+<span class="comment"># Step 4: Create Logical Volumes</span>
+lvcreate -n data1  -L 500G  jnvg
+lvcreate -n zk     -L 250G  zkvg
+lvcreate -n log    -L 1000G datavg
+
+<span class="comment"># Step 5: Format (mkfs)</span>
+mkfs.ext4 /dev/mapper/datavg-log
+mkfs.ext4 /dev/mapper/jnvg-data1
+
+<span class="comment"># Step 6: Update /etc/fstab</span>
+echo "/dev/mapper/datavg-log  /var/log  ext4  defaults  1 2" &gt;&gt; /etc/fstab
+
+<span class="comment"># Step 7: Mount</span>
+mkdir -p /var/log
+mount -a
+df -kh</div>
+<div class="qa-block">
+<div class="qa-item" id="q-lvm1a">
+<div class="qa-q" onclick="toggleQA('q-lvm1a')"><span class="q-badge">Q</span><span class="q-text">What is the difference between PV, VG, and LV?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><strong>PV (Physical Volume)</strong> — a raw disk or partition initialized for LVM use (e.g., <code>/dev/sdb</code>). It's the building block. <strong>VG (Volume Group)</strong> — a pool formed by combining one or more PVs. Think of it as a logical disk. <strong>LV (Logical Volume)</strong> — a slice carved from a VG, equivalent to a partition. It's what you format and mount. The key advantage: LVs can be resized, spanned across disks, and snapshotted without downtime.</p></div>
+</div>
+<div class="qa-item" id="q-lvm1b">
+<div class="qa-q" onclick="toggleQA('q-lvm1b')"><span class="q-badge">Q</span><span class="q-text">How do you extend an LV that has no free VG space?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>First, expand the VG by adding a new PV: <code>pvcreate /dev/sde</code> then <code>vgextend datavg /dev/sde</code>. After that, <code>lvextend -L +200G /dev/mapper/datavg-log -r</code> (the <code>-r</code> flag resizes the filesystem automatically). For virtual disks, rescan first: <code>echo 1 &gt; /sys/class/block/sdc/device/rescan</code> then <code>pvresize /dev/sdc</code>.</p></div>
+</div>
+<div class="qa-item" id="q-lvm1c">
+<div class="qa-q" onclick="toggleQA('q-lvm1c')"><span class="q-badge">Q</span><span class="q-text">How do you safely reduce (shrink) a Logical Volume?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span>
+<p>LV shrinking is risky — must shrink filesystem BEFORE reducing LV size, never the other way:</p>
+<ol class="step-list">
+<li><span class="step-n">1</span>Unmount: <code>umount /home</code></li>
+<li><span class="step-n">2</span>Check filesystem: <code>e2fsck -f /dev/mapper/vg-LogVol00</code></li>
+<li><span class="step-n">3</span>Shrink FS first: <code>resize2fs /dev/mapper/vg-LogVol00 10G</code></li>
+<li><span class="step-n">4</span>Reduce LV: <code>lvreduce -L 10G /dev/mapper/vg-LogVol00</code></li>
+<li><span class="step-n">5</span>Re-check FS: <code>e2fsck -f /dev/mapper/vg-LogVol00</code></li>
+<li><span class="step-n">6</span>Remount: <code>mount /home</code></li>
+</ol>
+</div>
+</div>
+<div class="qa-item" id="q-lvm1d">
+<div class="qa-q" onclick="toggleQA('q-lvm1d')"><span class="q-badge">Q</span><span class="q-text">What causes "LV is in Use" error during lvremove and how to fix it?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>This happens when a process holds the LV open. Fix: <code>dmsetup info -c | grep &lt;lvname&gt;</code> to get the major:minor numbers, then <code>lsof | grep "253,9"</code> to find the PID, then <code>kill -9 &lt;PID&gt;</code>, and retry <code>lvremove</code>. Also check if it's mounted: <code>umount -l /mountpoint</code> before removing.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lvm2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">LV Extension Commands & Resize Scenarios</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Extend by adding size, auto-resize FS (-r)</span>
+lvextend -L +100G /dev/mapper/datavg-lib -r
+lvextend -L +500G /dev/mapper/vg_splunk-lv_splunk -r
+lvextend -L +3.1T /dev/mapper/oravg-lvoraoltp001 -r
+
+<span class="comment"># LV extend by expanding virtual disk size first</span>
+echo 1 &gt; /sys/class/block/sdc/device/rescan
+pvresize /dev/sdd
+vgs
+lvextend -L +200G /dev/mapper/nfsvg-nfslv -r
+
+<span class="comment"># Swap resize procedure</span>
+swapoff /dev/mapper/rootvg-lv_swap
+lvresize -L 16G /dev/mapper/rootvg-lv_swap
+mkswap /dev/mapper/rootvg-lv_swap
+swapon -a
+free -h</div>
+<div class="qa-block">
+<div class="qa-item" id="q-lvm2a">
+<div class="qa-q" onclick="toggleQA('q-lvm2a')"><span class="q-badge">Q</span><span class="q-text">What does the -r flag do in lvextend?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>The <code>-r</code> flag tells <code>lvextend</code> to also resize the filesystem automatically after extending the LV. Without it, you'd have to run <code>resize2fs /dev/mapper/vg-lv</code> manually. It internally calls the appropriate resize tool based on the filesystem type (resize2fs for ext4, xfs_growfs for XFS, etc.).</p></div>
+</div>
+<div class="qa-item" id="q-lvm2b">
+<div class="qa-q" onclick="toggleQA('q-lvm2b')"><span class="q-badge">Q</span><span class="q-text">How do you increase swap space on an existing LVM partition?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>1. <code>swapoff /dev/mapper/rootvg-lv_swap</code> — disable swap. 2. <code>lvresize -L 16G /dev/mapper/rootvg-lv_swap</code> — resize LV. 3. <code>mkswap /dev/mapper/rootvg-lv_swap</code> — re-initialize swap. 4. <code>swapon -a</code> — re-enable. 5. Verify with <code>free -h</code> and <code>cat /proc/swaps</code>. Note: mkswap wipes old swap signature — data is lost, so swap should be empty before this.</p></div>
+</div>
+<div class="qa-item" id="q-lvm2c">
+<div class="qa-q" onclick="toggleQA('q-lvm2c')"><span class="q-badge">Q</span><span class="q-text">How do you move a home directory to a new LVM partition?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>1. Create new LV: <code>lvcreate -n qlikhomelv -L 10G qlikvg</code>. 2. Format: <code>mkfs.ext4 /dev/mapper/qlikvg-qlikhomelv</code>. 3. Mount to temp: <code>mount /dev/mapper/qlikvg-qlikhomelv /mnt</code>. 4. Copy data: <code>cd /home/user; tar -cf /mnt/home.tar *</code>. 5. Backup original dir: <code>mv /home/user /home/user_bkp</code>. 6. Create new dir: <code>mkdir /home/user</code>. 7. Extract: <code>cd /mnt; tar -xf home.tar</code>. 8. Add fstab entry, mount -a, set correct ownership/permissions with chown/chmod.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lvm3" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">fstab Management & Mount Operations</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Always backup fstab before changes</span>
+cp -rp /etc/fstab /etc/fstab_bkp-`date +%Y%m%d`
+
+<span class="comment"># Add entries</span>
+echo "/dev/mapper/datavg-log  /var/log  ext4  defaults  1 2" &gt;&gt; /etc/fstab
+
+<span class="comment"># Comment out entries (disable mount)</span>
+sed -i '/data/s/^#*/#/g' /etc/fstab
+
+<span class="comment"># Add ACL support to a mount</span>
+sed -i '/Cloudera/ s/defaults/defaults,acl/' /etc/fstab
+mount -o remount,acl /opt/Cloudera
+
+<span class="comment"># Test without reboot</span>
+mount -a
+df -kh</div>
+<div class="qa-block">
+<div class="qa-item" id="q-lvm3a">
+<div class="qa-q" onclick="toggleQA('q-lvm3a')"><span class="q-badge">Q</span><span class="q-text">What do the last two numbers in an fstab entry mean?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>The 5th field (dump) — 0 means no backup with <code>dump</code> utility, 1 means yes. The 6th field (pass) — controls <code>fsck</code> order at boot: 0 = skip, 1 = check first (root only), 2 = check after root. Never use 1 for non-root filesystems. Best practice: root = 1, data partitions = 2, tmpfs/NFS = 0 0.</p></div>
+</div>
+<div class="qa-item" id="q-lvm3b">
+<div class="qa-q" onclick="toggleQA('q-lvm3b')"><span class="q-badge">Q</span><span class="q-text">If an inactive VG is not detected, how do you activate it?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Run <code>lvscan</code> to see the status. If an LV shows as inactive, activate with <code>vgchange -ay /dev/datavgc</code>. This is common after disk replacements or importing VGs from other systems. After activation, <code>mount -a</code> to remount filesystems.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s2" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🔌</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">SAN & Multipath Storage</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">Storage Area Network management, multipath I/O, FC HBAs, and disk migration procedures</p>
+    </div>
+  </div>
+
+  <div id="san1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SAN Pre/Post Check Commands</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Pre-migration checks</span>
+date; cat /etc/redhat-release; uname -a
+multipath -ll              <span class="comment"># show all multipath devices</span>
+/etc/powermt display dev=all  <span class="comment"># EMC PowerPath status</span>
+inq -sym_wwn               <span class="comment"># Symmetrix WWN inquiry</span>
+cat /sys/class/fc_host/host*/port_state  <span class="comment"># FC HBA port states</span>
+sanview                    <span class="comment"># SAN topology view</span>
+vxdmpadm listctlr all      <span class="comment"># Veritas DMP controllers</span>
+<span class="comment"># Orphan path check</span>
+multipathd show paths | grep -i orphan
+
+<span class="comment"># Remove failed/orphan paths</span>
+multipath -ll | grep -i fail | awk '{print $3}' | \
+  while read i; do echo 1 &gt; /sys/block/$i/device/delete; done
+
+<span class="comment"># Scan for new SCSI devices</span>
+for i in /sys/class/scsi_host/*; do echo "- - -" &gt; $i/scan; done
+ls /sys/class/scsi_host/ | while read host; do
+  echo "- - -" &gt; /sys/class/scsi_host/$host/scan
+done</div>
+<div class="qa-block">
+<div class="qa-item" id="q-san1a">
+<div class="qa-q" onclick="toggleQA('q-san1a')"><span class="q-badge">Q</span><span class="q-text">What is multipath I/O and why is it used in enterprise environments?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Multipath I/O (MPIO) allows a server to access storage through multiple physical paths (HBA ports, switches, storage ports) simultaneously. Benefits: (1) <strong>High Availability</strong> — if one path fails, I/O continues through other paths. (2) <strong>Load Balancing</strong> — I/O distributed across paths improves throughput. (3) <strong>Non-disruptive maintenance</strong> — can replace failed paths without downtime. The OS sees one device even though multiple physical paths exist.</p></div>
+</div>
+<div class="qa-item" id="q-san1b">
+<div class="qa-q" onclick="toggleQA('q-san1b')"><span class="q-badge">Q</span><span class="q-text">How do you handle orphan paths in multipath?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Orphan paths are paths that don't belong to any multipath group. Fix: <code>multipathd show paths | grep -i orphan</code> to identify them, then for each orphan path, get the device name with <code>for i in `multipathd show paths format "%w;%i;%s;%t_%T" | grep undef | awk -F";" '{print $2}'`</code>, find the block device via <code>lsscsi</code>, then delete: <code>echo 1 &gt; /sys/block/$fd/device/delete</code>. Then run <code>multipath -r</code> to reload and <code>service multipathd reload</code>.</p></div>
+</div>
+<div class="qa-item" id="q-san1c">
+<div class="qa-q" onclick="toggleQA('q-san1c')"><span class="q-badge">Q</span><span class="q-text">Walk through a SAN migration LV extension procedure.</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span>
+<ol class="step-list">
+<li><span class="step-n">1</span>Scan for new LUNs: <code>for i in /sys/class/scsi_host/*; do echo "- - -" &gt; $i/scan; done</code></li>
+<li><span class="step-n">2</span>Verify new LUNs visible: <code>inq | grep -i &lt;LUNID&gt;</code></li>
+<li><span class="step-n">3</span>Check multipath: <code>multipath -ll | grep -i mpathlt</code></li>
+<li><span class="step-n">4</span>Create PV on new mpath device: <code>pvcreate /dev/mapper/mpathlr</code></li>
+<li><span class="step-n">5</span>Extend VG: <code>vgextend datavg /dev/mapper/mpathlr</code></li>
+<li><span class="step-n">6</span>Extend LV: <code>lvextend -L +200G /dev/mapper/datavg-data -r</code></li>
+<li><span class="step-n">7</span>Verify: <code>df -kh</code></li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="san2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">FC HBA Troubleshooting & Path Management</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Check FC port states</span>
+cat /sys/class/fc_host/host*/port_state
+
+<span class="comment"># Solaris FC HBA checks</span>
+mpathadm list initiator-port
+mpathadm list LU
+luxadm -e port
+fcinfo hba-port -l
+
+<span class="comment"># AIX path management</span>
+lspath | grep -i failed | grep -i fscsi12
+chpath -s enabled -l hdisk69 -p fscsi1
+
+<span class="comment"># PowerPath</span>
+powermt display
+powermt check force        <span class="comment"># Last resort to re-enable failed path</span>
+<span class="comment"># SCSI ID check (Linux)</span>
+ls -d /sys/block/sd*/device/scsi_device/*</div>
+<div class="qa-block">
+<div class="qa-item" id="q-san2a">
+<div class="qa-q" onclick="toggleQA('q-san2a')"><span class="q-badge">Q</span><span class="q-text">What is the difference between multipath and PowerPath?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><strong>device-mapper-multipath</strong> is the open-source Linux kernel solution, configured via <code>/etc/multipath.conf</code>. It's vendor-agnostic. <strong>EMC PowerPath</strong> is a vendor-specific commercial product from Dell EMC for EMC storage arrays. PowerPath offers advanced features like dynamic load balancing algorithms, better EMC integration, and automated failover. In interviews: know that <code>powermt display dev=all</code> shows PowerPath devices and <code>multipath -ll</code> shows dm-multipath devices.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s3" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🗄️</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Backup & NetBackup (Veritas)</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">NetBackup client troubleshooting, certificate management, and service control</p>
+    </div>
+  </div>
+
+  <div id="nb1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">NetBackup Error 7641 — Certificate & Host Cache Fix</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="warn-box"><strong>⚠ Error 7641</strong> — SSL certificate / host cache mismatch. Follow these steps in sequence.</div>
+<div class="cmd-block"><span class="comment"># Step 1: Clear host cache</span>
+/usr/openv/bin/bpclntcmd -clear_host_cache
+
+<span class="comment"># Step 2: Stop and restart NB client services</span>
+/usr/openv/netbackup/bin/goodies/netbackup stop
+/opt/VRTSpbx/bin/vxpbx_exchanged stop
+<span class="comment"># wait 2 minutes...</span>
+/usr/openv/netbackup/bin/goodies/netbackup start
+/opt/VRTSpbx/bin/vxpbx_exchanged start
+
+<span class="comment"># Step 3: Run certificate script</span>
+/usr/openv/support/scripts/get_nb_certs.sh
+
+<span class="comment"># Step 4: Get certificate from master server</span>
+/usr/openv/bin/nbcertcmd -getCertificate -host your_server -server crebm4600
+
+<span class="comment"># Step 5: Display CA cert details</span>
+/usr/openv/bin/nbcertcmd -displayCACertDetail -server crebm4600
+
+<span class="comment"># Check running processes</span>
+/usr/openv/netbackup/bin/bpps -x</div>
+<div class="qa-block">
+<div class="qa-item" id="q-nb1a">
+<div class="qa-q" onclick="toggleQA('q-nb1a')"><span class="q-badge">Q</span><span class="q-text">What causes NetBackup error 7641 and how do you resolve it?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Error 7641 relates to host credential/certificate issues preventing client-master server communication. Common causes: expired certificates, stale host cache after server migration, or wrong master server configured. Resolution steps: (1) Clear host cache with <code>bpclntcmd -clear_host_cache</code>. (2) Restart all NetBackup and VxPBX services. (3) Run <code>get_nb_certs.sh</code> to regenerate certificates. (4) Use <code>nbcertcmd -getCertificate</code> to pull a fresh cert from the master server. Always verify services are up with <code>bpps -x</code> after resolution.</p></div>
+</div>
+<div class="qa-item" id="q-nb1b">
+<div class="qa-q" onclick="toggleQA('q-nb1b')"><span class="q-badge">Q</span><span class="q-text">What is bpps and how is it different from checking netbackup processes manually?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><code>bpps -x</code> is NetBackup's own process status tool that shows all NB-related daemons in a formatted output with process relationships. It's far more reliable than <code>ps -ef | grep netbackup</code> because it understands the NB process hierarchy and shows the state of each daemon specifically. The <code>-x</code> flag shows extended information including legacy client processes.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="nb2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Log Compression & Archival (find + gzip/bzip2)</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<p class="body-text">A critical operational task — compressing old logs to reclaim disk space. The standard pattern uses <code>find</code> to identify, filter, and compress in a pipeline.</p>
+<div class="cmd-block"><span class="comment"># Compress files older than 31 days, excluding already compressed</span>
+find /DAPlogs/Citi/Logs -mtime +31 -type f \
+  | egrep -v "gz$|bz2$" \
+  | xargs ls -lrt | awk '{print $9}' \
+  | while read A; do bzip2 $A; done
+
+<span class="comment"># gzip files older than 30 days in Tanium log dir</span>
+find /opt/Tanium/TaniumClient/tmp -mtime +30 -type f \
+  | egrep -v "gz$|bz2$" \
+  | xargs ls -lrt | awk '{print $9}' \
+  | while read A; do gzip $A; done
+
+<span class="comment"># Compress nginx logs with date suffix</span>
+ls -lrt nginx-*.log | awk '{print $NF}' \
+  | xargs gzip -S -`date +"%Y%m%d"`.gz
+
+<span class="comment"># Find and delete files older than 90 days</span>
+find /tmp -type f -mtime +90 -exec rm {} \;
+
+<span class="comment"># Check disk usage first</span>
+du -sh * | sort -hr | head -n 20
+find . -xdev -size +1000000c -exec ls -lh {} \; | sort -nrk 5 | head -15</div>
+<div class="qa-block">
+<div class="qa-item" id="q-nb2a">
+<div class="qa-q" onclick="toggleQA('q-nb2a')"><span class="q-badge">Q</span><span class="q-text">Explain the find command options: -mtime, -type, -xdev</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><code>-mtime +N</code> — files modified more than N days ago (+31 = older than 31 days). <code>-mtime -N</code> — files modified within the last N days. <code>-type f</code> — only regular files (not dirs/symlinks). <code>-xdev</code> — don't cross filesystem boundaries (stays on same device/mount). Critical for log searches so you don't inadvertently scan NFS/tmpfs mounts. <code>-size +1000000c</code> — files larger than 1MB (c = bytes).</p></div>
+</div>
+<div class="qa-item" id="q-nb2b">
+<div class="qa-q" onclick="toggleQA('q-nb2b')"><span class="q-badge">Q</span><span class="q-text">What is the difference between gzip and bzip2?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><strong>gzip</strong>: faster compression/decompression, lower compression ratio, produces <code>.gz</code> files. Best for real-time log compression where speed matters. <strong>bzip2</strong>: slower but achieves 10-15% better compression, produces <code>.bz2</code> files. Best for archival where storage savings matter more than speed. In practice: use gzip for active log rotation, bzip2 for long-term archival to tape/cold storage like LTFS.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s4" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🖥️</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">HP & IBM Server Hardware Management</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">RAID controllers, MegaRAID/HPSSACLI, ILO management, firmware checks, LED control</p>
+    </div>
+  </div>
+
+  <div id="hw1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">HP HPSSACLI / HPACUCLI — Smart Array Commands</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Show full controller config</span>
+hpssacli ctrl all show config
+hpssacli ctrl all show config | egrep -i 'reb|rec'  <span class="comment"># rebuilding/recovery</span>
+<span class="comment"># Controller status</span>
+hpssacli ctrl all show status
+hpssacli ctrl all show detail | egrep "Firmware Version:|Array"
+
+<span class="comment"># Physical drive status</span>
+hpssacli ctrl slot=0 pd all show status
+hpssacli ctrl slot=0 pd 2I:1:6 show detail
+
+<span class="comment"># View logical drives</span>
+hpssacli ctrl slot=0 ld all show
+hpssacli ctrl slot=0 ld 2 show
+
+<span class="comment"># Create RAID logical drives</span>
+hpssacli ctrl slot=0 create type=ld drives=1I:1:3 raid=0
+hpssacli ctrl slot=0 create type=ld drives=1I:1:3,1I:1:4 raid=1
+hpssacli ctrl slot=0 create type=ld drives=1I:1:3,1I:1:4,2I:1:6,2I:1:7,2I:1:8 raid=5
+
+<span class="comment"># LED management (locate physical disk)</span>
+hpssacli ctrl slot=0 ld 2 modify led=on
+hpssacli ctrl slot=0 ld 2 modify led=off
+hpssacli ctrl slot=0 pd 1I:4:1 modify led=on   <span class="comment"># Blink Fault LED</span>
+<span class="comment"># Reenable a failed logical drive</span>
+hpssacli ctrl slot=0 ld 10 modify reenable forced
+
+<span class="comment"># Add spare disks</span>
+hpssacli ctrl slot=0 array all add spares=2I:1:6,2I:1:7
+
+<span class="comment"># HP hardware health check</span>
+hpasmcli -s 'SHOW FAN; SHOW TEMP; SHOW POWERSUPPLY'
+
+<span class="comment"># Individual drive detail</span>
+ssacli ctrl slot=0 pd 1I:1:14 show detail</div>
+<div class="qa-block">
+<div class="qa-item" id="q-hw1a">
+<div class="qa-q" onclick="toggleQA('q-hw1a')"><span class="q-badge">Q</span><span class="q-text">Explain RAID levels 0, 1, and 5. When would you use each?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><strong>RAID 0 (Striping)</strong> — data split across all disks, best performance, NO redundancy. If one disk fails, ALL data lost. Use for: temp/scratch data, caches. <strong>RAID 1 (Mirroring)</strong> — exact copy on two disks. Can lose one disk. Reads are fast (both disks serve reads). Use for: OS drives, boot volumes. <strong>RAID 5 (Distributed Parity)</strong> — data + parity distributed across 3+ disks. Can lose 1 disk. Good balance of performance/redundancy. Use for: data volumes. <strong>RAID 6</strong> — like RAID 5 but can lose 2 disks (double parity). For production critical storage.</p></div>
+</div>
+<div class="qa-item" id="q-hw1b">
+<div class="qa-q" onclick="toggleQA('q-hw1b')"><span class="q-badge">Q</span><span class="q-text">How do you identify a failing physical disk and replace it in HP server?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span>
+<ol class="step-list">
+<li><span class="step-n">1</span>Check status: <code>hpssacli ctrl slot=0 pd all show status</code> — look for "Predictive Failure" or "Failed"</li>
+<li><span class="step-n">2</span>Get drive location: <code>hpssacli ctrl slot=0 pd 2I:1:6 show detail</code> — note Port, Box, Bay</li>
+<li><span class="step-n">3</span>Blink the LED: <code>hpssacli ctrl slot=0 pd 2I:1:6 modify led=on</code> — physically identify the drive</li>
+<li><span class="step-n">4</span>Hot-swap the drive (if RAID allows)</li>
+<li><span class="step-n">5</span>Turn off LED: <code>hpssacli ctrl slot=0 pd 2I:1:6 modify led=off</code></li>
+<li><span class="step-n">6</span>Rescan: <code>hpssacli rescan</code></li>
+<li><span class="step-n">7</span>Monitor rebuild: <code>hpssacli ctrl slot=0 ld all show status</code></li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="hw2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">IBM MegaRAID storcli & MegaCli Commands</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Show controller info</span>
+/opt/MegaRAID/storcli/storcli64 /c0 show all
+
+<span class="comment"># Physical disk slot/state list</span>
+/opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL \
+  | egrep -i 'slot|state' | grep -v Forei | paste - -
+
+<span class="comment"># Locate a disk (blink LED)</span>
+/opt/MegaRAID/storcli/storcli64 /c0/e23/s12 start locate
+/opt/MegaRAID/storcli/storcli64 /c0/e8/s0 start locate
+
+<span class="comment"># Delete preserved cache (use if controller stuck)</span>
+/opt/MegaRAID/storcli/storcli64 /c0/v11 delete preservedcache
+
+<span class="comment"># IBM RAID creation (RAID 0, disk at enclosure:slot)</span>
+/opt/MegaRAID/MegaCli/MegaCli64 -CfgLdAdd -r0 [8:5] -a0
+
+<span class="comment"># Firmware check</span>
+dmidecode | egrep -i 'rel|rev|prod'
+dmidecode -t 0 | grep Firmware</div>
+<div class="qa-block">
+<div class="qa-item" id="q-hw2a">
+<div class="qa-q" onclick="toggleQA('q-hw2a')"><span class="q-badge">Q</span><span class="q-text">What is "preserved cache" in MegaRAID and when do you delete it?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Preserved cache is write-back cache stored in the controller's battery-backed memory when a virtual drive goes offline unexpectedly (e.g., power loss, disk failure). The controller preserves this cache to prevent data loss hoping the drives come back. If the drives are gone permanently (replaced), the controller keeps this orphaned cache and may block operations. You then run <code>storcli64 /c0/v11 delete preservedcache</code> to clear it. Only do this when you're certain the data isn't needed — it's a destructive operation.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="hw3" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">HP ILO — Out-of-Band Management</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Find ILO IP address</span>
+hponcfg -w /tmp/ilo.out
+cat /tmp/ilo.out
+
+<span class="comment"># Reset ILO password via XML</span>
+rpm -ivh /mnt/ilo6_hponcfg-3.2.0-0.noarch.rpm
+
+<span class="comment"># Create XML file: /tmp/pwd_ilo.xml</span>
+cat &gt; /tmp/pwd_ilo.xml &lt;&lt;'EOF'
+&lt;RIBCL VERSION="2.0"&gt;
+  &lt;LOGIN USER_LOGIN="x" PASSWORD="x"&gt;
+  &lt;USER_INFO MODE="write"&gt;
+    &lt;MOD_USER USER_LOGIN="Administrator"&gt;
+      &lt;PASSWORD value="Welcome1"/&gt;
+    &lt;/MOD_USER&gt;
+  &lt;/USER_INFO&gt;
+  &lt;/LOGIN&gt;
+&lt;/RIBCL&gt;
+EOF
+
+chmod 755 /tmp/pwd_ilo.xml
+hponcfg -f /tmp/pwd_ilo.xml</div>
+<div class="qa-block">
+<div class="qa-item" id="q-hw3a">
+<div class="qa-q" onclick="toggleQA('q-hw3a')"><span class="q-badge">Q</span><span class="q-text">What is ILO and why is it important in enterprise server management?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>ILO (Integrated Lights-Out) is HP's out-of-band management technology. It's a dedicated management processor with its own network port that allows admins to manage servers even when the OS is down, crashed, or the server is powered off. Features: remote console (KVM), remote power on/off/reset, hardware health monitoring, firmware updates, virtual media mounting, BIOS configuration. IBM equivalent is IMM (Integrated Management Module). Dell calls it iDRAC. Essential for remote data centers where physical access is impractical.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s5" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">⚙️</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">sed, awk & Shell Scripting</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">Text processing, in-place file editing, loop constructs, and automation patterns</p>
+    </div>
+  </div>
+
+  <div id="sed1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">sed — In-place File Editing Patterns</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Add line at TOP of file</span>
+sed -i '1i SERVER = sg3lixnbirmed02' bp.conf
+
+<span class="comment"># Remove a specific line by pattern</span>
+sed -i -e 's/SERVER = sg3lixnbirmas02//g' bp.conf
+sed -i '/kudu/d' /etc/passwd         <span class="comment"># delete lines matching 'kudu'</span>
+<span class="comment"># Insert line at specific line number</span>
+sed -i '47i vm.min_free_kbytes = 1048576' /etc/sysctl.conf
+
+<span class="comment"># Delete a range of lines</span>
+sed -i '12,15d' file
+
+<span class="comment"># Comment a line (prepend #)</span>
+sed -i '\/sbin\/reboot/s/^\(.*\)$/#\1\n/' /var/spool/cron/root
+
+<span class="comment"># Uncomment a line (remove leading #)</span>
+sed -i '\/sbin\/shutdown/s/^#//' /var/spool/cron/root
+
+<span class="comment"># Replace value within matching line</span>
+sed -i '/ulimit -u/ s/65536/262144/' /etc/profile
+sed -i '/Cloudera/ s/defaults/defaults,acl/' /etc/fstab
+
+<span class="comment"># Comment out a line by pattern</span>
+sed -i 's/^|||splunk_idx||*/#&amp;/' /opt/IBM/ITM/config/K20_MON_PROCESS.cfg
+
+<span class="comment"># Add line AFTER a match</span>
+sed -i '/|||splunk_idx||*/a NEW_LINE_CONTENT' /opt/IBM/ITM/config/K20_MON_PROCESS.cfg
+
+<span class="comment"># Replace with safe temp file (for complex changes)</span>
+sed '/join-ent/ s/oldpwd/newpwd/' /opt/admin/join &gt; /tmp/jointmp
+cat /tmp/jointmp &gt; /opt/admin/join</div>
+<div class="qa-block">
+<div class="qa-item" id="q-sed1a">
+<div class="qa-q" onclick="toggleQA('q-sed1a')"><span class="q-badge">Q</span><span class="q-text">What does the -i flag do in sed and is it safe?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><code>-i</code> means "in-place" — edits the file directly instead of printing to stdout. On GNU sed (Linux) you can use <code>-i</code> alone; on BSD/macOS sed, you must provide a suffix like <code>-i.bak</code>. Best practice: ALWAYS backup before <code>sed -i</code>: <code>cp -p file file.bak &amp;&amp; sed -i '...' file</code>. For critical files like <code>/etc/fstab</code>, <code>/etc/passwd</code>, always backup with a timestamp first.</p></div>
+</div>
+<div class="qa-item" id="q-sed1b">
+<div class="qa-q" onclick="toggleQA('q-sed1b')"><span class="q-badge">Q</span><span class="q-text">How does the substitution flag &amp; work in sed?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>In sed's replacement string, <code>&amp;</code> represents the entire matched pattern. So <code>s/^pattern/#&amp;/</code> means: match <code>^pattern</code> at start of line, and replace it with <code>#</code> + the entire match. This effectively prepends <code>#</code> to comment out matching lines without having to re-type the pattern in the replacement. Example: <code>sed -i 's/^vm.swappiness/#&amp;/' /etc/sysctl.conf</code> comments out the vm.swappiness line.</p></div>
+</div>
+<div class="qa-item" id="q-sed1c">
+<div class="qa-q" onclick="toggleQA('q-sed1c')"><span class="q-badge">Q</span><span class="q-text">What is the difference between sed 'd' and sed 's/pattern//g'?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><code>sed '/pattern/d'</code> deletes the <strong>entire line</strong> if pattern matches. <code>sed 's/pattern//g'</code> removes only the matched <strong>text</strong> within a line, leaving an empty line or shortened line. Use <code>/d</code> when you want to completely remove a line (like removing a server entry). Use <code>s//</code> when you want to change a value within a line.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sed2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Shell Loops — For Loops Over Server Lists</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Run command on multiple servers via SSH</span>
+for i in `cat /var/tmp/serverlist.txt`; do
+  ssh $i 'command here'
+done
+
+<span class="comment"># SSL cert backup across cluster</span>
+for i in `cat /var/tmp/serverlist.txt`; do
+  ssh $i 'cp -rp /opt/Cloudera/ssl/* /opt/Cloudera/ssl/backup_ssl_bkp_Oct03'
+done
+
+<span class="comment"># Push certs via SCP then extract</span>
+for i in `cat /var/tmp/serverlist.txt`; do
+  scp master:/var/tmp/certs/Cloudera_ssl.tar $i:/opt/Cloudera/ssl/
+done
+for i in `cat /var/tmp/serverlist.txt`; do
+  ssh $i 'cd /opt/Cloudera/ssl; tar -xvf /opt/Cloudera/ssl/Cloudera_ssl.tar'
+done
+
+<span class="comment"># Nested loop: FID per server</span>
+for i in `cat destsrv`; do
+  for j in `cat fid`; do
+    scp -p src:/opt/gpa/keytabs_for_failed_scp/$j.$i.keytab keytab/
+  done
+done
+
+<span class="comment"># Restart service and check status</span>
+for i in `cat /var/tmp/serverlist.txt`; do
+  ssh $i 'service cloudera-scm-agent restart'
+done
+for i in `cat /var/tmp/serverlist.txt`; do
+  ssh $i 'service cloudera-scm-agent status'
+done</div>
+<div class="qa-block">
+<div class="qa-item" id="q-sed2a">
+<div class="qa-q" onclick="toggleQA('q-sed2a')"><span class="q-badge">Q</span><span class="q-text">Why use a server list file instead of hardcoding hostnames?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Using a file (<code>cat serverlist.txt</code>) is a best practice because: (1) Easy to modify scope without changing the script. (2) Auditable — the list is a record of what systems were affected. (3) Reusable — same list for pre-check, action, and post-check loops. (4) Reduces typos — hostname is defined once. In large clusters (100+ nodes), hardcoding is impractical. Always verify the list before running destructive operations with a dry-run loop that just echos hostnames.</p></div>
+</div>
+<div class="qa-item" id="q-sed2b">
+<div class="qa-q" onclick="toggleQA('q-sed2b')"><span class="q-badge">Q</span><span class="q-text">How do you kill multiple processes matching a pattern?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Use a pipeline combining <code>ps</code>, <code>grep</code>, <code>awk</code>/<code>cut</code>, and <code>kill</code>: <code>kill $( ps -ef | egrep "BD_Setup|rpm" | grep -v grep | tr -s " " | cut -d" " -f2 | tr "\n" " " )</code>. The <code>grep -v grep</code> is critical to exclude the grep process itself. Alternatively: <code>pkill -f "pattern"</code> or <code>killall processname</code>. For user-specific: <code>ps -ef | grep 'username' | awk '{print $2}' | xargs kill</code>.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sed3" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">ACL Management — setfacl / nfs4_setfacl</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Set ACL for a user on a directory</span>
+setfacl -m user:user1:rwx /dir/name
+setfacl -R -m u:colleague:rwX .   <span class="comment"># recursive, X=execute on dirs only</span>
+setfacl -m u:wsadmin:rw autosys   <span class="comment"># read-write only</span>
+<span class="comment"># Set mask (maximum effective permissions)</span>
+setfacl -R -m m::rwx
+
+<span class="comment"># NFS4 ACL (for NFSv4 mounts)</span>
+nfs4_getfacl /nasapps/cde/cdesea1
+nfs4_setfacl -R -a A:O:104156563@nfsdomain:rwx /apps/clmreg1/path
+
+<span class="comment"># Enable ACL on a mount (if not set)</span>
+mount -o remount,acl /apps
+<span class="comment"># Also update fstab to persist:</span>
+sed -i '/apps/ s/defaults/defaults,acl/' /etc/fstab</div>
+<div class="qa-block">
+<div class="qa-item" id="q-sed3a">
+<div class="qa-q" onclick="toggleQA('q-sed3a')"><span class="q-badge">Q</span><span class="q-text">What is the difference between standard Unix permissions and ACLs?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Standard Unix permissions only support 3 permission sets: owner, group, others. ACLs (Access Control Lists) allow fine-grained permissions for any number of users and groups. Example: standard permissions can't grant read-only access to one specific user who isn't in the file's group — ACLs solve this. The <code>+</code> sign in <code>ls -l</code> output indicates ACLs are set. Use <code>getfacl filename</code> to view them. NFSv4 ACLs use different syntax with <code>nfs4_setfacl</code> and support inheritance flags.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s6" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">☀️</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Solaris & LDOM (Logical Domains)</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">Solaris LDom management, live migration, SVM disk mirroring, ZFS, health checks</p>
+    </div>
+  </div>
+
+  <div id="sol1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">LDOM Live Migration Steps</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Pre-migration checks</span>
+cat /opt/IHSldmcfg/etc/pod_hosts  <span class="comment"># Verify source/dest frames in hosts</span>
+/opt/IHSldmcfg/bin/check_pod_disk all  <span class="comment"># Disk status check</span>
+<span class="comment"># Take XML snapshot for backup</span>
+ldm ls-constraints -x LDOM &gt; LDOM.xml
+
+<span class="comment"># Switch to migration user</span>
+su - ldommig
+
+<span class="comment"># Perform migration</span>
+/opt/IHSldmcfg/bin/migrate_domain entcamwp01 mwdt4p01f3-cd
+
+<span class="comment"># Save configuration post-migration</span>
+ldm ls-spconfig
+ldm add-spconfig YYYYMMDD.N-normal
+
+<span class="comment"># Remove old configs if exhausted</span>
+ldm rm-spconfig configname
+
+<span class="comment"># List LDoms and start all</span>
+ldm ls
+ldm start -a</div>
+<div class="info-box"><strong>Common Error:</strong> "Failed to establish connection with ldmd on target" — Solution: On each frame in the pod, run <code>/opt/IHSldmcfg/sbin/PWP_config -c</code> then <code>-s</code> to set up the ldommig account password. Then ensure <code>xmpp_enabled</code> and <code>incoming_migration_enabled</code> are set to <code>true</code> via <code>svccfg</code>.</div>
+<div class="qa-block">
+<div class="qa-item" id="q-sol1a">
+<div class="qa-q" onclick="toggleQA('q-sol1a')"><span class="q-badge">Q</span><span class="q-text">What is a Solaris LDOM and how does it compare to a zone?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><strong>LDOMs</strong> (Logical Domains) are hypervisor-level virtualization on SPARC servers — each LDOM has its own OS, CPU cores, memory, and I/O devices. It's full hardware virtualization. <strong>Zones</strong> (Solaris Containers) are OS-level virtualization — multiple zones share the same kernel. LDOMs provide stronger isolation (separate kernels), Zones provide more lightweight density. LDOMs require SPARC T-series or similar hypervisor-capable hardware. Zones can run on any Solaris system.</p></div>
+</div>
+<div class="qa-item" id="q-sol1b">
+<div class="qa-q" onclick="toggleQA('q-sol1b')"><span class="q-badge">Q</span><span class="q-text">Why must you save the LDOM spconfig after migration?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>The LDOM configuration (spconfig) stored in NVRAM tells the SP (Service Processor) how to configure domains at boot. After a migration, the configuration in NVRAM on both the source and destination frames is outdated. If either frame reboots without an updated spconfig, the LDOM layout won't match reality. <code>ldm add-spconfig YYYYMMDD.N-normal</code> saves the current running config to NVRAM. Always do this on BOTH source and destination frames post-migration.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sol2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Solaris SVM Disk Mirroring Procedure</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<p class="body-text">Solaris Volume Manager (SVM) mirroring steps for root + swap + data partitions. Essential for HA on legacy SPARC systems.</p>
+<ol class="step-list">
+<li><span class="step-n">1</span>Backup <code>/etc/vfstab</code>: <code>cp /etc/vfstab /etc/vfstab.orig</code></li>
+<li><span class="step-n">2</span>Partition mirror disk identical to boot disk: <code>prtvtoc /dev/rdsk/c0t0d0s2 | fmthard -s - /dev/rdsk/c0t1d0s2</code></li>
+<li><span class="step-n">3</span>Create state DB replicas (at least 3): <code>metadb -a -f -c 3 c0t0d0s7 c0t1d0s7</code></li>
+<li><span class="step-n">4</span>Create submirrors for root: <code>metainit -f d10 1 1 c0t0d0s0</code>, <code>metainit d0 -m d10</code></li>
+<li><span class="step-n">5</span>Run metaroot: <code>metaroot d0</code> (updates /etc/vfstab and /etc/system)</li>
+<li><span class="step-n">6</span>Mirror swap and all other slices similarly</li>
+<li><span class="step-n">7</span>Reboot: <code>lockfs -fa &amp;&amp; init 6</code></li>
+<li><span class="step-n">8</span>Attach second submirrors: <code>metattach d0 d20</code></li>
+<li><span class="step-n">9</span>Monitor sync: <code>while true; do metastat | grep %; sleep 10; done</code></li>
+<li><span class="step-n">10</span>Install boot block: <code>installboot /usr/platform/`uname -i`/lib/fs/ufs/bootblk /dev/rdsk/c0t1d0s0</code></li>
+</ol>
+<div class="qa-block">
+<div class="qa-item" id="q-sol2a">
+<div class="qa-q" onclick="toggleQA('q-sol2a')"><span class="q-badge">Q</span><span class="q-text">What are SVM state database replicas and why do you need at least 3?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>State database replicas (metadb) store the configuration and state of all meta-devices. SVM uses a voting quorum system — it needs a majority of replicas to be active to function. With 3 replicas, you can lose 1 and still have 2 (majority). With 2 replicas, losing 1 leaves only 1, which isn't a majority, so the system panics (refuses to continue) to prevent data corruption. Best practice: create an odd number (3, 5, 7) spread across multiple disks for maximum fault tolerance.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sol3" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Solaris Health Check Commands</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># System info</span>
+uname -a; uptime; date; who -r
+prtdiag -v                         <span class="comment"># hardware diagnostics</span>
+prtconf -pv | grep -i boot         <span class="comment"># boot device</span>
+prtconf -pv | grep -i mem          <span class="comment"># memory info</span>
+<span class="comment"># Fault management</span>
+fmdump                             <span class="comment"># fault dump</span>
+fmadm faulty                       <span class="comment"># list faulty components</span>
+svcs -xv                           <span class="comment"># failed SMF services</span>
+<span class="comment"># Storage</span>
+iostat -En                         <span class="comment"># disk errors</span>
+cfgadm -al                         <span class="comment"># device config (hotplug)</span>
+echo | format                      <span class="comment"># disk list</span>
+zpool status; zfs list; zpool list
+
+<span class="comment"># FC HBA</span>
+luxadm -e port
+luxadm probe
+fcinfo hba-port -l
+
+<span class="comment"># SVM / VxVM</span>
+metadb -i; metastat -t
+vxprint -Aht; vxdg list; vxdisk list; vxtask list
+
+<span class="comment"># Messages</span>
+cat /var/adm/messages
+dmesg</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s7" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">📊</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Performance Monitoring & SAR</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">System Activity Reporter, CPU/memory/IO analysis, process troubleshooting</p>
+    </div>
+  </div>
+
+  <div id="perf1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SAR — System Activity Reporter Commands</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Navigate to SAR data directory</span>
+cd /var/log/sa/
+
+<span class="comment"># Real-time monitoring</span>
+sar -f sa12                        <span class="comment"># CPU from sa file 12</span>
+sar -r -f sa12                     <span class="comment"># Memory utilization</span>
+sar -b -f sa12                     <span class="comment"># I/O transfer rates</span>
+sar -n EDEV -f /var/log/sa/sa21    <span class="comment"># Network errors</span>
+<span class="comment"># Filter network stats by interface</span>
+sar -n EDEV -f /var/log/sa/sa21 \
+  | egrep 'IFACE|ens192|ens161' \
+  | egrep 'IFACE|11:|Average'
+
+<span class="comment"># Batch SAR report across all sa files</span>
+ls -lrth sa* | grep -v sar | awk '{print $9}' &gt; /tmp/sarfilelist
+for i in `cat /tmp/sarfilelist`; do
+  sar -f $i | egrep -i 'CPU|average'
+  echo "___"
+done &gt; /tmp/`uname -n`_CPU.txt
+
+for i in `cat /tmp/sarfilelist`; do
+  sar -r -f $i | egrep -i 'Linux|%memused|Average'
+  echo "___"
+done &gt; /tmp/`uname -n`_Memory.txt
+
+<span class="comment"># Email the report</span>
+echo "PFA" | mail -s "SAR REPORT From `uname -n`" \
+  -a /tmp/`uname -n`_CPU.txt \
+  -a /tmp/`uname -n`_Memory.txt admin@company.com</div>
+<div class="qa-block">
+<div class="qa-item" id="q-perf1a">
+<div class="qa-q" onclick="toggleQA('q-perf1a')"><span class="q-badge">Q</span><span class="q-text">What is SAR and where does it store its data?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>SAR (System Activity Reporter) is part of the <code>sysstat</code> package. It collects system statistics (CPU, memory, I/O, network) on a scheduled basis via cron (usually every 10 minutes). Data is stored in binary format in <code>/var/log/sa/</code> as files named <code>saNN</code> where NN is the day of month (e.g., <code>sa15</code> = 15th of month). The <code>sar</code> command reads these files. Compared to <code>top</code>/<code>vmstat</code>, SAR provides historical trending — invaluable for post-mortem analysis of past performance issues.</p></div>
+</div>
+<div class="qa-item" id="q-perf1b">
+<div class="qa-q" onclick="toggleQA('q-perf1b')"><span class="q-badge">Q</span><span class="q-text">How do you find top CPU and memory consuming processes?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>CPU: <code>ps aux --sort=-%cpu | head -n 15</code> (descending % CPU). Memory: <code>ps aux --sort -rss | head -n 15</code> (descending RSS memory). For AIX: <code>topas</code> or <code>svmon -Pt10</code> for top 10 memory consumers. On Solaris: <code>prstat</code>. For real-time Linux: <code>top</code> then press <code>M</code> for memory sort, <code>P</code> for CPU sort.</p></div>
+</div>
+<div class="qa-item" id="q-perf1c">
+<div class="qa-q" onclick="toggleQA('q-perf1c')"><span class="q-badge">Q</span><span class="q-text">What does iostat -xm 2 tell you and when do you use it?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><code>iostat -xm 2</code> shows extended disk statistics in megabytes, refreshing every 2 seconds. Key columns: <code>%util</code> (disk utilization — if near 100%, disk is bottleneck), <code>await</code> (average I/O wait time in ms — should be low), <code>r/s</code> and <code>w/s</code> (reads/writes per second), <code>svctm</code> (service time). Use when investigating slow applications, high I/O wait in top, or storage performance issues. Compare with <code>multipath -ll</code> to correlate to physical paths.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="perf2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Reboot Reason Investigation</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Find reboot/shutdown reason in logs</span>
+grep -iv ': starting\|kernel: .*: Power Button\|watching system buttons\|Stopped Cleaning Up' \
+  /var/log/messages /var/log/syslog \
+  | grep -iw 'recover[a-z]*\|power[a-z]*\|shut[a-z ]*down\|rsyslogd\|ups' \
+  | grep -i 'Aug 31 17:' | more
+
+<span class="comment"># Quick server info check</span>
+hostname; uname -a; uptime; date; who -br
+
+<span class="comment"># Check last reboot</span>
+last reboot | head -5
+who -b                             <span class="comment"># last boot time</span>
+<span class="comment"># Check WorkloadAutomation reboot logs</span>
+cd /opt/CA/WorkloadAutomationAE/SystemAgent/WA1_AGENT/log
+cat receiver.archive.log | grep reboo</div>
+<div class="qa-block">
+<div class="qa-item" id="q-perf2a">
+<div class="qa-q" onclick="toggleQA('q-perf2a')"><span class="q-badge">Q</span><span class="q-text">How do you investigate an unexpected server reboot?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>1. <code>last reboot</code> — check when it happened. 2. <code>uptime</code> — verify current uptime. 3. Check <code>/var/log/messages</code> around the reboot time for OOM killer, kernel panic, hardware errors. 4. Check <code>dmesg</code> for hardware errors. 5. <code>journalctl -b -1</code> — previous boot journal (systemd). 6. Check ILO/iDRAC logs for hardware events (power loss, thermal). 7. Look for scheduled reboots in crontab: <code>crontab -l | grep reboot</code>. 8. Check crash dumps in <code>/var/crash</code>.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s8" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🔒</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Security, SELinux & PAM</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">PAM configuration, SELinux modes, crontab access control, RPM database repair</p>
+    </div>
+  </div>
+
+  <div id="sec1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SELinux Management</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Check current SELinux mode</span>
+getenforce                         <span class="comment"># Enforcing / Permissive / Disabled</span>
+sestatus                           <span class="comment"># detailed status</span>
+<span class="comment"># Temporary mode change (no reboot)</span>
+setenforce 0                       <span class="comment"># Permissive</span>
+setenforce 1                       <span class="comment"># Enforcing</span>
+<span class="comment"># Permanent disable (requires reboot)</span>
+vi /etc/selinux/config
+<span class="comment"># Change:  SELINUX=disabled</span>
+shutdown -r now
+
+<span class="comment"># View SELinux denials</span>
+audit2why &lt; /var/log/audit/audit.log</div>
+<div class="qa-block">
+<div class="qa-item" id="q-sec1a">
+<div class="qa-q" onclick="toggleQA('q-sec1a')"><span class="q-badge">Q</span><span class="q-text">What are the three SELinux modes and when would you use each?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><strong>Enforcing</strong>: SELinux policy is active and violations are blocked and logged. This is the secure default for production systems. <strong>Permissive</strong>: Violations are logged but NOT blocked. Use during troubleshooting to determine if SELinux is causing an application issue, or when deploying new applications. <strong>Disabled</strong>: SELinux is completely off. Avoid in production; re-enabling requires a full filesystem relabel. Interview tip: Always prefer Permissive over Disabled for troubleshooting — it's reversible without a full relabel.</p></div>
+</div>
+<div class="qa-item" id="q-sec1b">
+<div class="qa-q" onclick="toggleQA('q-sec1b')"><span class="q-badge">Q</span><span class="q-text">What is the difference between SELINUXTYPE=targeted and mls?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><strong>targeted</strong>: Only specific processes (network daemons like httpd, sshd, etc.) are protected by SELinux policy. Most processes run in the unconfined domain. This is the default and most common. <strong>minimum</strong>: A subset of targeted — only the most critical processes are protected. <strong>mls</strong>: Multi-Level Security — enforces Bell-LaPadula model with sensitivity labels. Used in government/military environments with classified data. Extremely strict, complex to manage.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sec2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">PAM Configuration — Crontab Access Control</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="info-box"><strong>Issue:</strong> In RHEL 7, user FIDs cannot access crontab due to PAM configuration changes from RHEL 5/6.</div>
+<div class="cmd-block"><span class="comment"># Step 1: Add user to /etc/security/access.conf</span>
++:USER_Name:cron crond :0 tty1 tty2 tty3 tty4 tty5 tty6
+
+<span class="comment"># Step 2: If still failing, edit /etc/pam.d/crond</span>
+<span class="comment"># Change this line:</span>
+account    required    pam_access.so
+<span class="comment"># To this:</span>
+account    sufficient  pam_access.so
+
+<span class="comment"># Step 3: Verify</span>
+su - username
+crontab -l</div>
+<div class="qa-block">
+<div class="qa-item" id="q-sec2a">
+<div class="qa-q" onclick="toggleQA('q-sec2a')"><span class="q-badge">Q</span><span class="q-text">What is the difference between PAM 'required' and 'sufficient'?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>In PAM, the control flag determines how a module's success/failure affects the overall authentication: <strong>required</strong>: Must succeed for authentication to pass. If it fails, authentication ultimately fails (but all remaining modules still run — this prevents revealing which module failed). <strong>sufficient</strong>: If this module succeeds and no prior required module has failed, authentication succeeds immediately — no further modules are checked. <strong>requisite</strong>: Like required, but failure causes immediate termination. Changing <code>pam_access.so</code> from <code>required</code> to <code>sufficient</code> means if access.conf check passes, cron access is granted without further checks.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sec3" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">RPM Database Rebuild Procedure</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Step 1: Backup RPM database</span>
+mkdir /root/backups.rpm.`date +"%Y-%m-%d"`/
+cp -avr /var/lib/rpm/ /root/backups.rpm.`date +"%Y-%m-%d"`/
+
+<span class="comment"># Step 2: Remove corrupted lock files</span>
+rm -f /var/lib/rpm/__db.00*
+
+<span class="comment"># Step 3: Verify RPM database integrity</span>
+db_verify /var/lib/rpm/Packages
+
+<span class="comment"># Step 4: Rebuild the database indices</span>
+rpm --rebuilddb
+
+<span class="comment"># Step 5: Clean yum cache</span>
+yum clean all</div>
+<div class="qa-block">
+<div class="qa-item" id="q-sec3a">
+<div class="qa-q" onclick="toggleQA('q-sec3a')"><span class="q-badge">Q</span><span class="q-text">When and why does the RPM database get corrupted?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>The RPM database (Berkeley DB files in <code>/var/lib/rpm/</code>) gets corrupted when: (1) System crashes or loses power during an RPM operation. (2) Simultaneous RPM/yum processes creating lock conflicts. (3) NFS mounts used for RPM DB (file locking issues). (4) Out-of-space conditions mid-install. Symptoms: <code>rpm -qa</code> hangs or errors, yum fails with DB errors, package operations fail. The rebuild re-creates the index files from the raw <code>Packages</code> database. If <code>db_verify Packages</code> fails, the corruption is severe and may need restoring from backup.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s9" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🔑</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">SSH Key Management & Kerberos Keytabs</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">SSH key setup, bulk deployment scripts, keytab management, NSCD troubleshooting</p>
+    </div>
+  </div>
+
+  <div id="ssh1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">SSH Key Conversion & Deployment</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># SSH with specific cipher (for legacy systems)</span>
+ssh -t --ciphers=aes256-ctr relww-cob1935 bash
+
+<span class="comment"># RHEL 6 key → RHEL 7 conversion</span>
+ssh-keygen-g3 --key-format openssh2 \
+  --import-public-key pdwtwsf1@server.pub \
+  pdwtwsf1@server_converted.pub
+
+<span class="comment"># RHEL 7 → RHEL 6 conversion</span>
+ssh-keygen-g3 --import-public-key \
+  tangalang_openssh tangalang@sd-dba7-827f.pub
+
+<span class="comment"># Import public keys for multiple FIDs</span>
+for i in `ls`; do
+  ssh-keygen-g3 --import-public-key $i ../ssh-script/keys/$i
+done
+
+<span class="comment"># Set correct keytab permissions</span>
+function setperm {
+  chown $1:$1 /opt/Cloudera/keytabs/$1.*.keytab
+  chmod 600 /opt/Cloudera/keytabs/$1.*.keytab
+}
+for j in `cat fid`; do setperm $j; done</div>
+<div class="qa-block">
+<div class="qa-item" id="q-ssh1a">
+<div class="qa-q" onclick="toggleQA('q-ssh1a')"><span class="q-badge">Q</span><span class="q-text">What is a Kerberos keytab file and why must it have 600 permissions?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>A keytab (key table) file stores Kerberos principal credentials encrypted with the service's secret key, allowing a service to authenticate to Kerberos without a password prompt. It's essentially a long-lived credential file. Permissions must be <code>600</code> (owner read-write only) because: anyone who can read a keytab can authenticate as that Kerberos principal. Wider permissions are a critical security vulnerability. In Cloudera/Hadoop clusters, each service (HDFS, HBase, Solr) has its own keytab owned by its service account.</p></div>
+</div>
+<div class="qa-item" id="q-ssh1b">
+<div class="qa-q" onclick="toggleQA('q-ssh1b')"><span class="q-badge">Q</span><span class="q-text">What is Tectia SSH and how does it differ from OpenSSH?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Tectia SSH (formerly SSH Tectia, originally from SSH Communications Security) is the commercial enterprise SSH product. OpenSSH is the open-source implementation. Key differences: Tectia uses its own key format and stores keys in <code>/etc/opt/SSHtectia/keys/</code>. It supports SSH2 protocol and has different authorization file syntax. Keys need to be converted when migrating between Tectia and OpenSSH servers using <code>ssh-keygen-g3</code>. Tectia also supports FIPS 140-2 mode and has centralized certificate management features.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ssh2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">NSCD Troubleshooting — Name Service Cache Daemon</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># NSCD cache database files</span>
+ls /var/db/nscd/
+<span class="comment"># Should see 3 files: passwd, group, hosts</span>
+<span class="comment"># Fix procedure:</span>
+<span class="comment"># 1. Stop nscd service</span>
+service nscd stop
+
+<span class="comment"># 2. Backup cache files</span>
+mkdir /var/db/nscd_bkp
+cp /var/db/nscd/* /var/db/nscd_bkp/
+
+<span class="comment"># 3. Delete corrupted cache files</span>
+rm -f /var/db/nscd/passwd /var/db/nscd/group /var/db/nscd/hosts
+
+<span class="comment"># 4. Restart nscd</span>
+service nscd start
+
+<span class="comment"># Related: check HAC group membership</span>
+getent group prv_hac_sd-2cad-109d | grep oracle</div>
+<div class="qa-block">
+<div class="qa-item" id="q-ssh2a">
+<div class="qa-q" onclick="toggleQA('q-ssh2a')"><span class="q-badge">Q</span><span class="q-text">What is NSCD and what happens if its cache gets corrupted?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>NSCD (Name Service Cache Daemon) caches NSS lookups (passwd, group, hosts) to reduce latency and AD/LDAP query load. Corruption symptoms: <code>getent passwd</code> hangs or returns wrong data, <code>id username</code> fails, SSH authentication issues, sudo failures. The cache files in <code>/var/db/nscd/</code> can become corrupted after crashes or LDAP inconsistencies. Fix: stop nscd, delete cache files (they rebuild on start), restart. This is a Level 1 troubleshooting step for "user not found" or AD auth failures.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="s10" style="margin-bottom:36px;scroll-margin-top:74px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🧠</div>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem">Kernel Parameters & System Configuration</h2>
+      <p style="margin:4px 0 0;font-size:.83rem;color:var(--text3)">sysctl tuning, GRUB management, Dracut issues, VCS clustering, Tanium management</p>
+    </div>
+  </div>
+
+  <div id="kern1" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">01</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Kernel Parameter Tuning — sysctl</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Set kernel parameters (persistent via sysctl.conf)</span>
+<span class="comment"># Thread and process limits</span>
+sed -i '/kernel.threads-max/d' /etc/sysctl.conf
+sed -i '47i kernel.threads-max = 2000000' /etc/sysctl.conf
+
+sed -i '/kernel.pid_max/d' /etc/sysctl.conf
+sed -i 'kernel.pid_max = 2000000' &gt;&gt; /etc/sysctl.conf
+
+<span class="comment"># Memory management</span>
+echo "vm.swappiness = 1" &gt;&gt; /etc/sysctl.conf     <span class="comment"># reduce swap tendency</span>
+echo "vm.min_free_kbytes = 1048576" &gt;&gt; /etc/sysctl.conf  <span class="comment"># ~1GB reserve</span>
+echo "vm.max_map_count = 8000000" &gt;&gt; /etc/sysctl.conf
+
+<span class="comment"># File limits</span>
+echo "fs.file-max = 6552837" &gt;&gt; /etc/sysctl.conf
+
+<span class="comment"># Apply immediately without reboot</span>
+sysctl -p
+
+<span class="comment"># Apply to running kernel also</span>
+echo 2000000 &gt; /proc/sys/kernel/threads-max
+echo 2000000 &gt; /proc/sys/kernel/pid_max
+echo 8000000 &gt; /proc/sys/vm/max_map_count
+
+<span class="comment"># Conditional script (only update if value is lower)</span>
+[ $( sysctl -n kernel.threads-max ) -lt 2000000 ] &amp;&amp; \
+  echo "kernel.threads-max = 2000000" &gt;&gt; /etc/sysctl.conf</div>
+<div class="qa-block">
+<div class="qa-item" id="q-kern1a">
+<div class="qa-q" onclick="toggleQA('q-kern1a')"><span class="q-badge">Q</span><span class="q-text">What does vm.swappiness control and what value should it be in production?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><code>vm.swappiness</code> controls how aggressively the kernel swaps out anonymous memory pages (application data) to disk. Range: 0-100. Value 0 = avoid swapping unless OOM is imminent. Value 100 = swap aggressively. For most database servers and performance-critical applications: set to 1 (Hadoop/HBase recommendation). For general servers: 10-30. Default is 60 on RHEL/CentOS. High swappiness = excessive swapping = poor performance. Verify with: <code>sysctl vm.swappiness</code>.</p></div>
+</div>
+<div class="qa-item" id="q-kern1b">
+<div class="qa-q" onclick="toggleQA('q-kern1b')"><span class="q-badge">Q</span><span class="q-text">What is vm.max_map_count and when do you need to increase it?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p><code>vm.max_map_count</code> limits the number of memory map areas a process can have. Default is 65536. Elasticsearch, Hadoop, Spark, and Java applications with large JVMs often require 262144-8000000. Symptom of too-low value: <code>failed to create JVM</code>, OOM errors, memory mapping failures. Elasticsearch specifically requires at least 262144. The GPA/Hadoop teams in the notes required 8000000. Changing this doesn't require reboot — write to <code>/proc/sys/vm/max_map_count</code> for immediate effect.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="kern2" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">02</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">GRUB2 — Boot Kernel Management (Dracut Issue Fix)</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="info-box"><strong>Dracut Prompt Issue:</strong> Server drops to dracut emergency shell at boot. Cause: grubenv missing/null or wrong default kernel set.</div>
+<div class="cmd-block"><span class="comment"># Check current grubenv (default kernel)</span>
+ls -lrt /boot/grub2/grubenv
+cat /boot/grub2/grubenv
+
+<span class="comment"># List available kernels (note their order 0,1,2...)</span>
+awk -F\' /^menuentry/{print\$2} /etc/grub2.cfg
+
+<span class="comment"># Check current running kernel</span>
+uname -a
+
+<span class="comment"># Backup grubenv</span>
+mv /boot/grub2/grubenv /boot/grub2/grubenv.bkp
+
+<span class="comment"># Set default kernel (0 = first/newest, 1 = second, etc.)</span>
+grub2-set-default 1   <span class="comment"># set to latest kernel</span>
+<span class="comment"># Remove old kernels (keep latest 2)</span>
+package-cleanup --oldkernels --count=2</div>
+<div class="qa-block">
+<div class="qa-item" id="q-kern2a">
+<div class="qa-q" onclick="toggleQA('q-kern2a')"><span class="q-badge">Q</span><span class="q-text">What is the Dracut emergency shell and what causes it?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Dracut is the initramfs (initial RAM filesystem) framework in RHEL. During boot, dracut sets up the early boot environment before mounting root filesystem. If dracut can't complete (missing modules, bad fstab entry, disk issue, wrong kernel specified), it drops to a minimal shell prompt for debugging. Common causes: (1) Wrong default kernel in grubenv. (2) Missing or corrupted initramfs. (3) /etc/fstab entry for a non-existent device. (4) LVM volume group not activating. Fix: set correct kernel with <code>grub2-set-default</code>, or regenerate initramfs with <code>dracut -f</code>.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="kern3" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">03</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">VCS (Veritas Cluster Server) — Cluster Management</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># VCS command directory</span>
+cd /opt/VRTS/bin/
+
+<span class="comment"># Check cluster status summary</span>
+./hastatus -sum
+./hastatus -summ | grep PROD-TCON-TW
+
+<span class="comment"># Display resource state in a group</span>
+./hares -display -attribute State -group IPMP-1G -sys crdap-prd1902
+
+<span class="comment"># Take group offline / online</span>
+./hagrp -offline IPMP-1G -sys crdap-prd1902
+./hagrp -online IPMP-1G -sys crdap-prd1903
+
+<span class="comment"># Switch group to another node</span>
+./hagrp -switch IPMP -to crdap-prd1903
+hagrp -switch DWH_SG -to mwegc-dwhla01u
+
+<span class="comment"># Freeze / unfreeze a service group</span>
+hagrp -freeze DWH_SG -sys mwegc-dwhla01u
+hagrp -unfreeze DWH_SG -sys mwegc-dwhla01u
+
+<span class="comment"># Clear faulted resource</span>
+hares -clear twsela_script -sys sdcgcgndmlb08p
+
+<span class="comment"># Check all resources in a group</span>
+for i in `hagrp -resources PROD-TCON-TW`; do
+  hares -state $i
+done | grep -i servername</div>
+<div class="qa-block">
+<div class="qa-item" id="q-kern3a">
+<div class="qa-q" onclick="toggleQA('q-kern3a')"><span class="q-badge">Q</span><span class="q-text">What is Veritas Cluster Server and what is a Service Group?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>VCS (now InfoScale Availability) is a high-availability clustering solution. It monitors resources and automatically fails them over to another node when a fault is detected. A <strong>Service Group (SG)</strong> is a logical collection of resources (IP, disk, application processes, mount points) that represent a service. They all fail over together as a unit. Key concepts: Resources have dependencies (disk must be mounted before app starts). <code>hastatus -sum</code> shows health at a glance. <code>hagrp -switch</code> is used for planned maintenance to move services off a node gracefully.</p></div>
+</div>
+<div class="qa-item" id="q-kern3b">
+<div class="qa-q" onclick="toggleQA('q-kern3b')"><span class="q-badge">Q</span><span class="q-text">What does freezing a VCS service group do?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Freezing a service group (<code>hagrp -freeze</code>) prevents VCS from automatically switching the group to another node even if faults are detected. This is used during planned maintenance — you don't want VCS to failover while you're intentionally stopping services. After maintenance, <code>hagrp -unfreeze</code> re-enables automatic failover. If you forget to unfreeze, manual intervention is required for any subsequent failover. Persistent freezing (<code>-persistent</code> flag) survives VCS restarts.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="kern4" class="acc-card" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;scroll-margin-top:74px">
+    <div class="acc-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:.66rem;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0">04</span>
+        <span style="font-family:var(--font-head);font-size:.98rem;font-weight:600;color:var(--text)">Tanium Client Troubleshooting</span>
+      </div>
+      <span class="acc-chev" style="color:var(--text3);transition:transform .25s;flex-shrink:0;font-size:.85rem">▾</span>
+    </div>
+    <div class="acc-body">
+      <div style="padding:4px 18px 18px;border-top:1px solid var(--border)">
+        <div class="topic-body">
+<div class="cmd-block"><span class="comment"># Stop Tanium client</span>
+service TaniumClient stop
+
+<span class="comment"># Clear monitor database (fixes memory/disk issues)</span>
+&gt; /opt/TaniumClient/Tools/Trace/monitor.db
+
+<span class="comment"># Restart</span>
+service TaniumClient start
+
+<span class="comment"># Check tmp directory size</span>
+cd /opt/Tanium/TaniumClient/tmp
+ls | wc -l
+du -sh
+df -kh
+
+<span class="comment"># Compress old files in Tanium tmp dir</span>
+find /opt/Tanium/TaniumClient/tmp -mtime +30 -type f \
+  | egrep -v "gz$|bz2$" \
+  | xargs ls -lrt | awk '{print $9}' \
+  | while read A; do gzip $A; done</div>
+<div class="qa-block">
+<div class="qa-item" id="q-kern4a">
+<div class="qa-q" onclick="toggleQA('q-kern4a')"><span class="q-badge">Q</span><span class="q-text">What is Tanium and why do enterprise sysadmins manage it?</span></div>
+<div class="qa-a"><span class="a-badge">▸ ANSWER</span><p>Tanium is an enterprise endpoint management and security platform that provides real-time visibility and control across all endpoints in an organization. From a sysadmin perspective: the Tanium Client runs on each server and communicates with the Tanium server. Common issues: (1) <code>monitor.db</code> grows too large and causes client to stop working — fix: clear it while service is stopped. (2) <code>/tmp</code> directory fills with trace files — fix: compress old files with find+gzip. (3) Client stops sending data — fix: restart service. It's similar to managing other management agents like IBM ITM or Splunk.</p></div>
+</div>
+</div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </main>
+
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#s1" class="toc-link">💾 LVM & Filesystem Management</a><a href="#lvm1" class="toc-link h3">01 PV → VG → LV Creation Workflow</a><a href="#lvm2" class="toc-link h3">02 LV Extension Commands & Resize Scenarios</a><a href="#lvm3" class="toc-link h3">03 fstab Management & Mount Operations</a><a href="#s2" class="toc-link">🔌 SAN & Multipath Storage</a><a href="#san1" class="toc-link h3">01 SAN Pre/Post Check Commands</a><a href="#san2" class="toc-link h3">02 FC HBA Troubleshooting & Path Management</a><a href="#s3" class="toc-link">🗄️ Backup & NetBackup (Veritas)</a><a href="#nb1" class="toc-link h3">01 NetBackup Error 7641 — Certificate & Host Cache Fix</a><a href="#nb2" class="toc-link h3">02 Log Compression & Archival (find + gzip/bzip2)</a><a href="#s4" class="toc-link">🖥️ HP & IBM Server Hardware Management</a><a href="#hw1" class="toc-link h3">01 HP HPSSACLI / HPACUCLI — Smart Array Commands</a><a href="#hw2" class="toc-link h3">02 IBM MegaRAID storcli & MegaCli Commands</a><a href="#hw3" class="toc-link h3">03 HP ILO — Out-of-Band Management</a><a href="#s5" class="toc-link">⚙️ sed, awk & Shell Scripting</a><a href="#sed1" class="toc-link h3">01 sed — In-place File Editing Patterns</a><a href="#sed2" class="toc-link h3">02 Shell Loops — For Loops Over Server Lists</a><a href="#sed3" class="toc-link h3">03 ACL Management — setfacl / nfs4_setfacl</a><a href="#s6" class="toc-link">☀️ Solaris & LDOM (Logical Domains)</a><a href="#sol1" class="toc-link h3">01 LDOM Live Migration Steps</a><a href="#sol2" class="toc-link h3">02 Solaris SVM Disk Mirroring Procedure</a><a href="#sol3" class="toc-link h3">03 Solaris Health Check Commands</a><a href="#s7" class="toc-link">📊 Performance Monitoring & SAR</a><a href="#perf1" class="toc-link h3">01 SAR — System Activity Reporter Commands</a><a href="#perf2" class="toc-link h3">02 Reboot Reason Investigation</a><a href="#s8" class="toc-link">🔒 Security, SELinux & PAM</a><a href="#sec1" class="toc-link h3">01 SELinux Management</a><a href="#sec2" class="toc-link h3">02 PAM Configuration — Crontab Access Control</a><a href="#sec3" class="toc-link h3">03 RPM Database Rebuild Procedure</a><a href="#s9" class="toc-link">🔑 SSH Key Management & Kerberos Keytabs</a><a href="#ssh1" class="toc-link h3">01 SSH Key Conversion & Deployment</a><a href="#ssh2" class="toc-link h3">02 NSCD Troubleshooting — Name Service Cache Daemon</a><a href="#s10" class="toc-link">🧠 Kernel Parameters & System Configuration</a><a href="#kern1" class="toc-link h3">01 Kernel Parameter Tuning — sysctl</a><a href="#kern2" class="toc-link h3">02 GRUB2 — Boot Kernel Management (Dracut Issue Fix)</a><a href="#kern3" class="toc-link h3">03 VCS (Veritas Cluster Server) — Cluster Management</a><a href="#kern4" class="toc-link h3">04 Tanium Client Troubleshooting</a></nav>
+</div>
+
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer id="site-footer">
+  <span>StudyHub — Technical Reference Library</span>
+  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+</footer>
+
+<script>
+// Progress + back-to-top
+const pr = document.getElementById('prog');
+const bt = document.getElementById('btt');
+addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const m = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+  if (pr) pr.style.width = (m > 0 ? Math.min(s / m * 100, 100) : 0) + '%';
+  if (bt) bt.classList.toggle('vis', s > 280);
+}, {passive: true});
+
+// Nav toggle
+function toggleNav() {
+  const nav = document.getElementById('site-nav');
+  const ov = document.getElementById('mob-ov');
+  nav.classList.toggle('open');
+  ov.classList.toggle('on');
+}
+
+// Active ToC highlighting
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('.content-section[id]');
+function updateToc() {
+  const top = window.scrollY + 80;
+  let cur = null;
+  sections.forEach(s => { if (s.offsetTop <= top) cur = s.id; });
+  tocLinks.forEach(l => {
+    l.classList.toggle('active-toc', l.getAttribute('href') === '#' + cur);
+  });
+}
+if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
+
+
+document.querySelectorAll('.acc-header').forEach(function(header) {
+  header.addEventListener('click', function() {
+    this.closest('.acc-card').classList.toggle('is-open');
+  });
+});
+
+document.querySelectorAll('.qa-q').forEach(function(q) {
+  q.addEventListener('click', function() {
+    this.closest('.qa-item').classList.toggle('is-open');
+  });
+});
+
+</script>
+</body>
+</html>
