@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHEL Study Guide — StudyHub</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* ── site-wide overrides ── */
+:root { --topbar-h:58px; --sidebar-w:240px; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* topbar */
+#site-topbar {
+  position:fixed; top:0; left:0; right:0; z-index:9000;
+  height:var(--topbar-h); background:var(--navy);
+  display:flex; align-items:center; padding:0 20px; gap:14px;
+  border-bottom:2px solid var(--blue);
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo span { color:var(--accent); }
+.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.topbar-spacer { flex:1; }
+#menu-btn { display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
+
+/* progress bar */
+#prog { position:fixed; top:var(--topbar-h); left:0; height:3px; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--sky)); z-index:8999;
+  transition:width .08s linear; pointer-events:none; }
+
+/* back-to-top */
+#btt { position:fixed; bottom:24px; right:20px; width:42px; height:42px;
+  background:var(--blue); color:#fff; border:none; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; z-index:8998; opacity:0; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(27,79,138,.45); transition:opacity .2s,transform .2s; }
+#btt.vis { opacity:1; pointer-events:auto; }
+#btt:hover { background:var(--mid); transform:translateY(-2px); }
+
+/* layout */
+.site-body { display:flex; margin-top:var(--topbar-h); flex:1; min-height:calc(100vh - var(--topbar-h)); }
+
+/* left sidebar (page nav) */
+#site-nav {
+  width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.nav-sec { padding:10px 16px 2px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); }
+.nav-link { display:flex; align-items:center; gap:8px; padding:9px 16px;
+  color:var(--text2); text-decoration:none; font-size:.84rem; border-left:3px solid transparent;
+  transition:all .12s; }
+.nav-link:hover { background:rgba(255,255,255,.05); color:var(--text); border-left-color:var(--border2); }
+.nav-link.active { background:rgba(240,165,0,.09); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
+
+/* right toc sidebar */
+#toc-nav {
+  width:220px; flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  padding:16px 0; display:flex; flex-direction:column;
+}
+.toc-head { padding:0 16px 8px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); border-bottom:1px solid var(--border); margin-bottom:4px; }
+.toc-link { display:block; padding:6px 16px; color:var(--text3); text-decoration:none;
+  font-size:.78rem; line-height:1.35; transition:color .12s;
+  border-left:2px solid transparent; }
+.toc-link:hover { color:var(--sky); border-left-color:var(--sky); }
+.toc-link.h3 { padding-left:26px; font-size:.72rem; }
+
+/* main content */
+#main-content {
+  flex:1; padding:32px 40px; overflow-x:hidden; min-width:0;
+}
+.page-hero {
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.page-hero h1 { margin-bottom:6px; }
+.page-hero p { color:var(--text2); font-size:.95rem; margin:0; }
+.hero-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; }
+.badge-blue { background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:var(--green); border:1px solid rgba(16,185,129,.25); }
+.badge-gold { background:rgba(240,165,0,.15); color:var(--accent); border:1px solid rgba(240,165,0,.25); }
+.badge-purple { background:rgba(139,92,246,.15); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+
+/* content sections */
+.content-section { margin-bottom:40px; scroll-margin-top:calc(var(--topbar-h) + 16px); }
+.section-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px; margin-bottom:20px;
+}
+.section-card h2 { margin-top:0; }
+
+/* code blocks */
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; margin:12px 0 16px; }
+code { font-family:var(--font-mono); font-size:.82rem; color:var(--code-fg); }
+pre code { color:var(--code-fg); }
+:not(pre) > code { background:rgba(121,192,255,.1); color:var(--code-fg);
+  padding:2px 6px; border-radius:4px; font-size:.8em; }
+
+/* tables */
+table { width:100%; border-collapse:collapse; margin:12px 0 16px; font-size:.875rem; }
+th { background:rgba(27,79,138,.35); color:var(--sky); padding:9px 12px;
+  text-align:left; font-weight:600; border-bottom:2px solid var(--border2); font-size:.78rem; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,.025); }
+.tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid var(--border); margin:12px 0 16px; }
+.tbl-wrap table { margin:0; border:none; }
+
+/* Q&A cards */
+.qa-card {
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:12px; overflow:hidden;
+}
+.qa-q { padding:12px 16px; background:rgba(27,79,138,.2);
+  color:var(--text); font-weight:600; font-size:.9rem;
+  display:flex; gap:10px; align-items:flex-start; }
+.qa-q::before { content:"Q"; font-family:var(--font-mono); color:var(--accent);
+  font-size:.7rem; font-weight:700; background:rgba(240,165,0,.1);
+  border-radius:4px; padding:2px 6px; flex-shrink:0; margin-top:1px; }
+.qa-a { padding:12px 16px 14px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.qa-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+  font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-family:var(--font-mono); margin-left:8px; }
+.qa-badge-concept { background:rgba(74,159,213,.15); color:var(--sky); }
+.qa-badge-cmd { background:rgba(16,185,129,.15); color:var(--green); }
+.qa-badge-crit { background:rgba(239,68,68,.15); color:var(--red); }
+.qa-badge-task { background:rgba(240,165,0,.15); color:var(--accent); }
+.qa-badge-scenario { background:rgba(139,92,246,.15); color:var(--purple); }
+
+/* callout boxes */
+.callout { border-left:4px solid; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0; }
+.callout-note { border-color:var(--sky); background:rgba(74,159,213,.08); }
+.callout-warn { border-color:var(--accent); background:rgba(240,165,0,.08); }
+.callout-danger { border-color:var(--red); background:rgba(239,68,68,.08); }
+.callout-tip { border-color:var(--green); background:rgba(16,185,129,.08); }
+.callout-title { font-weight:700; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:4px; }
+
+/* topic tag */
+.topic-tag { display:inline-flex; align-items:center; padding:3px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:600; margin-bottom:10px; }
+
+/* section divider */
+.section-divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* version badges in RHEL */
+.ver-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem;
+  font-weight:700; font-family:var(--font-mono); margin-right:4px;
+  background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.2); }
+
+/* footer */
+#site-footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:20px 40px; display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--text3);
+}
+#site-footer a { color:var(--sky); text-decoration:none; }
+
+/* mobile overlay */
+#mob-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8800; }
+#mob-ov.on { display:block; }
+
+@media (max-width:1100px) {
+  #toc-nav { display:none; }
+}
+@media (max-width:768px) {
+  #site-nav { position:fixed; left:0; top:var(--topbar-h);
+    bottom:0; transform:translateX(-100%); z-index:8900;
+    transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  #site-nav.open { transform:translateX(0); }
+  #menu-btn { display:block; }
+  #main-content { padding:20px 16px; }
+  #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="site-topbar">
+  <a href="index.html" class="logo">Study<span>Hub</span></a>
+  <span class="page-title-bar">Red Hat Enterprise Linux</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn" onclick="toggleNav()">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link ">🏠 Home</a>
+<a href="rhel.html" class="nav-link active">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
+
+  </nav>
+
+  <main id="main-content">
+    
+<div class="page-hero">
+  <h1>🐧 RHEL Study Guide</h1>
+  <p>Complete Red Hat Enterprise Linux Administration Reference — RHEL 6, 7, 8 &amp; 9</p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">RHEL 6/7/8/9</span>
+    <span class="badge badge-green">12 Sections</span>
+    <span class="badge badge-gold">Users · LVM · SELinux · Networking · Services</span>
+  </div>
+</div>
+<main class="content __content">
+<!-- ═══ 01 USERS & GROUPS ═══ -->
+<div class="tab-pane active" id="tab-users">
+<h2 id="rhel-user-group-administration"><span class="icon">👤</span> User &amp; Group Administration</h2>
+<p class="topic-desc">Managing users, groups, passwords, sudo, and login policies across RHEL 6/7/8/9.</p>
+<h3>Types of Users</h3>
+<table>
+<tr><th>Type</th><th>Example</th><th>UID (RHEL 6)</th><th>UID (RHEL 7/8/9)</th><th>Home</th><th>Shell</th></tr>
+<tr><td><span class="label label-red">Super</span></td><td>root</td><td>0</td><td>0</td><td>/root</td><td>/bin/bash</td></tr>
+<tr><td><span class="label label-green">Normal</span></td><td>ram, raju</td><td>500–60000</td><td>1000–60000</td><td>/home/user</td><td>/bin/bash</td></tr>
+<tr><td><span class="label label-yellow">System</span></td><td>apache, ftp</td><td>1–499</td><td>1–999 (static 1-200, dynamic 201-999)</td><td>/var/ftp…</td><td>/sbin/nologin</td></tr>
+<tr><td><span class="label label-blue">Network</span></td><td>LDAP user</td><td>same as normal</td><td>same as normal</td><td>/home/guests/ldapuser</td><td>/bin/bash</td></tr>
+<tr><td><span class="label label-purple">Sudo</span></td><td>normal+admin privs</td><td>same as normal</td><td>same as normal</td><td>/home/user</td><td>/bin/bash</td></tr>
+</table>
+<h3>Important User Configuration Files</h3>
+<ul>
+<li><code>/etc/passwd</code> — username:x:uid:gid:comment:home:shell</li>
+<li><code>/etc/shadow</code> — username:password:lastchg:min:max:warn:inactive:expire</li>
+<li><code>/etc/group</code> — group info (name, gid, members)</li>
+<li><code>/etc/gshadow</code> — group password hashes</li>
+<li><code>/etc/default/useradd</code> — default settings for new users</li>
+<li><code>/etc/login.defs</code> — login policy defaults</li>
+<li><code>/etc/skel</code> — template files copied to new user home (.bashrc, .bash_profile, .bash_logout)</li>
+</ul>
+<h3>Creating Users</h3>
+<pre><span class="cmt"># Full useradd syntax</span>
+useradd -u 600 -g 600 -G java -c "oracle user" -d /home/raju -s /bin/bash raju
+
+<span class="cmt"># Create multiple users from a file (same format as /etc/passwd)</span>
+newusers userfile.txt
+
+<span class="cmt"># Change passwords for multiple users at once</span>
+chpasswd &lt;&lt;EOF
+user1:newpass1
+user2:newpass2
+EOF</pre>
+<h3>Modifying &amp; Deleting Users</h3>
+<pre><span class="cmt"># Lock / Unlock user</span>
+usermod -L username        <span class="cmt"># lock (disable login)</span>
+usermod -U username        <span class="cmt"># unlock</span>
+
+<span class="cmt"># Change login name</span>
+usermod -l newname oldname
+
+<span class="cmt"># Move home directory to new path</span>
+usermod -md /home/newpath username
+
+<span class="cmt"># Delete user (remove home dir)</span>
+userdel -r username
+
+<span class="cmt"># Recover accidentally deleted user from /etc/passwd</span>
+pwunconv</pre>
+<h3>Group Management</h3>
+<pre>groupadd -g 1500 devteam
+groupmod -n newname oldname
+groupdel groupname
+gpasswd -a username groupname   <span class="cmt"># add user to group</span>
+gpasswd -d username groupname   <span class="cmt"># remove from group</span>
+groups username                 <span class="cmt"># list user's groups</span></pre>
+<h3>Password Aging (chage)</h3>
+<pre>chage -l username              <span class="cmt"># list policies</span>
+chage -M 90 username           <span class="cmt"># max 90 days before expiry</span>
+chage -m 7 username            <span class="cmt"># min 7 days before change</span>
+chage -W 14 username           <span class="cmt"># warn 14 days before expire</span>
+chage -E 2025-12-31 username   <span class="cmt"># account expiry date</span>
+chage -d 0 username            <span class="cmt"># force password change on next login</span>
+passwd -x -1 username          <span class="cmt"># never expires</span></pre>
+<h3>SUDO Configuration</h3>
+<pre><span class="cmt"># Edit sudoers safely (always use visudo)</span>
+visudo   <span class="cmt"># opens /etc/sudoers</span>
+
+<span class="cmt"># Give full sudo to a user</span>
+raju    ALL=(ALL)    ALL
+
+<span class="cmt"># Allow without password</span>
+raju    ALL=NOPASSWD:/usr/sbin/useradd, /usr/sbin/usermod
+
+<span class="cmt"># Group sudo (% prefix)</span>
+%oracle    ALL=ALL
+
+<span class="cmt"># Command alias</span>
+Cmnd_Alias NETWORKING=/usr/sbin/route, /usr/sbin/ifconfig
+raju    ALL=NETWORKING
+
+<span class="cmt"># User alias</span>
+User_Alias OURTEAM=raju, shyam, ram
+OURTEAM ALL=ALL</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 Updates</div>
+<ul>
+<li>Default UID range for regular users: <strong>1000–60000</strong> (same as RHEL 7)</li>
+<li><code>useradd</code> / <code>usermod</code> / <code>groupadd</code> syntax unchanged</li>
+<li>Password hashing now defaults to <strong>yescrypt</strong> (RHEL 9) — stronger than SHA-512</li>
+<li><code>authselect</code> replaces <code>authconfig</code> for PAM/SSSD configuration</li>
+<li><code>/etc/sudoers.d/</code> directory for modular sudo rules</li>
+<li>RHEL 9: <code>useradd --no-create-home</code> recommended for service accounts</li>
+</ul>
+</div>
+<h3>Account Lockout (PAM)</h3>
+<pre><span class="cmt"># RHEL 6/7 — /etc/pam.d/system-auth</span>
+auth required pam_tally2.so no_magic_root
+account required pam_tally2.so deny=3 lock_time=180
+
+<span class="cmt"># RHEL 8/9 — uses pam_faillock (replaces pam_tally2)</span>
+<span class="cmt"># /etc/security/faillock.conf</span>
+deny = 3
+unlock_time = 180
+
+<span class="cmt"># Check failed attempts</span>
+faillock --user username
+faillock --user username --reset   <span class="cmt"># unlock</span></pre>
+<h3>Root Password Recovery</h3>
+<div class="diff-grid">
+<div class="diff-col rhel6"><h4>RHEL 6</h4><ol><li>Reboot → press <kbd>e</kbd> → edit kernel line</li><li>Append <code>1</code> at end → press <kbd>b</kbd></li><li>Boot single-user → <code>passwd root</code></li></ol></div>
+<div class="diff-col rhel7"><h4>RHEL 7</h4><ol><li>Reboot → press <kbd>e</kbd></li><li>On <code>linux16</code> line append: <code>rd.break console=tty1 selinux=0</code></li><li>Press <kbd>Ctrl+X</kbd> → <code>mount -o remount,rw /sysroot</code></li><li><code>chroot /sysroot</code> → <code>passwd root</code> → exit twice</li></ol></div>
+<div class="diff-col rhel8"><h4>RHEL 8 / 9</h4><ol><li>Reboot → press <kbd>e</kbd></li><li>On <code>linux</code> line append: <code>rd.break</code></li><li><code>mount -o remount,rw /sysroot</code></li><li><code>chroot /sysroot</code> → <code>passwd root</code></li><li><code>touch /.autorelabel</code> → exit twice</li></ol></div>
+</div>
+</div>
+<!-- ═══ 02 PARTITIONS & FS ═══ -->
+<div class="tab-pane" id="tab-partitions">
+<h2 id="rhel-managing-partitions-file-systems"><span class="icon">💾</span> Managing Partitions &amp; File Systems</h2>
+<p class="topic-desc">Disk partitioning, file system creation, mounting, fstab, fsck, and more.</p>
+<h3>Partition Types &amp; Tools</h3>
+<pre><span class="cmt"># View all disks and partitions</span>
+fdisk -l
+lsblk
+blkid
+
+<span class="cmt"># Create MBR partition (RHEL 6/7)</span>
+fdisk /dev/sdb
+<span class="cmt">  n → new | p → primary | e → extended | t → change type</span>
+<span class="cmt">  8e → LVM | 82 → swap | 83 → Linux | fd → RAID</span>
+<span class="cmt">  w → write and exit</span>
+
+<span class="cmt"># Update partition table without reboot</span>
+partprobe /dev/sdb
+partx -a /dev/sdb</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 — GPT Partitioning</div>
+<ul>
+<li>Use <code>parted</code> or <code>gdisk</code> for GPT disks (&gt;2TB or UEFI systems)</li>
+<li><code>parted /dev/sdb mklabel gpt</code> → <code>mkpart primary ext4 0% 100%</code></li>
+<li><code>partprobe</code> still works to refresh partition table</li>
+<li><strong>Stratis</strong> (RHEL 8+) and <strong>VDO</strong> (Virtual Data Optimizer) are new storage solutions</li>
+</ul>
+</div>
+<h3>File System Comparison</h3>
+<table>
+<tr><th>FS Type</th><th>Journaling</th><th>Max File</th><th>Max FS</th><th>Default In</th></tr>
+<tr><td>ext2</td><td>No</td><td>2TB</td><td>32TB</td><td>RHEL 3/4</td></tr>
+<tr><td>ext3</td><td>Yes</td><td>2TB</td><td>32TB</td><td>RHEL 5</td></tr>
+<tr><td>ext4</td><td>Yes</td><td>16TB</td><td>1EB</td><td>RHEL 6</td></tr>
+<tr><td><strong>xfs</strong></td><td>Yes</td><td>8EB</td><td>8EB</td><td>RHEL 7/8/9</td></tr>
+<tr><td>btrfs</td><td>Yes (CoW)</td><td>16EB</td><td>16EB</td><td>Optional</td></tr>
+</table>
+<h3>Create, Mount, and Configure File Systems</h3>
+<pre><span class="cmt"># Create file system</span>
+mkfs.ext4 /dev/sdb1
+mkfs.xfs  /dev/sdb2      <span class="cmt"># default in RHEL 7+</span>
+
+<span class="cmt"># Temporary mount</span>
+mkdir /mnt/data
+mount /dev/sdb1 /mnt/data
+
+<span class="cmt"># Permanent mount — edit /etc/fstab</span>
+<span class="cmt"># device   mountpoint  fstype  options  dump  fsck</span>
+/dev/sdb1   /mnt/data   ext4   defaults   0    0
+UUID=xxxx   /mnt/data2  xfs    defaults   0    0
+LABEL=myfs  /mnt/data3  ext4   defaults   0    0
+
+mount -a   <span class="cmt"># mount all in fstab</span>
+df -hT     <span class="cmt"># verify</span></pre>
+<h3>Label &amp; UUID Operations</h3>
+<pre>e2label /dev/sdb1 mydata          <span class="cmt"># assign label (ext*)</span>
+xfs_admin -L myxfs /dev/sdb2      <span class="cmt"># assign label (xfs)</span>
+blkid /dev/sdb1                   <span class="cmt"># get UUID</span>
+tune2fs -l /dev/sdb1              <span class="cmt"># show metadata</span></pre>
+<h3>fsck — File System Check</h3>
+<pre><span class="cmt"># ALWAYS unmount before fsck</span>
+umount /dev/sdb1
+fsck /dev/sdb1
+e2fsck -p /dev/sdb1    <span class="cmt"># non-interactive</span>
+fsck -AR -y            <span class="cmt"># all file systems, auto-fix</span>
+
+<span class="cmt"># Repair superblock</span>
+dumpe2fs /dev/sdb1 | grep superblock
+e2fsck -b &lt;secondary_superblock&gt; /dev/sdb1</pre>
+<h3>Swap Management</h3>
+<pre><span class="cmt"># Rule: RAM ≤ 2GB → swap = 2×RAM; RAM &gt; 2GB → swap = 2GB + RAM</span>
+fdisk /dev/sdb   <span class="cmt"># create partition, type 82</span>
+mkswap /dev/sdb2
+swapon /dev/sdb2
+free -m           <span class="cmt"># verify</span>
+
+<span class="cmt"># In /etc/fstab:</span>
+/dev/sdb2   swap   swap   defaults   0   0
+
+<span class="cmt"># Create swap file (when no free partition)</span>
+dd if=/dev/zero of=/swapfile bs=1M count=2048
+mkswap /swapfile
+swapon /swapfile</pre>
+<div class="card warn">
+<div class="card-title">⚠️ /etc/fstab Entries</div>
+<p>Fields: <code>device | mountpoint | fstype | options | dump | fsck</code><br/>
+        fsck value: 0=skip, 1=root first, 2=other. Use 0 for network/special filesystems.</p>
+</div>
+</div>
+<!-- ═══ 03 LVM & RAID ═══ -->
+<div class="tab-pane" id="tab-lvm">
+<h2 id="rhel-lvm-raid"><span class="icon">🗂️</span> LVM &amp; RAID</h2>
+<p class="topic-desc">Logical Volume Management, extending/reducing volumes, RAID levels, and migration.</p>
+<h3>LVM Components</h3>
+<ul>
+<li><strong>PV (Physical Volume)</strong> — raw partition with type <code>8e</code></li>
+<li><strong>PE (Physical Extent)</strong> — chunk of disk space, default 4MB</li>
+<li><strong>VG (Volume Group)</strong> — pool combining PVs</li>
+<li><strong>LV (Logical Volume)</strong> — usable volume formatted with a FS</li>
+<li><strong>LE (Logical Extent)</strong> — mapped to PEs</li>
+</ul>
+<h3>Creating LVM (Full Workflow)</h3>
+<pre><span class="cmt"># Step 1: Create partitions with type 8e</span>
+fdisk /dev/sdb    <span class="cmt"># create partition → t → 8e → w</span>
+partprobe /dev/sdb
+
+<span class="cmt"># Step 2: Create Physical Volumes</span>
+pvcreate /dev/sdb1 /dev/sdc1
+
+<span class="cmt"># Step 3: Create Volume Group</span>
+vgcreate myvg /dev/sdb1 /dev/sdc1
+vgcreate -s 8M myvg /dev/sdb1   <span class="cmt"># 8MB PE size</span>
+
+<span class="cmt"># Step 4: Create Logical Volume</span>
+lvcreate -L +10G -n mylv myvg
+lvcreate -l 100 -n mylv myvg    <span class="cmt"># using PE count</span>
+
+<span class="cmt"># Step 5: Format and mount</span>
+mkfs.xfs /dev/myvg/mylv
+mkdir /mnt/lvm
+mount /dev/myvg/mylv /mnt/lvm
+
+<span class="cmt"># Permanent — /etc/fstab</span>
+/dev/myvg/mylv   /mnt/lvm   xfs   defaults   0   0</pre>
+<h3>Extending LVM</h3>
+<pre><span class="cmt"># Extend VG (add new PV)</span>
+pvcreate /dev/sdd1
+vgextend myvg /dev/sdd1
+
+<span class="cmt"># Extend LV and filesystem (online — no downtime)</span>
+lvextend -L +5G /dev/myvg/mylv
+xfs_growfs /mnt/lvm            <span class="cmt"># for XFS</span>
+resize2fs /dev/myvg/mylv       <span class="cmt"># for ext4</span>
+
+<span class="cmt"># Shortcut: extend + resize in one command</span>
+lvresize -r -L +5G /dev/myvg/mylv   <span class="cmt"># RHEL 7+</span></pre>
+<h3>Reducing LVM (ext4 only — requires downtime)</h3>
+<pre><span class="cmt"># DANGER: XFS cannot be reduced. ext4 only.</span>
+umount /mnt/lvm
+e2fsck /dev/myvg/mylv
+lvreduce -L -2G /dev/myvg/mylv
+resize2fs /dev/myvg/mylv
+mount -a</pre>
+<h3>Migrating Data Between PVs</h3>
+<pre>pvmove /dev/sdb1 /dev/sdd1     <span class="cmt"># move data from old to new PV</span>
+vgreduce myvg /dev/sdb1        <span class="cmt"># remove failed PV from VG</span>
+pvremove /dev/sdb1             <span class="cmt"># remove PV metadata</span></pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 LVM Thin Provisioning</div>
+<pre><span class="cmt"># Create thin pool</span>
+lvcreate -L 20G --thinpool mypool myvg
+
+<span class="cmt"># Create thin volume (over-provisioned)</span>
+lvcreate -V 50G --thin -n thin_lv myvg/mypool
+
+<span class="cmt"># Snapshot</span>
+lvcreate -s -n snap1 -L 1G /dev/myvg/mylv</pre>
+</div>
+<h3>RAID Levels Comparison</h3>
+<table>
+<tr><th>RAID</th><th>Type</th><th>Min Disks</th><th>Fault Tolerance</th><th>Performance</th><th>Space</th></tr>
+<tr><td>RAID 0</td><td>Striping</td><td>2</td><td>None</td><td>Fast R/W</td><td>100%</td></tr>
+<tr><td>RAID 1</td><td>Mirroring</td><td>2</td><td>1 disk</td><td>Fast R, slow W</td><td>50%</td></tr>
+<tr><td>RAID 5</td><td>Stripe+Parity</td><td>3</td><td>1 disk</td><td>Good R/W</td><td>~67-75%</td></tr>
+<tr><td>RAID 10</td><td>Mirror+Stripe</td><td>4</td><td>1 per mirror pair</td><td>Best R/W</td><td>50%</td></tr>
+</table>
+<h3>Software RAID with mdadm</h3>
+<pre><span class="cmt"># Create RAID 5</span>
+mdadm -Cv /dev/md0 -n 3 /dev/sdb /dev/sdc /dev/sdd -l 5
+
+<span class="cmt"># Check status</span>
+cat /proc/mdstat
+mdadm -D /dev/md0
+
+<span class="cmt"># Simulate disk failure + replace</span>
+mdadm /dev/md0 -f /dev/sdb   <span class="cmt"># mark failed</span>
+mdadm /dev/md0 -r /dev/sdb   <span class="cmt"># remove</span>
+mdadm /dev/md0 -a /dev/sde   <span class="cmt"># add replacement</span>
+
+<span class="cmt"># Save RAID config</span>
+mdadm --detail --scan &gt;&gt; /etc/mdadm.conf</pre>
+</div>
+<!-- ═══ 04 PERMISSIONS & SUDO ═══ -->
+<div class="tab-pane" id="tab-permissions">
+<h2 id="rhel-permissions-acl-special-bits"><span class="icon">🔒</span> Permissions, ACL &amp; Special Bits</h2>
+<p class="topic-desc">Linux file permissions, ACLs, SUID/SGID/sticky bit, umask, disk quotas.</p>
+<h3>Permission Basics</h3>
+<pre>ls -l filename
+<span class="cmt"># -rwxr-xr-- 1 root root 1234 Jan 1 file</span>
+<span class="cmt"># r=4, w=2, x=1, -=0</span>
+<span class="cmt"># chmod [ugo][+-=][rwx] file  OR  chmod 755 file</span>
+
+chmod 755 /dir
+chmod -R 644 /dir/       <span class="cmt"># recursive</span>
+chown root:devs file     <span class="cmt"># change owner and group</span>
+chgrp devs file          <span class="cmt"># change group only</span></pre>
+<h3>Special Permissions</h3>
+<pre><span class="cmt"># SUID (Set UID) — run as file owner</span>
+chmod u+s /usr/bin/passwd
+<span class="cmt"># rwsrwxrwx — 's' in owner execute position</span>
+
+<span class="cmt"># SGID (Set GID) — run as file group | dirs: inherit group</span>
+chmod g+s /shared_dir
+
+<span class="cmt"># Sticky Bit — only owner can delete from dir</span>
+chmod o+t /tmp
+<span class="cmt"># rwxrwxrwt — 't' in others execute position</span>
+
+<span class="cmt"># Numeric: 4=SUID, 2=SGID, 1=sticky</span>
+chmod 4755 file   <span class="cmt"># SUID + 755</span>
+chmod 1777 /tmp   <span class="cmt"># sticky + full perms</span></pre>
+<h3>umask</h3>
+<pre><span class="cmt"># Default: root=0022, users=0002</span>
+<span class="cmt"># File perms = 666 - umask | Dir perms = 777 - umask</span>
+umask              <span class="cmt"># see current</span>
+umask 027          <span class="cmt"># set temporarily</span>
+
+<span class="cmt"># Make permanent for all users</span>
+echo "umask 027" &gt;&gt; /etc/bashrc
+source /etc/bashrc</pre>
+<h3>ACL (Access Control List)</h3>
+<pre><span class="cmt"># Mount partition with ACL support</span>
+<span class="cmt"># /dev/sdb1  /mnt/data  ext4  defaults,acl  0 0</span>
+
+<span class="cmt"># View ACL</span>
+getfacl filename
+
+<span class="cmt"># Set ACL</span>
+setfacl -m u:alice:rw  filename      <span class="cmt"># user</span>
+setfacl -m g:devs:rx   /dir          <span class="cmt"># group</span>
+setfacl -R -m u:alice:rwx /dir       <span class="cmt"># recursive</span>
+
+<span class="cmt"># Remove ACL</span>
+setfacl -x u:alice  filename
+setfacl -b          filename         <span class="cmt"># remove all ACL</span></pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 — ACL Notes</div>
+<p>XFS mounts with ACL support by default (no extra mount option needed). For ext4, <code>acl</code> option may still be required on older kernels.</p>
+</div>
+<h3>Disk Quotas</h3>
+<pre><span class="cmt"># /etc/fstab — add usrquota and/or grpquota</span>
+/dev/sdb1  /mnt/data  ext4  defaults,usrquota,grpquota  0 0
+
+<span class="cmt"># Remount and create quota database</span>
+mount -o remount /mnt/data
+quotacheck -cug /mnt/data
+quotaon /mnt/data
+
+<span class="cmt"># Set user quota</span>
+edquota -u username      <span class="cmt"># edit in editor</span>
+edquota -t               <span class="cmt"># edit grace period</span>
+edquota -p user1 user2   <span class="cmt"># copy user1's quota to user2</span>
+
+<span class="cmt"># Report</span>
+repquota /mnt/data</pre>
+</div>
+<!-- ═══ 05 NETWORKING ═══ -->
+<div class="tab-pane" id="tab-network">
+<h2 id="rhel-network-configuration-troubleshooting"><span class="icon">🌐</span> Network Configuration &amp; Troubleshooting</h2>
+<p class="topic-desc">IP configuration, bonding/teaming, routing, and diagnostic commands across RHEL versions.</p>
+<h3>IP Address Classes</h3>
+<table>
+<tr><th>Class</th><th>Range</th><th>Default Subnet</th><th>CIDR</th></tr>
+<tr><td>A</td><td>0.0.0.0 – 127.255.255.255</td><td>255.0.0.0</td><td>/8</td></tr>
+<tr><td>B</td><td>128.0.0.0 – 191.255.255.255</td><td>255.255.0.0</td><td>/16</td></tr>
+<tr><td>C</td><td>192.0.0.0 – 223.255.255.255</td><td>255.255.255.0</td><td>/24</td></tr>
+<tr><td>D</td><td>224.0.0.0 – 239.255.255.255</td><td>Multicast</td><td>—</td></tr>
+</table>
+<h3>Static IP Configuration</h3>
+<div class="diff-grid">
+<div class="diff-col rhel6"><h4>RHEL 6 — setup / ifcfg</h4>
+<pre style="font-size:.75rem"># /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+BOOTPROTO=none
+ONBOOT=yes
+IPADDR=192.168.1.10
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+DNS1=8.8.8.8
+
+service network restart</pre>
+</div>
+<div class="diff-col rhel7"><h4>RHEL 7 — nmcli</h4>
+<pre style="font-size:.75rem">nmcli connection add \
+  con-name "eth0" ifname eth0 type ethernet
+nmcli connection modify "eth0" \
+  ipv4.addresses "192.168.1.10/24 192.168.1.1" \
+  ipv4.dns 8.8.8.8 ipv4.method static
+nmcli connection up "eth0"
+systemctl restart network</pre>
+</div>
+</div>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 — NetworkManager &amp; nmcli</div>
+<pre><span class="cmt"># RHEL 8/9 — Traditional network.service is deprecated</span>
+<span class="cmt"># Only NetworkManager; /etc/sysconfig/network-scripts/ deprecated in RHEL 9</span>
+
+<span class="cmt"># Add and configure connection</span>
+nmcli con add type ethernet ifname ens160 con-name mycon
+nmcli con mod mycon \
+  ipv4.addresses 192.168.1.10/24 \
+  ipv4.gateway 192.168.1.1 \
+  ipv4.dns 8.8.8.8 \
+  ipv4.method manual
+nmcli con up mycon
+
+<span class="cmt"># RHEL 9 — use nmtui (TUI) or cockpit web console</span>
+nmtui
+
+<span class="cmt"># Show all connections</span>
+nmcli con show
+nmcli device status</pre>
+</div>
+<h3>Hostname Management</h3>
+<pre><span class="cmt"># Temporary (all versions)</span>
+hostname server1.example.com
+
+<span class="cmt"># RHEL 6 permanent: /etc/sysconfig/network → HOSTNAME=...</span>
+<span class="cmt"># RHEL 7/8/9 permanent:</span>
+hostnamectl set-hostname server1.example.com
+hostnamectl status</pre>
+<h3>NIC Bonding / Teaming</h3>
+<div class="diff-grid">
+<div class="diff-col rhel6"><h4>RHEL 6 — Bonding</h4>
+<pre style="font-size:.75rem"># /etc/sysconfig/network-scripts/ifcfg-bond0
+DEVICE=bond0
+BOOTPROTO=none
+ONBOOT=yes
+IPADDR=192.168.1.5
+BONDING_OPTS="mode=1 miimon=50"
+
+# ifcfg-eth0
+MASTER=bond0
+SLAVE=yes</pre>
+</div>
+<div class="diff-col rhel7"><h4>RHEL 7 — Teaming</h4>
+<pre style="font-size:.75rem">nmcli con add con-name team0 \
+  ifname team0 type team \
+  config '{"runner":{"name":"activebackup"}}'
+nmcli con add con-name port1 \
+  ifname eth1 type team-slave master team0
+nmcli con add con-name port2 \
+  ifname eth2 type team-slave master team0
+nmcli con mod team0 \
+  ipv4.addresses "10.0.0.5/24" ipv4.method static
+nmcli con up team0
+teamdctl team0 state</pre>
+</div>
+</div>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 — Bonding (Teaming deprecated)</div>
+<pre><span class="cmt"># NIC Teaming is deprecated in RHEL 9; use Bonding</span>
+nmcli con add type bond con-name bond0 ifname bond0 \
+  bond.options "mode=active-backup,miimon=1000"
+nmcli con add type ethernet ifname ens160 master bond0
+nmcli con add type ethernet ifname ens161 master bond0
+nmcli con mod bond0 ipv4.addresses 10.0.0.5/24 ipv4.method manual
+nmcli con up bond0</pre>
+</div>
+<h3>Network Diagnostics</h3>
+<pre>ping -c 4 8.8.8.8
+traceroute 8.8.8.8    <span class="cmt"># or tracepath</span>
+nslookup google.com
+dig google.com
+host google.com
+netstat -ntulp         <span class="cmt"># open ports (or ss -ntulp in RHEL 7+)</span>
+ss -ntulp              <span class="cmt"># preferred RHEL 7+</span>
+nmap -p 22 192.168.1.1
+ethtool eth0           <span class="cmt"># check cable/link</span>
+ip addr show
+ip route
+route -n</pre>
+</div>
+<!-- ═══ 06 SELINUX ═══ -->
+<div class="tab-pane" id="tab-selinux">
+<h2 id="rhel-managing-selinux"><span class="icon">🛡️</span> Managing SELinux</h2>
+<p class="topic-desc">SELinux modes, contexts, Booleans, policies, and troubleshooting.</p>
+<h3>SELinux Modes</h3>
+<table>
+<tr><th>Mode</th><th>Policy Checked</th><th>Actions Blocked</th><th>Logs</th></tr>
+<tr><td><span class="label label-red">Enforcing</span></td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+<tr><td><span class="label label-yellow">Permissive</span></td><td>Yes</td><td>No (debug)</td><td>Yes</td></tr>
+<tr><td><span class="label label-green">Disabled</span></td><td>No</td><td>No</td><td>No</td></tr>
+</table>
+<h3>Managing SELinux Modes</h3>
+<pre><span class="cmt"># Check mode</span>
+getenforce
+sestatus
+
+<span class="cmt"># Change temporarily (no reboot)</span>
+setenforce 0    <span class="cmt"># Permissive</span>
+setenforce 1    <span class="cmt"># Enforcing</span>
+
+<span class="cmt"># Permanent — /etc/selinux/config (or /etc/sysconfig/selinux symlink)</span>
+SELINUX=enforcing    <span class="cmt"># or permissive or disabled</span>
+
+<span class="cmt"># Note: Changing to/from disabled requires reboot + relabeling</span></pre>
+<h3>Contexts &amp; Labels</h3>
+<pre><span class="cmt"># View contexts</span>
+ls -Z filename
+ls -ldZ /var/www/html
+ps -efZ | grep httpd
+
+<span class="cmt"># Change context (temporary — lost on relabel)</span>
+chcon -t httpd_sys_content_t /mywebdir
+
+<span class="cmt"># Set persistent context (survives relabel)</span>
+semanage fcontext -a -t httpd_sys_content_t "/mywebdir(/.*)?"
+restorecon -Rv /mywebdir
+
+<span class="cmt"># Relabel entire filesystem (on next boot)</span>
+touch /.autorelabel
+reboot</pre>
+<h3>Booleans</h3>
+<pre><span class="cmt"># List all booleans</span>
+getsebool -a
+getsebool -a | grep ftp
+getsebool -a | grep http
+
+<span class="cmt"># Change boolean temporarily</span>
+setsebool httpd_can_network_connect on
+
+<span class="cmt"># Change permanently (-P)</span>
+setsebool -P httpd_can_network_connect on
+setsebool -P allow_ftpd_anon_write on
+setsebool -P samba_export_all_rw 1</pre>
+<h3>SELinux Port Management</h3>
+<pre><span class="cmt"># View ports for a type</span>
+semanage port -l | grep http
+
+<span class="cmt"># Add custom port for httpd (e.g., 8888)</span>
+semanage port -a -t http_port_t -p tcp 8888</pre>
+<h3>Troubleshooting SELinux Denials</h3>
+<pre><span class="cmt"># Audit log</span>
+cat /var/log/audit/audit.log | grep AVC
+
+<span class="cmt"># Human-readable explanations</span>
+ausearch -m avc -ts recent
+sealert -a /var/log/audit/audit.log
+
+<span class="cmt"># Install troubleshooting tools</span>
+yum install setroubleshoot-server -y    <span class="cmt"># RHEL 6/7</span>
+dnf install setroubleshoot-server -y    <span class="cmt"># RHEL 8/9</span></pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 SELinux Notes</div>
+<ul>
+<li>SELinux is <strong>Enforcing by default</strong> and strongly recommended to keep enabled</li>
+<li><code>semanage</code> from <code>policycoreutils-python-utils</code> package</li>
+<li>RHEL 9: Improved <code>audit2allow</code> and <code>audit2why</code> tools</li>
+<li>New SELinux sandbox modes for containers via <code>container-selinux</code></li>
+</ul>
+</div>
+</div>
+<!-- ═══ 07 BOOT & KERNEL ═══ -->
+<div class="tab-pane" id="tab-booting">
+<h2 id="rhel-booting-procedure-kernel"><span class="icon">🚀</span> Booting Procedure &amp; Kernel</h2>
+<p class="topic-desc">BIOS/UEFI, GRUB, init/systemd, run levels/targets, kernel modules.</p>
+<h3>Boot Stages</h3>
+<table>
+<tr><th>Stage</th><th>RHEL 6</th><th>RHEL 7 / 8 / 9</th></tr>
+<tr><td>Firmware</td><td>BIOS → POST</td><td>BIOS/UEFI → POST</td></tr>
+<tr><td>Boot Loader</td><td>GRUB (v1) — /boot/grub/grub.conf</td><td>GRUB2 — /boot/grub2/grub.cfg</td></tr>
+<tr><td>Kernel</td><td>vmlinuz + initramfs</td><td>vmlinuz + initramfs</td></tr>
+<tr><td>Init Process</td><td>init (PID 1) → /etc/inittab</td><td>systemd (PID 1)</td></tr>
+<tr><td>Runlevel/Target</td><td>runlevels 0–6</td><td>systemd targets</td></tr>
+</table>
+<h3>Run Levels vs Systemd Targets</h3>
+<table>
+<tr><th>Run Level</th><th>Meaning</th><th>Systemd Target</th></tr>
+<tr><td>0</td><td>Halt / Power off</td><td>poweroff.target</td></tr>
+<tr><td>1</td><td>Single user (maintenance)</td><td>rescue.target</td></tr>
+<tr><td>2</td><td>Multi-user, no network</td><td>—</td></tr>
+<tr><td>3</td><td>Multi-user, CLI with network</td><td>multi-user.target</td></tr>
+<tr><td>5</td><td>Multi-user, GUI</td><td>graphical.target</td></tr>
+<tr><td>6</td><td>Reboot</td><td>reboot.target</td></tr>
+</table>
+<pre><span class="cmt"># RHEL 6 — change run level</span>
+init 3
+who -r                         <span class="cmt"># check run level</span>
+
+<span class="cmt"># RHEL 7/8/9 — change target</span>
+systemctl isolate multi-user.target
+systemctl get-default
+systemctl set-default graphical.target</pre>
+<h3>GRUB2 Commands (RHEL 7/8/9)</h3>
+<pre><span class="cmt"># View config (never edit directly)</span>
+cat /boot/grub2/grub.cfg
+
+<span class="cmt"># Regenerate grub config</span>
+grub2-mkconfig -o /boot/grub2/grub.cfg            <span class="cmt"># BIOS</span>
+grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg  <span class="cmt"># UEFI</span>
+
+<span class="cmt"># Reinstall GRUB</span>
+grub2-install /dev/sda   <span class="cmt"># BIOS</span></pre>
+<h3>Kernel Modules</h3>
+<pre>lsmod                     <span class="cmt"># list loaded modules</span>
+modinfo module_name       <span class="cmt"># info about module</span>
+modprobe module_name      <span class="cmt"># load module with deps</span>
+modprobe -r module_name   <span class="cmt"># remove module</span>
+rmmod module_name         <span class="cmt"># remove without dep check</span>
+depmod                    <span class="cmt"># scan for new hardware</span>
+
+<span class="cmt"># Blacklist a module permanently</span>
+echo "blacklist usb_storage" &gt; /etc/modprobe.d/blacklist.conf</pre>
+<h3>Kernel Version &amp; Info</h3>
+<pre>uname -r             <span class="cmt"># kernel version</span>
+uname -a             <span class="cmt"># all info</span>
+rpm -qa kernel*      <span class="cmt"># installed kernels</span>
+cat /etc/redhat-release
+
+<span class="cmt"># RHEL 8/9 — manage multiple kernels</span>
+dnf install kernel    <span class="cmt"># install new kernel</span>
+grubby --default-kernel
+grubby --set-default /boot/vmlinuz-&lt;version&gt;</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 Boot Changes</div>
+<ul>
+<li>RHEL 8/9 uses <strong>systemd</strong> exclusively — no SysV init compatibility layer needed</li>
+<li><strong>Early kdump</strong> available in RHEL 9 for faster crash dumps</li>
+<li><code>/etc/default/grub</code> is the editable GRUB2 config source</li>
+<li>Secure Boot supported; GRUB2 signed by Red Hat</li>
+<li>RHEL 9: <strong>UKI (Unified Kernel Image)</strong> support added</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 08 JOB AUTOMATION ═══ -->
+<div class="tab-pane" id="tab-jobs">
+<h2 id="rhel-job-automation-cron-at"><span class="icon">⏰</span> Job Automation (Cron &amp; At)</h2>
+<p class="topic-desc">Scheduling with crontab, at, anacron — for regular and one-time jobs.</p>
+<h3>Cron Format</h3>
+<pre><span class="cmt"># MIN  HOUR  DOM  MON  DOW  COMMAND</span>
+<span class="cmt">#  0-59  0-23  1-31  1-12  0-7(0&amp;7=Sun)</span>
+
+<span class="cmt"># Examples</span>
+0 2 * * *  /backup.sh            <span class="cmt"># daily at 2AM</span>
+30 8 * * 1  /weekly_report.sh    <span class="cmt"># every Monday 8:30AM</span>
+*/5 * * * * /check.sh            <span class="cmt"># every 5 minutes</span>
+0 0 1 * *   /monthly.sh          <span class="cmt"># first of every month</span>
+@reboot     /startup.sh          <span class="cmt"># on every boot</span>
+@monthly    /monthly.sh          <span class="cmt"># monthly shortcut</span></pre>
+<h3>Crontab Commands</h3>
+<pre>crontab -e              <span class="cmt"># edit current user's crontab</span>
+crontab -l              <span class="cmt"># list crontabs</span>
+crontab -r              <span class="cmt"># remove all crontabs</span>
+crontab -eu username    <span class="cmt"># edit another user's crontab (root)</span>
+cat /etc/crontab        <span class="cmt"># system-wide crontab</span></pre>
+<h3>Allow / Deny Cron</h3>
+<pre><span class="cmt"># /etc/cron.allow — only listed users can use cron</span>
+<span class="cmt"># /etc/cron.deny  — listed users cannot use cron</span>
+<span class="cmt"># If neither file exists → all users except root are denied</span></pre>
+<h3>Service Commands</h3>
+<div class="diff-grid">
+<div class="diff-col rhel6"><h4>RHEL 6</h4>
+<pre style="font-size:.76rem">service crond start
+service crond restart
+chkconfig crond on
+service atd start
+chkconfig atd on</pre>
+</div>
+<div class="diff-col rhel7"><h4>RHEL 7 / 8 / 9</h4>
+<pre style="font-size:.76rem">systemctl start crond
+systemctl restart crond
+systemctl enable crond
+systemctl start atd
+systemctl enable atd</pre>
+</div>
+</div>
+<h3>at Jobs (One-time Execution)</h3>
+<pre>at 14:30                     <span class="cmt"># schedule at 2:30 PM</span>
+at now +30min
+at 9AM Jan 20 2026
+at midnight + 4days
+
+<span class="cmt"># In at editor → enter commands → Ctrl+D to save</span>
+
+atq                          <span class="cmt"># list queued jobs</span>
+at -l                        <span class="cmt"># same as atq</span>
+atrm 3                       <span class="cmt"># remove job #3</span>
+at -r 3                      <span class="cmt"># same as atrm</span></pre>
+<h3>Anacron (Missed Jobs)</h3>
+<pre><span class="cmt"># /etc/anacrontab — handles jobs missed due to downtime</span>
+<span class="cmt"># PERIOD  DELAY  JOB-ID  COMMAND</span>
+1         5      daily    run-parts /etc/cron.daily
+7         10     weekly   run-parts /etc/cron.weekly</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 — systemd Timers</div>
+<pre><span class="cmt"># Modern alternative to cron in RHEL 8/9</span>
+<span class="cmt"># /etc/systemd/system/myjob.timer</span>
+[Unit]
+Description=Run myjob every day
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+systemctl enable --now myjob.timer
+systemctl list-timers --all</pre>
+</div>
+</div>
+<!-- ═══ 09 SSH ═══ -->
+<div class="tab-pane" id="tab-ssh">
+<h2 id="rhel-ssh-remote-administration"><span class="icon">🔐</span> SSH &amp; Remote Administration</h2>
+<p class="topic-desc">SSH configuration, key-based auth, port forwarding, scp, rsync, and security.</p>
+<h3>SSH Basics</h3>
+<pre><span class="cmt"># Connect to remote host</span>
+ssh user@192.168.1.10
+ssh 192.168.1.10 -l root
+ssh root@server.example.com
+
+<span class="cmt"># Run command on remote host without login</span>
+ssh root@192.168.1.10 "df -h"
+
+<span class="cmt"># Run GUI over SSH (X forwarding)</span>
+ssh -X root@192.168.1.10</pre>
+<h3>Key-Based Authentication</h3>
+<pre><span class="cmt"># 1. Generate keys on local machine</span>
+ssh-keygen -t rsa -b 4096
+<span class="cmt"># Keys: ~/.ssh/id_rsa (private)  ~/.ssh/id_rsa.pub (public)</span>
+
+<span class="cmt"># 2. Copy public key to remote host</span>
+ssh-copy-id user@remote_host
+
+<span class="cmt"># Remote stores key in ~/.ssh/authorized_keys</span>
+<span class="cmt"># Next login will not ask password</span></pre>
+<h3>SSH Configuration (/etc/ssh/sshd_config)</h3>
+<pre><span class="cmt"># Prevent root login</span>
+PermitRootLogin no
+
+<span class="cmt"># Disable password auth (key-only)</span>
+PasswordAuthentication no
+
+<span class="cmt"># Allow empty passwords</span>
+PermitEmptyPasswords yes
+
+<span class="cmt"># Enable X11 forwarding</span>
+X11Forwarding yes
+
+<span class="cmt"># Allow/deny specific users</span>
+AllowUsers alice bob
+DenyUsers hacker
+AllowGroups sysadmins
+
+<span class="cmt"># Change SSH port</span>
+Port 2222
+
+<span class="cmt"># Max auth attempts</span>
+MaxAuthTries 3
+
+<span class="cmt"># Restart after changes</span>
+systemctl restart sshd    <span class="cmt"># RHEL 7/8/9</span>
+service sshd restart      <span class="cmt"># RHEL 6</span></pre>
+<h3>File Transfer</h3>
+<pre><span class="cmt"># scp — secure copy (overwrites existing)</span>
+scp file.txt user@192.168.1.10:/tmp/
+scp -r /dir user@host:/dest/
+scp user@host:/remote/file /local/path
+
+<span class="cmt"># rsync — syncs only changed data (faster)</span>
+rsync -av /src/ user@host:/dest/
+rsync -aAx /src/ user@host:/dest/  <span class="cmt"># with ACL+SELinux</span>
+rsync -avz --delete /src/ user@host:/dest/  <span class="cmt"># delete removed files</span></pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 SSH Changes</div>
+<ul>
+<li>RHEL 9: <strong>SHA-1 disabled by default</strong> in crypto policies — update old SSH keys</li>
+<li>System-wide crypto policy: <code>update-crypto-policies --set DEFAULT</code> or <code>FUTURE</code></li>
+<li><code>ssh-rsa</code> keys may need to be re-generated as <code>ed25519</code> for RHEL 9</li>
+<li>RHEL 8+: <code>sshd</code> uses <code>sshd_config.d/</code> drop-in directory</li>
+</ul>
+</div>
+<h3>Allow / Deny Hosts (TCP Wrappers)</h3>
+<pre><span class="cmt"># /etc/hosts.allow — allowed hosts</span>
+sshd: 192.168.1.0/24
+sshd: *.example.com
+
+<span class="cmt"># /etc/hosts.deny — denied hosts</span>
+sshd: ALL EXCEPT 192.168.1.10
+sshd: 10.0.0.0/8</pre>
+</div>
+<!-- ═══ 10 MEMORY & SWAP ═══ -->
+<div class="tab-pane" id="tab-memory">
+<h2 id="rhel-memory-management-swap"><span class="icon">🧠</span> Memory Management &amp; Swap</h2>
+<p class="topic-desc">RAM, swap configuration, virtual memory concepts, and monitoring.</p>
+<h3>Swap Size Guidelines</h3>
+<table>
+<tr><th>RAM</th><th>Recommended Swap</th></tr>
+<tr><td>≤ 2 GB</td><td>2× RAM (minimum 2 GB)</td></tr>
+<tr><td>2–8 GB</td><td>Equal to RAM</td></tr>
+<tr><td>8–64 GB</td><td>4–8 GB</td></tr>
+<tr><td>64–256 GB</td><td>Minimum 16 GB</td></tr>
+</table>
+<h3>Swap Commands</h3>
+<pre>free -m               <span class="cmt"># RAM and swap summary</span>
+swapon -s             <span class="cmt"># list swap partitions/files</span>
+vmstat 2 5            <span class="cmt"># virtual memory statistics</span>
+cat /proc/meminfo     <span class="cmt"># detailed memory info</span>
+
+<span class="cmt"># Activate / deactivate</span>
+swapon /dev/sdb2
+swapoff /dev/sdb2
+swapon -a             <span class="cmt"># all in /etc/fstab</span>
+swapoff -a</pre>
+<h3>Create Swap Partition</h3>
+<pre>fdisk /dev/sdb    <span class="cmt"># create partition, type 82</span>
+mkswap /dev/sdb2
+swapon /dev/sdb2
+
+<span class="cmt"># Add to /etc/fstab</span>
+/dev/sdb2   swap   swap   defaults   0   0</pre>
+<h3>Create Swap File</h3>
+<pre>dd if=/dev/zero of=/swapfile bs=1M count=2048
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+
+<span class="cmt"># /etc/fstab</span>
+/swapfile   swap   swap   defaults   0   0</pre>
+<h3>Key Concepts</h3>
+<ul>
+<li><strong>Virtual memory</strong> = Physical RAM + Swap space</li>
+<li><strong>Page-out (swap-in)</strong>: inactive pages move from RAM → swap</li>
+<li><strong>Page-in (swap-out)</strong>: pages move from swap → RAM when needed</li>
+<li>High swap usage = insufficient RAM; add more RAM rather than more swap</li>
+</ul>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 — Memory Features</div>
+<ul>
+<li><strong>ZRAM</strong> — compressed swap in RAM, enabled by default in RHEL 9 for better performance</li>
+<li><strong>VDO (Virtual Data Optimizer)</strong> — deduplication + compression layer (RHEL 8)</li>
+<li><code>systemd-oomd</code> — out-of-memory daemon to kill processes proactively (RHEL 9)</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 11 SOFTWARE MANAGEMENT ═══ -->
+<div class="tab-pane" id="tab-software">
+<h2 id="rhel-software-management"><span class="icon">📦</span> Software Management</h2>
+<p class="topic-desc">RPM, YUM, DNF, repositories, and kernel patching procedures.</p>
+<h3>RPM Commands</h3>
+<pre><span class="cmt"># Install / Upgrade / Remove</span>
+rpm -ivh package.rpm
+rpm -Uvh package.rpm       <span class="cmt"># upgrade (installs if not present)</span>
+rpm -e package_name
+rpm -e --nodeps package    <span class="cmt"># ignore dependencies</span>
+rpm -ivh package.rpm --force  <span class="cmt"># force reinstall</span>
+
+<span class="cmt"># Query</span>
+rpm -qa                    <span class="cmt"># all installed</span>
+rpm -qa | grep httpd
+rpm -qi package            <span class="cmt"># detailed info</span>
+rpm -ql package            <span class="cmt"># list files</span>
+rpm -qf /usr/bin/ls        <span class="cmt"># which package owns file</span>
+rpm -qR package            <span class="cmt"># list dependencies</span>
+rpm -V  package            <span class="cmt"># verify package integrity</span>
+rpm --replacepkgs package  <span class="cmt"># restore missing files</span></pre>
+<h3>YUM Commands (RHEL 6/7)</h3>
+<pre>yum install httpd -y
+yum remove httpd -y
+yum update httpd
+yum update             <span class="cmt"># update all packages</span>
+yum search keyword
+yum info package
+yum list installed
+yum list available
+yum groupinstall "Development Tools"
+yum repolist
+yum history
+yum history undo &lt;id&gt;
+yum clean all</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 — DNF (Replaces YUM)</div>
+<pre><span class="cmt"># DNF is the default; yum is a compatibility alias in RHEL 8/9</span>
+dnf install httpd -y
+dnf remove httpd
+dnf update
+dnf search keyword
+dnf info package
+dnf grouplist
+dnf groupinstall "Development Tools"
+
+<span class="cmt"># Module streams (Application Streams — new in RHEL 8)</span>
+dnf module list
+dnf module enable nodejs:18
+dnf module install nodejs:18/common
+
+<span class="cmt"># Enable EPEL repository</span>
+dnf install epel-release -y
+dnf config-manager --enable powertools    <span class="cmt"># RHEL 8 CRB</span>
+dnf config-manager --enable crb          <span class="cmt"># RHEL 9 CRB</span></pre>
+</div>
+<h3>YUM Repository Setup</h3>
+<pre><span class="cmt"># /etc/yum.repos.d/local.repo</span>
+[localrepo]
+name=Local RHEL Repo
+baseurl=file:///mnt/cdrom
+gpgcheck=0
+enabled=1
+
+<span class="cmt"># Network repo example</span>
+baseurl=http://server/rhel8
+<span class="cmt"># or</span>
+baseurl=ftp://server/pub/rhel
+
+yum clean all
+yum repolist</pre>
+</div>
+<!-- ═══ 12 BACKUP & RESTORE ═══ -->
+<div class="tab-pane" id="tab-backup">
+<h2 id="rhel-backup-restore"><span class="icon">💿</span> Backup &amp; Restore</h2>
+<p class="topic-desc">tar, cpio, dd, dump/restore, rsync, and backup strategies.</p>
+<h3>tar (Tape Archiving)</h3>
+<pre><span class="cmt"># Create archive</span>
+tar -cvf /backup/etc.tar /etc/
+
+<span class="cmt"># With gzip compression</span>
+tar -czvf /backup/etc.tar.gz /etc/
+
+<span class="cmt"># With bzip2 (smaller, slower)</span>
+tar -cjvf /backup/etc.tar.bz2 /etc/
+
+<span class="cmt"># With xz (RHEL 7+, best compression)</span>
+tar -cJvf /backup/etc.tar.xz /etc/
+
+<span class="cmt"># List contents</span>
+tar -tvf archive.tar
+
+<span class="cmt"># Extract to specific path</span>
+tar -xvf archive.tar -C /restore/
+
+<span class="cmt"># Include ACL and SELinux contexts</span>
+tar --xattrs -cvf /backup/full.tar /data/
+
+<span class="cmt"># Add files to existing archive</span>
+tar -uvf archive.tar newfile</pre>
+<h3>Backup Types</h3>
+<table>
+<tr><th>Type</th><th>Description</th><th>dump Level</th></tr>
+<tr><td>Full</td><td>All data, longest time</td><td>Level 0</td></tr>
+<tr><td>Incremental</td><td>Changes since last backup (any level)</td><td>Levels 1–9</td></tr>
+<tr><td>Differential</td><td>Changes since last full backup</td><td>Level 2 (cumulative)</td></tr>
+</table>
+<h3>dd — Disk-to-Disk Backup</h3>
+<pre>dd if=/dev/sda of=/dev/sdb           <span class="cmt"># clone disk</span>
+dd if=/dev/sda of=/backup/mbr.bak bs=512 count=1  <span class="cmt"># backup MBR</span>
+dd if=/dev/cdrom of=/isos/rhel9.iso  <span class="cmt"># create ISO from DVD</span>
+dd if=/dev/zero of=/bigfile bs=1M count=1024  <span class="cmt"># create empty file</span></pre>
+<h3>rsync</h3>
+<pre>rsync -av /source/ /dest/
+rsync -av /source/ user@host:/dest/
+rsync -aAx /source/ /dest/      <span class="cmt"># preserve ACL + SELinux</span>
+rsync -avz --delete /src/ /dst/ <span class="cmt"># delete removed files</span></pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 Backup Tools</div>
+<ul>
+<li><strong>Restic</strong> — modern, encrypted, deduplicated backup (available via EPEL)</li>
+<li><strong>Relax-and-Recover (ReaR)</strong> — system-level disaster recovery: <code>dnf install rear -y</code></li>
+<li><code>rear mkbackup</code> → creates bootable rescue ISO + backup</li>
+<li>Timeshift (GNOME) for desktop snapshot-based backup</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 13 SERVICES ═══ -->
+<div class="tab-pane" id="tab-services">
+<h2 id="rhel-managing-services-daemons"><span class="icon">⚙️</span> Managing Services &amp; Daemons</h2>
+<p class="topic-desc">service/chkconfig (RHEL 6) vs systemctl (RHEL 7/8/9), unit files, and targets.</p>
+<h3>Service Commands Comparison</h3>
+<table>
+<tr><th>Action</th><th>RHEL 6 (SysV)</th><th>RHEL 7 / 8 / 9 (systemd)</th></tr>
+<tr><td>Start</td><td><code>service httpd start</code></td><td><code>systemctl start httpd</code></td></tr>
+<tr><td>Stop</td><td><code>service httpd stop</code></td><td><code>systemctl stop httpd</code></td></tr>
+<tr><td>Restart</td><td><code>service httpd restart</code></td><td><code>systemctl restart httpd</code></td></tr>
+<tr><td>Reload</td><td><code>service httpd reload</code></td><td><code>systemctl reload httpd</code></td></tr>
+<tr><td>Status</td><td><code>service httpd status</code></td><td><code>systemctl status httpd</code></td></tr>
+<tr><td>Enable at boot</td><td><code>chkconfig httpd on</code></td><td><code>systemctl enable httpd</code></td></tr>
+<tr><td>Disable at boot</td><td><code>chkconfig httpd off</code></td><td><code>systemctl disable httpd</code></td></tr>
+<tr><td>Enable + Start</td><td>two separate commands</td><td><code>systemctl enable --now httpd</code></td></tr>
+<tr><td>List all</td><td><code>chkconfig --list</code></td><td><code>systemctl list-unit-files</code></td></tr>
+</table>
+<h3>systemctl Advanced</h3>
+<pre><span class="cmt"># Mask (prevent any start, including manual)</span>
+systemctl mask httpd
+systemctl unmask httpd
+
+<span class="cmt"># Check dependencies</span>
+systemctl list-dependencies httpd
+
+<span class="cmt"># Failed services</span>
+systemctl --failed --type=service
+
+<span class="cmt"># Journal logs for a service</span>
+journalctl -u httpd
+journalctl -u httpd -f         <span class="cmt"># follow live</span>
+journalctl -u httpd --since "1 hour ago"</pre>
+<h3>initd vs systemd</h3>
+<table>
+<tr><th>Feature</th><th>initd (RHEL 6)</th><th>systemd (RHEL 7+)</th></tr>
+<tr><td>PID 1</td><td>init</td><td>systemd</td></tr>
+<tr><td>Service location</td><td>/etc/init.d/</td><td>/usr/lib/systemd/system/</td></tr>
+<tr><td>Service naming</td><td>httpd, sshd…</td><td>httpd.service, sshd.service…</td></tr>
+<tr><td>Parallel startup</td><td>Sequential (slow)</td><td>Parallel (fast)</td></tr>
+<tr><td>Logging</td><td>/var/log/messages</td><td>journald + /var/log/messages</td></tr>
+</table>
+</div>
+<!-- ═══ 14 PROCESS ═══ -->
+<div class="tab-pane" id="tab-process">
+<h2 id="rhel-process-management"><span class="icon">📊</span> Process Management</h2>
+<p class="topic-desc">ps, top, kill, nice/renice, signals, process states, vmstat, SAR.</p>
+<h3>Key Commands</h3>
+<pre>ps -ef                 <span class="cmt"># all processes with PPID</span>
+ps -aux                <span class="cmt"># all including background</span>
+ps -u username         <span class="cmt"># user's processes</span>
+ps -o pid,comm,%mem,%cpu  <span class="cmt"># custom fields</span>
+pgrep -u alice         <span class="cmt"># PIDs for user alice</span>
+pidof httpd            <span class="cmt"># PIDs of named process</span>
+pstree                 <span class="cmt"># parent-child tree</span></pre>
+<h3>Process Signals</h3>
+<table>
+<tr><th>Signal</th><th>Number</th><th>Action</th></tr>
+<tr><td>SIGHUP</td><td>1</td><td>Reload config (reload)</td></tr>
+<tr><td>SIGINT</td><td>2</td><td>Interrupt (Ctrl+C)</td></tr>
+<tr><td>SIGKILL</td><td>9</td><td>Force kill (unblockable)</td></tr>
+<tr><td>SIGTERM</td><td>15</td><td>Graceful terminate (default)</td></tr>
+<tr><td>SIGCONT</td><td>18</td><td>Continue stopped process</td></tr>
+<tr><td>SIGSTOP</td><td>19</td><td>Stop process</td></tr>
+<tr><td>SIGTSTP</td><td>20</td><td>Suspend (Ctrl+Z)</td></tr>
+</table>
+<pre>kill -9 1234           <span class="cmt"># kill by PID (force)</span>
+kill -15 1234          <span class="cmt"># kill gracefully</span>
+kill -1 1234           <span class="cmt"># reload</span>
+pkill -9 firefox       <span class="cmt"># kill by name</span>
+pkill -u alice         <span class="cmt"># kill all of user</span>
+killall httpd          <span class="cmt"># kill all with name</span></pre>
+<h3>Priority (nice / renice)</h3>
+<pre><span class="cmt"># Nice scale: -20 (highest priority) to 19 (lowest)</span>
+<span class="cmt"># Default niceness = 0</span>
+
+nice -n 10 command       <span class="cmt"># start with low priority</span>
+nice -n -5 command       <span class="cmt"># higher priority (root only)</span>
+renice 5 -p 1234         <span class="cmt"># change running process</span>
+renice -n 10 1560        <span class="cmt"># RHEL 7+ syntax</span></pre>
+<h3>top Interactive Keys</h3>
+<pre><span class="cmt"># While top is running:</span>
+k → kill process    M → sort by memory   P → sort by CPU
+r → renice          u → filter by user   z → color mode
+q → quit            1 → show all CPUs    d → change refresh rate</pre>
+<h3>Monitoring Commands</h3>
+<pre>vmstat 2 10        <span class="cmt"># virtual memory stats every 2s, 10 times</span>
+iostat 5 2         <span class="cmt"># I/O stats</span>
+sar -r 2 5         <span class="cmt"># memory utilization</span>
+sar -p ALL 2 5     <span class="cmt"># CPU utilization</span>
+sar -b 2 5         <span class="cmt"># disk I/O</span>
+uptime             <span class="cmt"># load average (1m, 5m, 15m)</span>
+lscpu              <span class="cmt"># CPU info</span>
+nproc              <span class="cmt"># number of CPUs</span>
+cat /proc/cpuinfo</pre>
+<h3>Process States</h3>
+<ul>
+<li><strong>R</strong> — Running</li>
+<li><strong>S</strong> — Sleeping (interruptible)</li>
+<li><strong>D</strong> — Uninterruptible sleep (I/O wait)</li>
+<li><strong>T</strong> — Stopped (Ctrl+Z)</li>
+<li><strong>Z</strong> — Zombie (finished but parent hasn't reaped)</li>
+<li><strong>O</strong> — Orphan (running without parent)</li>
+</ul>
+</div>
+<!-- ═══ 15 FTP ═══ -->
+<div class="tab-pane" id="tab-ftp">
+<h2 id="rhel-ftp-server-vsftpd"><span class="icon">📁</span> FTP Server (vsftpd)</h2>
+<p class="topic-desc">Configure FTP server, secure FTP, anonymous and authenticated access.</p>
+<h3>FTP Profile</h3>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Package</td><td>vsftpd (server), ftp / lftp (client)</td></tr>
+<tr><td>Config file</td><td>/etc/vsftpd/vsftpd.conf</td></tr>
+<tr><td>Document root</td><td>/var/ftp/pub</td></tr>
+<tr><td>Port</td><td>21 (commands), 20 (data)</td></tr>
+<tr><td>Daemon</td><td>vsftpd</td></tr>
+<tr><td>User control files</td><td>/etc/vsftpd/user_list, /etc/vsftpd/ftpusers</td></tr>
+</table>
+<h3>Basic FTP Server Setup</h3>
+<pre><span class="cmt"># Install</span>
+yum install vsftpd* -y          <span class="cmt"># RHEL 6/7</span>
+dnf install vsftpd -y           <span class="cmt"># RHEL 8/9</span>
+
+<span class="cmt"># Create files in FTP root</span>
+mkdir -p /var/ftp/pub
+touch /var/ftp/pub/test{1..5}
+
+<span class="cmt"># Start and enable</span>
+systemctl start vsftpd
+systemctl enable vsftpd
+
+<span class="cmt"># Firewall</span>
+firewall-cmd --permanent --add-service=ftp
+firewall-cmd --reload</pre>
+<h3>Key vsftpd.conf Settings</h3>
+<pre><span class="cmt"># /etc/vsftpd/vsftpd.conf</span>
+anonymous_enable=YES       <span class="cmt"># allow anon login</span>
+local_enable=YES           <span class="cmt"># allow local users</span>
+write_enable=YES           <span class="cmt"># allow uploads</span>
+anon_upload_enable=YES     <span class="cmt"># anon uploads</span>
+chroot_local_user=YES      <span class="cmt"># jail users to home dir</span>
+ftp_banner="Welcome!"
+max_clients=20</pre>
+<h3>LFTP Client</h3>
+<pre>lftp 192.168.1.10
+lftp&gt; ls
+lftp&gt; get filename
+lftp&gt; put localfile
+lftp&gt; mget f1 f2 f3
+lftp&gt; quit</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 FTP Notes</div>
+<ul>
+<li>vsftpd is still available but SFTP (via SSH) is preferred for security</li>
+<li>SELinux boolean: <code>setsebool -P ftpd_full_access 1</code></li>
+<li>Use <code>pasv_enable=YES</code> with <code>pasv_min/max_port</code> for firewall-friendly passive mode</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 16 NFS ═══ -->
+<div class="tab-pane" id="tab-nfs">
+<h2 id="rhel-nfs-autofs"><span class="icon">🗄️</span> NFS &amp; Autofs</h2>
+<p class="topic-desc">NFS server/client, secure NFS with Kerberos, Autofs, and LDAP client.</p>
+<h3>NFS Server Setup</h3>
+<pre><span class="cmt"># Install and configure</span>
+yum install nfs-utils -y
+mkdir /shared
+chmod 777 /shared
+
+<span class="cmt"># /etc/exports</span>
+/shared   *.example.com(rw,sync)
+/shared   192.168.1.0/24(ro,sync)
+/shared   client1.example.com(rw,sync,no_root_squash)
+
+<span class="cmt"># Export and start</span>
+exportfs -rv
+systemctl restart nfs-server   <span class="cmt"># RHEL 7/8/9</span>
+systemctl enable nfs-server
+service nfs restart             <span class="cmt"># RHEL 6</span>
+
+<span class="cmt"># Firewall</span>
+firewall-cmd --permanent --add-service=nfs
+firewall-cmd --permanent --add-service=mountd
+firewall-cmd --permanent --add-service=rpc-bind
+firewall-cmd --reload</pre>
+<h3>NFS Client</h3>
+<pre><span class="cmt"># Check available exports</span>
+showmount -e server.example.com
+
+<span class="cmt"># Mount temporarily</span>
+mkdir /mnt/nfs
+mount server.example.com:/shared /mnt/nfs
+
+<span class="cmt"># Permanent — /etc/fstab</span>
+server.example.com:/shared  /mnt/nfs  nfs  defaults  0  0</pre>
+<h3>Autofs Configuration</h3>
+<pre><span class="cmt"># Install</span>
+yum install autofs -y
+
+<span class="cmt"># /etc/auto.master</span>
+/mnt   /etc/auto.misc   --timeout=60
+
+<span class="cmt"># /etc/auto.misc</span>
+nfs   -rw   server.example.com:/shared
+
+<span class="cmt"># Restart autofs</span>
+systemctl restart autofs
+systemctl enable autofs
+
+<span class="cmt"># Access triggers auto-mount</span>
+cd /mnt/nfs   <span class="cmt"># → auto-mounted!</span></pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 NFS Notes</div>
+<ul>
+<li>Default NFS version is <strong>NFSv4.2</strong> in RHEL 8/9</li>
+<li>NFSv4 uses TCP port 2049 only — simpler firewall rules</li>
+<li>No need to start rpcbind separately for NFSv4</li>
+<li>NFS over RDMA supported in RHEL 8/9 for high-performance storage</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 17 SAMBA ═══ -->
+<div class="tab-pane" id="tab-samba">
+<h2 id="rhel-samba-server"><span class="icon">🪟</span> Samba Server</h2>
+<p class="topic-desc">File sharing between Linux and Windows using SMB/CIFS protocol.</p>
+<h3>Samba Profile</h3>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Package</td><td>samba (server), samba-client</td></tr>
+<tr><td>Config</td><td>/etc/samba/smb.conf</td></tr>
+<tr><td>Ports</td><td>137(NetBIOS), 138, 139, 445(auth)</td></tr>
+<tr><td>Log</td><td>/var/log/samba/</td></tr>
+<tr><td>Daemons</td><td>smbd, nmbd</td></tr>
+</table>
+<h3>Samba Server Configuration</h3>
+<pre><span class="cmt"># Install</span>
+dnf install samba samba-client -y
+
+<span class="cmt"># Create share directory</span>
+mkdir /samba
+chmod 777 /samba
+chcon -t samba_share_t /samba    <span class="cmt"># SELinux context</span>
+
+<span class="cmt"># Create samba user</span>
+useradd sambauser
+smbpasswd -a sambauser
+
+<span class="cmt"># /etc/samba/smb.conf — add at end</span>
+[myshare]
+  comment = My Samba Share
+  path = /samba
+  public = no
+  writable = yes
+  valid users = sambauser
+  write list = sambauser
+
+<span class="cmt"># Test config</span>
+testparm
+
+<span class="cmt"># Start</span>
+systemctl start smb nmb
+systemctl enable smb nmb
+
+<span class="cmt"># Firewall</span>
+firewall-cmd --permanent --add-service=samba
+firewall-cmd --reload</pre>
+<h3>Samba Client (Linux)</h3>
+<pre><span class="cmt"># List shares</span>
+smbclient -L //server -U username
+
+<span class="cmt"># Mount Samba share</span>
+mount -t cifs //server/myshare /mnt/samba \
+  -o username=sambauser,password=pass
+
+<span class="cmt"># Permanent mount in /etc/fstab</span>
+//server/myshare  /mnt/samba  cifs  credentials=/etc/samba/creds  0  0</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 Samba</div>
+<ul>
+<li>Samba 4.x — full Active Directory Domain Controller support</li>
+<li>SELinux boolean: <code>setsebool -P samba_export_all_rw 1</code></li>
+<li>RHEL 9 ships Samba 4.17+ with SMBv1 disabled by default</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 18 NTP ═══ -->
+<div class="tab-pane" id="tab-ntp">
+<h2 id="rhel-ntp-chrony-time-synchronization"><span class="icon">🕐</span> NTP &amp; Chrony Time Synchronization</h2>
+<p class="topic-desc">Configure time synchronization using ntpd (RHEL 6) or chrony (RHEL 7+).</p>
+<h3>NTP vs Chrony</h3>
+<table>
+<tr><th>Feature</th><th>ntpd (RHEL 6)</th><th>chronyd (RHEL 7/8/9)</th></tr>
+<tr><td>Package</td><td>ntp</td><td>chrony</td></tr>
+<tr><td>Config file</td><td>/etc/ntp.conf</td><td>/etc/chrony.conf</td></tr>
+<tr><td>Daemon</td><td>ntpd</td><td>chronyd</td></tr>
+<tr><td>CLI tool</td><td>ntpq, ntpstat</td><td>chronyc</td></tr>
+<tr><td>Port</td><td>123 UDP</td><td>123 UDP</td></tr>
+</table>
+<h3>Chrony Configuration (RHEL 7/8/9)</h3>
+<pre><span class="cmt"># /etc/chrony.conf</span>
+server time1.google.com iburst
+server time2.google.com iburst
+server 0.rhel.pool.ntp.org iburst
+
+<span class="cmt"># Restrict to local NTP server</span>
+allow 192.168.1.0/24
+
+systemctl restart chronyd
+systemctl enable chronyd
+
+<span class="cmt"># Verify sync</span>
+chronyc tracking
+chronyc sources -v
+timedatectl</pre>
+<h3>timedatectl (RHEL 7+)</h3>
+<pre>timedatectl                          <span class="cmt"># show status</span>
+timedatectl set-time "2025-01-01 12:00:00"
+timedatectl set-timezone Asia/Kolkata
+timedatectl list-timezones | grep Asia
+timedatectl set-ntp true             <span class="cmt"># enable NTP sync</span></pre>
+<h3>NTP RHEL 6</h3>
+<pre>yum install ntp -y
+<span class="cmt"># /etc/ntp.conf → add: server pool.ntp.org iburst</span>
+service ntpd start
+chkconfig ntpd on
+ntpq -p             <span class="cmt"># check peers</span>
+ntpstat             <span class="cmt"># sync status</span></pre>
+</div>
+<!-- ═══ 19 DNS ═══ -->
+<div class="tab-pane" id="tab-dns">
+<h2 id="rhel-dns-server-bind"><span class="icon">🌍</span> DNS Server (BIND)</h2>
+<p class="topic-desc">Configure primary and secondary DNS, forward/reverse zones, unbound caching.</p>
+<h3>DNS Profile</h3>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Package</td><td>bind, bind-utils, caching-nameserver</td></tr>
+<tr><td>Daemon</td><td>named</td></tr>
+<tr><td>Port</td><td>53 (UDP/TCP)</td></tr>
+<tr><td>Main config</td><td>/etc/named.conf</td></tr>
+<tr><td>Zone config</td><td>/etc/named.rfc1912.zones</td></tr>
+<tr><td>Zone files</td><td>/var/named/</td></tr>
+<tr><td>Log</td><td>/var/log/messages</td></tr>
+</table>
+<h3>Primary DNS Server Setup</h3>
+<pre><span class="cmt"># Install</span>
+yum install bind* caching-nameserver* -y    <span class="cmt"># RHEL 6/7</span>
+dnf install bind bind-utils -y             <span class="cmt"># RHEL 8/9</span>
+
+<span class="cmt"># /etc/named.conf — key changes</span>
+listen-on port 53 { 127.0.0.1; 192.168.1.11; };
+allow-query { localhost; 192.168.1.0/24; };
+
+<span class="cmt"># /etc/named.rfc1912.zones — add zones</span>
+zone "example.com" IN {
+    type master;
+    file "named.forward";
+};
+zone "1.168.192.in-addr.arpa" IN {
+    type master;
+    file "named.reverse";
+};
+
+<span class="cmt"># Forward zone — /var/named/named.forward</span>
+$TTL 1D
+@  IN SOA  ns1.example.com. admin.example.com. (2024010101 1D 1H 1W 3H)
+   IN NS   ns1.example.com.
+ns1        IN A   192.168.1.11
+server     IN A   192.168.1.11
+client     IN A   192.168.1.10
+www        IN CNAME  server.example.com.
+
+<span class="cmt"># Reverse zone — /var/named/named.reverse</span>
+$TTL 1D
+@ IN SOA ns1.example.com. admin.example.com. (2024010101 1D 1H 1W 3H)
+  IN NS  ns1.example.com.
+11 IN PTR server.example.com.
+10 IN PTR client.example.com.
+
+<span class="cmt"># Verify config</span>
+named-checkconf
+named-checkzone example.com /var/named/named.forward
+
+<span class="cmt"># Start</span>
+systemctl restart named
+systemctl enable named
+
+<span class="cmt"># Firewall</span>
+firewall-cmd --permanent --add-service=dns
+firewall-cmd --reload
+
+<span class="cmt"># Test</span>
+dig server.example.com
+dig -x 192.168.1.11
+nslookup server.example.com</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 DNS — unbound</div>
+<pre><span class="cmt"># RHEL 8/9 — unbound for caching resolver (replaces dnsmasq for many cases)</span>
+dnf install unbound -y
+systemctl enable --now unbound
+
+<span class="cmt"># /etc/unbound/unbound.conf</span>
+interface: 0.0.0.0
+access-control: 192.168.1.0/24 allow
+
+<span class="cmt"># RHEL 9 — split DNS with systemd-resolved</span>
+systemctl enable --now systemd-resolved
+resolvectl status</pre>
+</div>
+</div>
+<!-- ═══ 20 DHCP ═══ -->
+<div class="tab-pane" id="tab-dhcp">
+<h2 id="rhel-dhcp-server"><span class="icon">📡</span> DHCP Server</h2>
+<p class="topic-desc">Dynamic IP assignment with DHCP — DORA process, server and client config.</p>
+<h3>DHCP DORA Process</h3>
+<ol>
+<li><strong>Discover</strong> — Client broadcasts looking for DHCP server</li>
+<li><strong>Offer</strong> — Server offers an IP address</li>
+<li><strong>Request</strong> — Client requests the offered IP</li>
+<li><strong>Acknowledge</strong> — Server confirms the lease</li>
+</ol>
+<h3>DHCP Profile</h3>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Package</td><td>dhcp (server), dhclient (client)</td></tr>
+<tr><td>Config</td><td>/etc/dhcp/dhcpd.conf</td></tr>
+<tr><td>Lease file</td><td>/var/lib/dhcpd/dhcpd.leases</td></tr>
+<tr><td>Port</td><td>67 (server), 68 (client) — UDP</td></tr>
+<tr><td>Daemon</td><td>dhcpd</td></tr>
+</table>
+<h3>DHCP Server Configuration</h3>
+<pre><span class="cmt"># Install</span>
+yum install dhcp -y         <span class="cmt"># RHEL 6/7</span>
+dnf install dhcp-server -y  <span class="cmt"># RHEL 8/9</span>
+
+<span class="cmt"># /etc/dhcp/dhcpd.conf</span>
+default-lease-time 3600;
+max-lease-time 86400;
+authoritative;
+
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    range 192.168.1.50 192.168.1.150;
+    option domain-name "example.com";
+    option domain-name-servers 192.168.1.11;
+    option routers 192.168.1.1;
+    option broadcast-address 192.168.1.255;
+}
+
+<span class="cmt"># Fixed IP for specific host (reservation)</span>
+host printer {
+    hardware ethernet 00:11:22:33:44:55;
+    fixed-address 192.168.1.200;
+}
+
+<span class="cmt"># Start</span>
+systemctl start dhcpd
+systemctl enable dhcpd
+
+<span class="cmt"># Firewall</span>
+firewall-cmd --permanent --add-service=dhcp
+firewall-cmd --reload</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 DHCP</div>
+<ul>
+<li>RHEL 8+: Use <strong>dhcp-server</strong> package (renamed from dhcp)</li>
+<li>NetworkManager handles DHCPv6 for clients automatically</li>
+<li>ISC DHCP is being replaced by <strong>Kea DHCP</strong> in future versions</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 21 APACHE ═══ -->
+<div class="tab-pane" id="tab-apache">
+<h2 id="rhel-web-server-apache-httpd"><span class="icon">🌐</span> Web Server (Apache httpd)</h2>
+<p class="topic-desc">Apache configuration, virtual hosts, SSL/TLS, CGI, and access control.</p>
+<h3>Apache Profile</h3>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Package</td><td>httpd</td></tr>
+<tr><td>Config dir</td><td>/etc/httpd/conf/</td></tr>
+<tr><td>VHost configs</td><td>/etc/httpd/conf.d/</td></tr>
+<tr><td>Document root</td><td>/var/www/html/</td></tr>
+<tr><td>Log files</td><td>/var/log/httpd/</td></tr>
+<tr><td>Port</td><td>80 (HTTP), 443 (HTTPS)</td></tr>
+<tr><td>Daemon</td><td>httpd</td></tr>
+</table>
+<h3>Basic Apache Setup</h3>
+<pre>yum install httpd -y          <span class="cmt"># RHEL 6/7</span>
+dnf install httpd -y          <span class="cmt"># RHEL 8/9</span>
+
+echo "&lt;h1&gt;Hello&lt;/h1&gt;" &gt; /var/www/html/index.html
+
+systemctl start httpd
+systemctl enable httpd
+
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --add-service=https
+firewall-cmd --reload</pre>
+<h3>Virtual Host Configuration</h3>
+<pre><span class="cmt"># /etc/httpd/conf.d/site1.conf</span>
+&lt;VirtualHost 192.168.1.11:80&gt;
+    ServerAdmin admin@site1.com
+    ServerName site1.example.com
+    DocumentRoot /var/www/site1
+    ErrorLog /var/log/httpd/site1_error.log
+    CustomLog /var/log/httpd/site1_access.log combined
+&lt;/VirtualHost&gt;
+
+&lt;Directory "/var/www/site1"&gt;
+    AllowOverride None
+    Require all granted
+&lt;/Directory&gt;</pre>
+<h3>HTTPS / SSL Configuration</h3>
+<pre>yum install mod_ssl -y
+
+<span class="cmt"># /etc/httpd/conf.d/ssl.conf — key lines</span>
+&lt;VirtualHost *:443&gt;
+    SSLEngine on
+    SSLCertificateFile    /etc/pki/tls/certs/server.crt
+    SSLCertificateKeyFile /etc/pki/tls/private/server.key
+    ServerName server.example.com
+    DocumentRoot /var/www/html
+&lt;/VirtualHost&gt;</pre>
+<h3>Password-Protected Directory</h3>
+<pre>htpasswd -c /etc/httpd/conf.d/.htpasswd admin
+<span class="cmt"># (remove -c for additional users)</span>
+
+<span class="cmt"># In VirtualHost config</span>
+&lt;Directory "/var/www/html/private"&gt;
+    AuthType Basic
+    AuthName "Restricted Area"
+    AuthUserFile /etc/httpd/conf.d/.htpasswd
+    Require valid-user
+&lt;/Directory&gt;</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 Apache Notes</div>
+<ul>
+<li>Apache 2.4 — <code>Require all granted</code> replaces <code>Order Allow,Deny</code></li>
+<li>RHEL 9: TLS 1.0/1.1 disabled by default via crypto policies</li>
+<li>Use <code>apachectl configtest</code> to validate config</li>
+<li><code>httpd -M</code> to list loaded modules</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 22 MAIL ═══ -->
+<div class="tab-pane" id="tab-mail">
+<h2 id="rhel-mail-server-postfix"><span class="icon">📧</span> Mail Server (Postfix)</h2>
+<p class="topic-desc">Configure Postfix MTA, relay, and basic mail routing.</p>
+<h3>Mail Profile</h3>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Package (server)</td><td>postfix</td></tr>
+<tr><td>Package (client)</td><td>mailx, mutt</td></tr>
+<tr><td>Config file</td><td>/etc/postfix/main.cf</td></tr>
+<tr><td>Port</td><td>25 (SMTP), 587 (submission), 110 (POP3), 143 (IMAP)</td></tr>
+<tr><td>Log</td><td>/var/log/maillog</td></tr>
+<tr><td>Queue</td><td>/var/spool/postfix/</td></tr>
+</table>
+<h3>Basic Postfix Setup</h3>
+<pre>yum install postfix -y    <span class="cmt"># usually pre-installed</span>
+
+<span class="cmt"># /etc/postfix/main.cf — key settings</span>
+inet_interfaces = all           <span class="cmt"># listen on all interfaces</span>
+myhostname = mail.example.com
+mydomain = example.com
+myorigin = $mydomain
+mydestination = $myhostname, localhost, $mydomain
+mynetworks = 192.168.1.0/24
+relayhost =                     <span class="cmt"># leave empty for local delivery</span>
+
+systemctl start postfix
+systemctl enable postfix
+
+firewall-cmd --permanent --add-service=smtp
+firewall-cmd --reload
+
+<span class="cmt"># Test</span>
+echo "Test" | mail -s "Subject" user@example.com
+mailq              <span class="cmt"># view mail queue</span></pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 Mail</div>
+<ul>
+<li>Postfix replaces sendmail as default MTA in RHEL 8/9</li>
+<li>Use <code>postconf -e 'setting = value'</code> to modify config</li>
+<li>For full mail server: add Dovecot (IMAP/POP3) and SpamAssassin</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 23 iSCSI ═══ -->
+<div class="tab-pane" id="tab-iscsi">
+<h2 id="rhel-iscsi-remote-storage"><span class="icon">💿</span> iSCSI (Remote Storage)</h2>
+<p class="topic-desc">Configure iSCSI target (server) and initiator (client) for block-level SAN storage.</p>
+<h3>iSCSI Terminology</h3>
+<ul>
+<li><strong>Target</strong> — the iSCSI server exposing storage (LUN)</li>
+<li><strong>Initiator</strong> — the client connecting to the target</li>
+<li><strong>IQN</strong> — iSCSI Qualified Name (unique identifier)</li>
+<li><strong>LUN</strong> — Logical Unit Number (virtual disk)</li>
+<li>Port: <strong>3260 TCP</strong></li>
+</ul>
+<h3>iSCSI Target (Server)</h3>
+<pre><span class="cmt"># RHEL 6/7</span>
+yum install scsi-target-utils -y
+<span class="cmt"># RHEL 8/9</span>
+dnf install targetcli -y
+
+targetcli
+/backstores/block create name=disk1 dev=/dev/sdb
+/iscsi create iqn.2024-01.com.example:storage
+/iscsi/iqn.2024-01.com.example:storage/tpg1/luns create /backstores/block/disk1
+/iscsi/iqn.2024-01.com.example:storage/tpg1/acls create iqn.2024-01.com.example:client1
+saveconfig
+exit
+
+systemctl start target
+systemctl enable target
+
+firewall-cmd --permanent --add-port=3260/tcp
+firewall-cmd --reload</pre>
+<h3>iSCSI Initiator (Client)</h3>
+<pre>yum install iscsi-initiator-utils -y
+
+<span class="cmt"># /etc/iscsi/initiatorname.iscsi</span>
+InitiatorName=iqn.2024-01.com.example:client1
+
+<span class="cmt"># Discover targets</span>
+iscsiadm -m discovery -t st -p 192.168.1.10
+
+<span class="cmt"># Login</span>
+iscsiadm -m node -T iqn.2024-01.com.example:storage -p 192.168.1.10 -l
+
+<span class="cmt"># Verify new disk</span>
+fdisk -l
+lsblk</pre>
+</div>
+<!-- ═══ 24 MYSQL ═══ -->
+<div class="tab-pane" id="tab-mysql">
+<h2 id="rhel-mysql-mariadb"><span class="icon">🗃️</span> MySQL / MariaDB</h2>
+<p class="topic-desc">Install, configure, and manage MySQL/MariaDB database server.</p>
+<h3>MySQL Profile</h3>
+<table>
+<tr><th>Item</th><th>RHEL 6/7</th><th>RHEL 8/9</th></tr>
+<tr><td>Package</td><td>mysql-server</td><td>mysql-server or mariadb-server</td></tr>
+<tr><td>Config</td><td>/etc/my.cnf</td><td>/etc/my.cnf or /etc/mysql/</td></tr>
+<tr><td>Data dir</td><td>/var/lib/mysql</td><td>/var/lib/mysql</td></tr>
+<tr><td>Port</td><td>3306</td><td>3306</td></tr>
+</table>
+<h3>MariaDB Setup (RHEL 8/9)</h3>
+<pre>dnf install mariadb-server -y
+systemctl start mariadb
+systemctl enable mariadb
+
+<span class="cmt"># Secure installation</span>
+mysql_secure_installation
+
+<span class="cmt"># Connect</span>
+mysql -u root -p
+
+<span class="cmt"># Basic SQL</span>
+SHOW DATABASES;
+CREATE DATABASE mydb;
+USE mydb;
+CREATE TABLE users (id INT, name VARCHAR(50));
+GRANT ALL ON mydb.* TO 'app'@'localhost' IDENTIFIED BY 'password';
+FLUSH PRIVILEGES;
+
+<span class="cmt"># Firewall</span>
+firewall-cmd --permanent --add-service=mysql
+firewall-cmd --reload</pre>
+<h3>RHEL 8/9 Module Streams</h3>
+<pre><span class="cmt"># Available MySQL versions</span>
+dnf module list mysql
+
+<span class="cmt"># Install specific version</span>
+dnf module enable mysql:8.0 -y
+dnf install mysql-server -y</pre>
+</div>
+<!-- ═══ 25 LOGS ═══ -->
+<div class="tab-pane" id="tab-logs">
+<h2 id="rhel-log-management"><span class="icon">📋</span> Log Management</h2>
+<p class="topic-desc">rsyslog, journald, logrotate, and centralized logging.</p>
+<h3>Key Log Files</h3>
+<table>
+<tr><th>Log File</th><th>Contents</th></tr>
+<tr><td>/var/log/messages</td><td>General system messages</td></tr>
+<tr><td>/var/log/secure</td><td>Authentication, sudo, SSH logs</td></tr>
+<tr><td>/var/log/dmesg</td><td>Kernel ring buffer / hardware messages</td></tr>
+<tr><td>/var/log/cron</td><td>Cron and at job execution</td></tr>
+<tr><td>/var/log/maillog</td><td>Mail server logs</td></tr>
+<tr><td>/var/log/httpd/</td><td>Apache access and error logs</td></tr>
+<tr><td>/var/log/audit/audit.log</td><td>SELinux and audit events</td></tr>
+<tr><td>/var/log/yum.log</td><td>Package installation history</td></tr>
+<tr><td>/var/log/wtmp</td><td>Login history (use <code>last</code>)</td></tr>
+<tr><td>/var/log/btmp</td><td>Failed login history (use <code>lastb</code>)</td></tr>
+</table>
+<h3>rsyslog Configuration</h3>
+<pre><span class="cmt"># /etc/rsyslog.conf</span>
+<span class="cmt"># Facility.Severity   Action</span>
+*.info;mail.none;authpriv.none  /var/log/messages
+authpriv.*                      /var/log/secure
+cron.*                          /var/log/cron
+
+<span class="cmt"># Send logs to remote log server</span>
+*.* @@192.168.1.20:514    <span class="cmt"># TCP (@@)</span>
+*.* @192.168.1.20:514     <span class="cmt"># UDP (@)</span></pre>
+<h3>journald (RHEL 7/8/9)</h3>
+<pre>journalctl                          <span class="cmt"># all logs</span>
+journalctl -n 50                    <span class="cmt"># last 50 lines</span>
+journalctl -f                       <span class="cmt"># follow live</span>
+journalctl -p err                   <span class="cmt"># errors only</span>
+journalctl -u httpd                 <span class="cmt"># specific service</span>
+journalctl --since "2024-01-01"
+journalctl --since yesterday --until now
+journalctl -b                       <span class="cmt"># current boot</span>
+journalctl -b -1                    <span class="cmt"># previous boot</span>
+
+<span class="cmt"># Make journal persistent</span>
+mkdir -p /var/log/journal
+systemd-tmpfiles --create --prefix /var/log/journal</pre>
+<h3>logrotate</h3>
+<pre><span class="cmt"># /etc/logrotate.conf  /etc/logrotate.d/</span>
+/var/log/messages {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+    postrotate
+        /bin/kill -HUP $(cat /var/run/syslogd.pid 2&gt;/dev/null) 2&gt;/dev/null || true
+    endscript
+}
+
+logrotate -f /etc/logrotate.conf   <span class="cmt"># force rotate now</span></pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 Logging</div>
+<ul>
+<li>RHEL 8/9: journald logs stored in <code>/var/log/journal/</code> persistently by default</li>
+<li><code>rsyslog</code> still available alongside journald</li>
+<li><strong>logwatch</strong>: <code>dnf install logwatch -y</code> for daily log summaries</li>
+</ul>
+</div>
+</div>
+<!-- ═══ 26 FIREWALL ═══ -->
+<div class="tab-pane" id="tab-firewall">
+<h2 id="rhel-firewall-iptables"><span class="icon">🔥</span> Firewall &amp; IPtables</h2>
+<p class="topic-desc">iptables (RHEL 6), firewalld (RHEL 7/8/9), and nftables (RHEL 9).</p>
+<h3>iptables (RHEL 6)</h3>
+<pre><span class="cmt"># Allow service</span>
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+
+<span class="cmt"># Block IP</span>
+iptables -A INPUT -s 10.0.0.5 -j DROP
+
+<span class="cmt"># Save and restore</span>
+service iptables save
+service iptables restart
+iptables -L -n -v    <span class="cmt"># list rules</span></pre>
+<h3>firewalld (RHEL 7/8/9)</h3>
+<pre><span class="cmt"># Status</span>
+systemctl start firewalld
+systemctl enable firewalld
+firewall-cmd --state
+
+<span class="cmt"># Add service (permanent)</span>
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --add-service=ssh
+firewall-cmd --reload
+
+<span class="cmt"># Add port directly</span>
+firewall-cmd --permanent --add-port=8080/tcp
+firewall-cmd --reload
+
+<span class="cmt"># Remove service</span>
+firewall-cmd --permanent --remove-service=http
+firewall-cmd --reload
+
+<span class="cmt"># List rules</span>
+firewall-cmd --list-all
+firewall-cmd --list-services
+
+<span class="cmt"># Zones</span>
+firewall-cmd --get-active-zones
+firewall-cmd --zone=public --add-service=https --permanent</pre>
+<h3>Rich Rules (advanced)</h3>
+<pre><span class="cmt"># Allow specific IP for SSH</span>
+firewall-cmd --permanent --add-rich-rule=\
+  'rule family="ipv4" source address="192.168.1.5" service name="ssh" accept'
+
+<span class="cmt"># Block an IP</span>
+firewall-cmd --permanent --add-rich-rule=\
+  'rule family="ipv4" source address="10.0.0.5" reject'
+
+firewall-cmd --reload</pre>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8 / 9 — nftables Backend</div>
+<pre><span class="cmt"># RHEL 8+: firewalld uses nftables backend (not iptables)</span>
+<span class="cmt"># nftables is also available directly</span>
+nft list ruleset
+
+<span class="cmt"># iptables-legacy still available for compatibility</span>
+iptables-legacy -L
+
+<span class="cmt"># RHEL 9: prefer firewalld; nftables scripting for advanced use</span>
+nft add rule inet filter input tcp dport 80 accept</pre>
+</div>
+</div>
+<!-- ═══ 27 PORT REFERENCE ═══ -->
+<div class="tab-pane" id="tab-ports">
+<h2 id="rhel-port-numbers-reference"><span class="icon">🔌</span> Port Numbers Reference</h2>
+<p class="topic-desc">Common service port numbers for quick exam and interview reference.</p>
+<div class="port-grid">
+<div class="port-item">FTP Data <span class="port-num">20</span></div>
+<div class="port-item">FTP Control <span class="port-num">21</span></div>
+<div class="port-item">SSH <span class="port-num">22</span></div>
+<div class="port-item">Telnet <span class="port-num">23</span></div>
+<div class="port-item">SMTP <span class="port-num">25</span></div>
+<div class="port-item">DNS <span class="port-num">53</span></div>
+<div class="port-item">DHCP Server <span class="port-num">67</span></div>
+<div class="port-item">DHCP Client <span class="port-num">68</span></div>
+<div class="port-item">TFTP <span class="port-num">69</span></div>
+<div class="port-item">HTTP <span class="port-num">80</span></div>
+<div class="port-item">POP3 <span class="port-num">110</span></div>
+<div class="port-item">NTP <span class="port-num">123</span></div>
+<div class="port-item">NetBIOS NS <span class="port-num">137</span></div>
+<div class="port-item">NetBIOS DG <span class="port-num">138</span></div>
+<div class="port-item">NetBIOS Session <span class="port-num">139</span></div>
+<div class="port-item">IMAP <span class="port-num">143</span></div>
+<div class="port-item">SNMP <span class="port-num">161</span></div>
+<div class="port-item">LDAP <span class="port-num">389</span></div>
+<div class="port-item">HTTPS <span class="port-num">443</span></div>
+<div class="port-item">Samba Auth <span class="port-num">445</span></div>
+<div class="port-item">Log Server <span class="port-num">514</span></div>
+<div class="port-item">SMTP Submission <span class="port-num">587</span></div>
+<div class="port-item">LDAPS <span class="port-num">636</span></div>
+<div class="port-item">NFS <span class="port-num">2049</span></div>
+<div class="port-item">Squid Proxy <span class="port-num">3128</span></div>
+<div class="port-item">MySQL/MariaDB <span class="port-num">3306</span></div>
+<div class="port-item">iSCSI <span class="port-num">3260</span></div>
+<div class="port-item">Cockpit <span class="port-num">9090</span></div>
+</div>
+<hr class="divider"/>
+<h3>Quick Reference Table</h3>
+<table>
+<tr><th>Protocol</th><th>Transport</th><th>Port</th></tr>
+<tr><td>ICMP (ping)</td><td>—</td><td>No port number</td></tr>
+<tr><td>HTTP</td><td>TCP</td><td>80</td></tr>
+<tr><td>HTTPS (SSL/TLS)</td><td>TCP</td><td>443</td></tr>
+<tr><td>SSH</td><td>TCP</td><td>22</td></tr>
+<tr><td>FTP (passive/active)</td><td>TCP</td><td>21 (cmd), 20 (data)</td></tr>
+<tr><td>DNS</td><td>UDP/TCP</td><td>53</td></tr>
+<tr><td>DHCP</td><td>UDP</td><td>67/68</td></tr>
+<tr><td>NTP</td><td>UDP</td><td>123</td></tr>
+<tr><td>NFS</td><td>TCP/UDP</td><td>2049</td></tr>
+<tr><td>Samba/CIFS</td><td>TCP</td><td>445</td></tr>
+</table>
+<div class="card rhel8">
+<div class="card-title">🔵 RHEL 8/9 New Services</div>
+<table>
+<tr><th>Service</th><th>Port</th><th>Description</th></tr>
+<tr><td>Cockpit Web Console</td><td>9090 TCP</td><td>Web-based admin UI</td></tr>
+<tr><td>Podman REST API</td><td>8080 TCP</td><td>Container management</td></tr>
+<tr><td>Prometheus</td><td>9090 TCP</td><td>Monitoring (EPEL)</td></tr>
+</table>
+</div>
+</div>
+</main>
+
+  </main>
+
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#rhel-user-group-administration" class="toc-link">👤User & Group Administration</a><a href="#rhel-managing-partitions-file-systems" class="toc-link">💾Managing Partitions & File Systems</a><a href="#rhel-lvm-raid" class="toc-link">🗂️LVM & RAID</a><a href="#rhel-permissions-acl-special-bits" class="toc-link">🔒Permissions, ACL & Special Bits</a><a href="#rhel-network-configuration-troubleshooting" class="toc-link">🌐Network Configuration & Troubleshooting</a><a href="#rhel-managing-selinux" class="toc-link">🛡️Managing SELinux</a><a href="#rhel-booting-procedure-kernel" class="toc-link">🚀Booting Procedure & Kernel</a><a href="#rhel-job-automation-cron-at" class="toc-link">⏰Job Automation (Cron & At)</a><a href="#rhel-ssh-remote-administration" class="toc-link">🔐SSH & Remote Administration</a><a href="#rhel-memory-management-swap" class="toc-link">🧠Memory Management & Swap</a><a href="#rhel-software-management" class="toc-link">📦Software Management</a><a href="#rhel-backup-restore" class="toc-link">💿Backup & Restore</a><a href="#rhel-managing-services-daemons" class="toc-link">⚙️Managing Services & Daemons</a><a href="#rhel-process-management" class="toc-link">📊Process Management</a><a href="#rhel-ftp-server-vsftpd" class="toc-link">📁FTP Server (vsftpd)</a><a href="#rhel-nfs-autofs" class="toc-link">🗄️NFS & Autofs</a><a href="#rhel-samba-server" class="toc-link">🪟Samba Server</a><a href="#rhel-ntp-chrony-time-synchronization" class="toc-link">🕐NTP & Chrony Time Synchronization</a><a href="#rhel-dns-server-bind" class="toc-link">🌍DNS Server (BIND)</a><a href="#rhel-dhcp-server" class="toc-link">📡DHCP Server</a><a href="#rhel-web-server-apache-httpd" class="toc-link">🌐Web Server (Apache httpd)</a><a href="#rhel-mail-server-postfix" class="toc-link">📧Mail Server (Postfix)</a><a href="#rhel-iscsi-remote-storage" class="toc-link">💿iSCSI (Remote Storage)</a><a href="#rhel-mysql-mariadb" class="toc-link">🗃️MySQL / MariaDB</a><a href="#rhel-log-management" class="toc-link">📋Log Management</a><a href="#rhel-firewall-iptables" class="toc-link">🔥Firewall & IPtables</a><a href="#rhel-port-numbers-reference" class="toc-link">🔌Port Numbers Reference</a></nav>
+</div>
+
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer id="site-footer">
+  <span>StudyHub — Technical Reference Library</span>
+  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+</footer>
+
+<script>
+// Progress + back-to-top
+const pr = document.getElementById('prog');
+const bt = document.getElementById('btt');
+addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const m = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+  if (pr) pr.style.width = (m > 0 ? Math.min(s / m * 100, 100) : 0) + '%';
+  if (bt) bt.classList.toggle('vis', s > 280);
+}, {passive: true});
+
+// Nav toggle
+function toggleNav() {
+  const nav = document.getElementById('site-nav');
+  const ov = document.getElementById('mob-ov');
+  nav.classList.toggle('open');
+  ov.classList.toggle('on');
+}
+
+// Active ToC highlighting
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('.content-section[id]');
+function updateToc() {
+  const top = window.scrollY + 80;
+  let cur = null;
+  sections.forEach(s => { if (s.offsetTop <= top) cur = s.id; });
+  tocLinks.forEach(l => {
+    l.classList.toggle('active-toc', l.getAttribute('href') === '#' + cur);
+  });
+}
+if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
+
+
+</script>
+</body>
+</html>

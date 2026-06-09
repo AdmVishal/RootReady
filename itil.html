@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITIL & Unix Operations — StudyHub</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* ── site-wide overrides ── */
+:root { --topbar-h:58px; --sidebar-w:240px; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* topbar */
+#site-topbar {
+  position:fixed; top:0; left:0; right:0; z-index:9000;
+  height:var(--topbar-h); background:var(--navy);
+  display:flex; align-items:center; padding:0 20px; gap:14px;
+  border-bottom:2px solid var(--blue);
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo span { color:var(--accent); }
+.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.topbar-spacer { flex:1; }
+#menu-btn { display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
+
+/* progress bar */
+#prog { position:fixed; top:var(--topbar-h); left:0; height:3px; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--sky)); z-index:8999;
+  transition:width .08s linear; pointer-events:none; }
+
+/* back-to-top */
+#btt { position:fixed; bottom:24px; right:20px; width:42px; height:42px;
+  background:var(--blue); color:#fff; border:none; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; z-index:8998; opacity:0; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(27,79,138,.45); transition:opacity .2s,transform .2s; }
+#btt.vis { opacity:1; pointer-events:auto; }
+#btt:hover { background:var(--mid); transform:translateY(-2px); }
+
+/* layout */
+.site-body { display:flex; margin-top:var(--topbar-h); flex:1; min-height:calc(100vh - var(--topbar-h)); }
+
+/* left sidebar (page nav) */
+#site-nav {
+  width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.nav-sec { padding:10px 16px 2px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); }
+.nav-link { display:flex; align-items:center; gap:8px; padding:9px 16px;
+  color:var(--text2); text-decoration:none; font-size:.84rem; border-left:3px solid transparent;
+  transition:all .12s; }
+.nav-link:hover { background:rgba(255,255,255,.05); color:var(--text); border-left-color:var(--border2); }
+.nav-link.active { background:rgba(240,165,0,.09); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
+
+/* right toc sidebar */
+#toc-nav {
+  width:220px; flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  padding:16px 0; display:flex; flex-direction:column;
+}
+.toc-head { padding:0 16px 8px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); border-bottom:1px solid var(--border); margin-bottom:4px; }
+.toc-link { display:block; padding:6px 16px; color:var(--text3); text-decoration:none;
+  font-size:.78rem; line-height:1.35; transition:color .12s;
+  border-left:2px solid transparent; }
+.toc-link:hover { color:var(--sky); border-left-color:var(--sky); }
+.toc-link.h3 { padding-left:26px; font-size:.72rem; }
+
+/* main content */
+#main-content {
+  flex:1; padding:32px 40px; overflow-x:hidden; min-width:0;
+}
+.page-hero {
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.page-hero h1 { margin-bottom:6px; }
+.page-hero p { color:var(--text2); font-size:.95rem; margin:0; }
+.hero-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; }
+.badge-blue { background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:var(--green); border:1px solid rgba(16,185,129,.25); }
+.badge-gold { background:rgba(240,165,0,.15); color:var(--accent); border:1px solid rgba(240,165,0,.25); }
+.badge-purple { background:rgba(139,92,246,.15); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+
+/* content sections */
+.content-section { margin-bottom:40px; scroll-margin-top:calc(var(--topbar-h) + 16px); }
+.section-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px; margin-bottom:20px;
+}
+.section-card h2 { margin-top:0; }
+
+/* code blocks */
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; margin:12px 0 16px; }
+code { font-family:var(--font-mono); font-size:.82rem; color:var(--code-fg); }
+pre code { color:var(--code-fg); }
+:not(pre) > code { background:rgba(121,192,255,.1); color:var(--code-fg);
+  padding:2px 6px; border-radius:4px; font-size:.8em; }
+
+/* tables */
+table { width:100%; border-collapse:collapse; margin:12px 0 16px; font-size:.875rem; }
+th { background:rgba(27,79,138,.35); color:var(--sky); padding:9px 12px;
+  text-align:left; font-weight:600; border-bottom:2px solid var(--border2); font-size:.78rem; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,.025); }
+.tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid var(--border); margin:12px 0 16px; }
+.tbl-wrap table { margin:0; border:none; }
+
+/* Q&A cards */
+.qa-card {
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:12px; overflow:hidden;
+}
+.qa-q { padding:12px 16px; background:rgba(27,79,138,.2);
+  color:var(--text); font-weight:600; font-size:.9rem;
+  display:flex; gap:10px; align-items:flex-start; }
+.qa-q::before { content:"Q"; font-family:var(--font-mono); color:var(--accent);
+  font-size:.7rem; font-weight:700; background:rgba(240,165,0,.1);
+  border-radius:4px; padding:2px 6px; flex-shrink:0; margin-top:1px; }
+.qa-a { padding:12px 16px 14px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.qa-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+  font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-family:var(--font-mono); margin-left:8px; }
+.qa-badge-concept { background:rgba(74,159,213,.15); color:var(--sky); }
+.qa-badge-cmd { background:rgba(16,185,129,.15); color:var(--green); }
+.qa-badge-crit { background:rgba(239,68,68,.15); color:var(--red); }
+.qa-badge-task { background:rgba(240,165,0,.15); color:var(--accent); }
+.qa-badge-scenario { background:rgba(139,92,246,.15); color:var(--purple); }
+
+/* callout boxes */
+.callout { border-left:4px solid; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0; }
+.callout-note { border-color:var(--sky); background:rgba(74,159,213,.08); }
+.callout-warn { border-color:var(--accent); background:rgba(240,165,0,.08); }
+.callout-danger { border-color:var(--red); background:rgba(239,68,68,.08); }
+.callout-tip { border-color:var(--green); background:rgba(16,185,129,.08); }
+.callout-title { font-weight:700; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:4px; }
+
+/* topic tag */
+.topic-tag { display:inline-flex; align-items:center; padding:3px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:600; margin-bottom:10px; }
+
+/* section divider */
+.section-divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* version badges in RHEL */
+.ver-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem;
+  font-weight:700; font-family:var(--font-mono); margin-right:4px;
+  background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.2); }
+
+/* footer */
+#site-footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:20px 40px; display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--text3);
+}
+#site-footer a { color:var(--sky); text-decoration:none; }
+
+/* mobile overlay */
+#mob-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8800; }
+#mob-ov.on { display:block; }
+
+@media (max-width:1100px) {
+  #toc-nav { display:none; }
+}
+@media (max-width:768px) {
+  #site-nav { position:fixed; left:0; top:var(--topbar-h);
+    bottom:0; transform:translateX(-100%); z-index:8900;
+    transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  #site-nav.open { transform:translateX(0); }
+  #menu-btn { display:block; }
+  #main-content { padding:20px 16px; }
+  #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="site-topbar">
+  <a href="index.html" class="logo">Study<span>Hub</span></a>
+  <span class="page-title-bar">ITIL Processes · Unix/Linux Operations</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn" onclick="toggleNav()">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link ">🏠 Home</a>
+<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link active">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
+
+  </nav>
+
+  <main id="main-content">
+    
+<div class="page-hero">
+  <h1>⚙️ ITIL &amp; Unix Operations</h1>
+  <p>ITIL Processes mapped to Unix/Linux Operations — L3 Scenario Walkthroughs &amp; Key Concepts</p>
+  <div class="hero-badges">
+    <span class="badge badge-green">11 ITIL Processes</span>
+    <span class="badge badge-blue">L3 Scenarios</span>
+    <span class="badge badge-gold">Incident · Problem · Change · Release · DR</span>
+  </div>
+</div>
+<div class="content-section section-card" id="incident">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">01</span>
+<div class="card-icon" style="background:rgba(255,71,87,0.15);">🔥</div>
+<div class="card-title-group">
+<div class="card-title">Incident Management</div>
+<div class="card-subtitle">Restore service · Minimize impact · ITIL v4</div>
+</div>
+<span class="card-badge badge-critical">Critical</span>
+<span class="card-chevron open">▼</span>
+</div>
+<div class="card-body open">
+<div class="card-section">
+<div class="section-label">Objective</div>
+<div class="objective-box">
+            Restore normal service operation as quickly as possible and minimize the adverse impact on business operations, ensuring that agreed levels of service quality are maintained.
+          </div>
+</div>
+<div class="card-section">
+<div class="section-label">Lifecycle</div>
+<div class="lifecycle">
+<div class="lifecycle-step"><span class="lifecycle-item">📋 Log</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🏷️ Categorize</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">⚡ Prioritize</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">👤 Assign</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🔍 Investigate</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">✅ Resolve</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🧪 Validate</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🔒 Close</span></div>
+</div>
+</div>
+<div class="card-section" id="priority-matrix">
+<div class="section-label">Priority Matrix</div>
+<table class="priority-table">
+<thead>
+<tr>
+<th>Priority</th>
+<th>Impact</th>
+<th>Response SLA</th>
+<th>Resolution SLA</th>
+<th>Example Scenario</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="p-badge p1">P1</span></td>
+<td>Critical — Business halted</td>
+<td>15 min</td>
+<td>4 hours</td>
+<td>Production server down, entire service unavailable</td>
+</tr>
+<tr>
+<td><span class="p-badge p2">P2</span></td>
+<td>High — Major degradation</td>
+<td>30 min</td>
+<td>8 hours</td>
+<td>High CPU, partial service outage, NFS mount failure</td>
+</tr>
+<tr>
+<td><span class="p-badge p3">P3</span></td>
+<td>Medium — Partial impact</td>
+<td>2 hours</td>
+<td>24 hours</td>
+<td>Filesystem 80% full, non-critical process crash</td>
+</tr>
+<tr>
+<td><span class="p-badge p4">P4</span></td>
+<td>Low — Minimal impact</td>
+<td>4 hours</td>
+<td>72 hours</td>
+<td>Minor log errors, scheduled maintenance tasks</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="card-section">
+<div class="section-label">Common Examples (Unix)</div>
+<div class="example-tags">
+<span class="example-tag">Server Down</span>
+<span class="example-tag">Filesystem 100% Full</span>
+<span class="example-tag">High CPU/Memory</span>
+<span class="example-tag">NFS Mount Failure</span>
+<span class="example-tag">Cluster Failover</span>
+<span class="example-tag">Zombie Processes</span>
+<span class="example-tag">Swap Exhaustion</span>
+<span class="example-tag">Network Unreachable</span>
+<span class="example-tag">SSH Login Failure</span>
+<span class="example-tag">Cron Job Not Running</span>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Diagnostic Commands</div>
+<div class="cmd-grid">
+<div class="cmd-block">
+<div class="cmd-bar">disk usage</div>
+<div class="cmd-code">df -kh
+df -ih   # inode check</div>
+<div class="cmd-desc">Check filesystem usage &amp; inodes</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">find large files</div>
+<div class="cmd-code">du -sh /*
+du -sh /var/* | sort -rh
+find / -size +500M</div>
+<div class="cmd-desc">Locate space hogs</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">open files</div>
+<div class="cmd-code">lsof | grep deleted
+lsof +L1</div>
+<div class="cmd-desc">Find deleted-but-open files</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">cpu / memory</div>
+<div class="cmd-code">top -c
+vmstat 1 5
+sar -u 1 10</div>
+<div class="cmd-desc">Real-time system performance</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">network</div>
+<div class="cmd-code">ping -c 4 &lt;host&gt;
+traceroute &lt;host&gt;
+netstat -tunlp</div>
+<div class="cmd-desc">Connectivity diagnostics</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">process</div>
+<div class="cmd-code">ps -ef | grep &lt;proc&gt;
+kill -9 &lt;pid&gt;
+strace -p &lt;pid&gt;</div>
+<div class="cmd-desc">Process inspection &amp; kill</div>
+</div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Interview Q&amp;A</div>
+<div class="qa-list">
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is the difference between an Incident and a Problem?
+              </div>
+<div class="qa-answer">
+                An <strong>Incident</strong> is an unplanned interruption or degradation of an IT service. The goal is restoration — fast. A <strong>Problem</strong> is the underlying root cause of one or more incidents. For example: a server crashing = Incident. The recurring crash caused by a memory leak in a Java application = Problem. Incidents are reactive; Problem Management is proactive and preventive.
+              </div>
+</div>
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is a P1 Incident? What do you do when one occurs?
+              </div>
+<div class="qa-answer">
+                A P1 (Priority 1) incident has critical business impact — production is down or a major business function is completely unavailable. Actions: 1) Immediately alert the on-call team and management bridge. 2) Assign an Incident Commander. 3) Begin parallel investigation without delay. 4) Communicate status updates every 15–30 mins. 5) Escalate to L3/vendor if L2 cannot resolve. 6) After resolution, mandatory RCA is filed.
+              </div>
+</div>
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                Walk me through how you handle a filesystem that is 100% full.
+              </div>
+<div class="qa-answer">
+                1) Confirm with <code>df -kh</code> and <code>df -ih</code> (check inodes too). 2) Check for deleted-but-open files with <code>lsof +L1</code> — sending SIGHUP to the process frees space immediately. 3) Find large files: <code>du -sh /* | sort -rh</code>. 4) Check /tmp, /var/log for old logs. 5) If logs, rotate or truncate (not delete while in use). 6) As emergency: raise a Change to extend the LV/volume. 7) After resolution, set up monitoring alerts at 80/90% thresholds.
+              </div>
+</div>
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What information is mandatory when logging an incident ticket?
+              </div>
+<div class="qa-answer">
+                Mandatory fields: Affected CI (Configuration Item), Date/Time detected, Impact &amp; Urgency, Description of symptoms, Steps to reproduce, Affected users/services count, Priority level, Assigned team/engineer, Any alerts/monitoring evidence, Initial workaround (if applied).
+              </div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="problem">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">02</span>
+<div class="card-icon" style="background:rgba(255,165,2,0.15);">🔎</div>
+<div class="card-title-group">
+<div class="card-title">Problem Management</div>
+<div class="card-subtitle">Root cause identification · Prevent recurrence</div>
+</div>
+<span class="card-badge badge-high">High</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Objective</div>
+<div class="objective-box">
+            Identify and eliminate the root cause of incidents to prevent recurrence. Manage Known Errors and maintain the KEDB (Known Error Database).
+          </div>
+</div>
+<div class="card-section">
+<div class="section-label">Lifecycle</div>
+<div class="lifecycle">
+<div class="lifecycle-step"><span class="lifecycle-item">🔍 Identify</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">📊 Log</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🔬 Investigate RCA</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🩹 Workaround</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🔧 Permanent Fix</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🔒 Close</span></div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">RCA Techniques</div>
+<div class="concept-grid">
+<div class="concept-card">
+<div class="concept-title">5 Whys</div>
+<div class="concept-body">Recursively ask "Why?" until the root cause is reached. Simple and effective for most Unix incidents.</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">Fishbone (Ishikawa)</div>
+<div class="concept-body">Cause-and-effect diagram categorizing causes into people, process, technology, environment.</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">Timeline Analysis</div>
+<div class="concept-body">Reconstruct event sequence from logs: <code>last</code>, <code>/var/log/messages</code>, audit logs.</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">Change Review</div>
+<div class="concept-body">Check if any recent changes (patches, configs) preceded the incident. Review CMDB diff.</div>
+</div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Interview Q&amp;A</div>
+<div class="qa-list">
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is KEDB and why is it important?
+              </div>
+<div class="qa-answer">
+                KEDB (Known Error Database) is a repository of Known Errors — problems for which a root cause and workaround/fix has been identified. It allows support teams to resolve recurring incidents faster by referencing known solutions instead of starting from scratch. In ITSM tools like ServiceNow or BMC Remedy, KEs are linked to problem and incident records.
+              </div>
+</div>
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is the difference between a workaround and a permanent fix?
+              </div>
+<div class="qa-answer">
+                A <strong>workaround</strong> is a temporary solution that restores service without removing the root cause (e.g., restarting a service that crashes every 12 hours). It reduces impact but the problem persists. A <strong>permanent fix</strong> eliminates the root cause (e.g., patching the memory leak causing the crash). Permanent fixes usually go through the Change Management process.
+              </div>
+</div>
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What Unix logs would you analyze during an RCA?
+              </div>
+<div class="qa-answer">
+                Key logs: <code>/var/log/messages</code> or <code>/var/log/syslog</code> (system events), <code>/var/log/secure</code> (auth), <code>dmesg</code> (kernel ring buffer), <code>/var/log/cron</code> (scheduled jobs), application-specific logs, <code>last</code> and <code>lastb</code> (logins), <code>ausearch</code> (audit), cluster logs (<code>/var/VRTSvcs/log/engine_A.log</code> for VCS).
+              </div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="change">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">03</span>
+<div class="card-icon" style="background:rgba(255,107,53,0.15);">⚙️</div>
+<div class="card-title-group">
+<div class="card-title">Change Management</div>
+<div class="card-subtitle">Controlled changes · CAB approval · Zero surprise</div>
+</div>
+<span class="card-badge badge-high">High</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Objective</div>
+<div class="objective-box">
+            Ensure all changes to IT services and infrastructure are assessed, authorized, implemented, and reviewed in a controlled manner to minimize risk and disruption.
+          </div>
+</div>
+<div class="card-section">
+<div class="section-label">Change Types</div>
+<div class="change-types">
+<div class="change-type">
+<div class="change-type-icon">📋</div>
+<div class="change-type-name">Standard</div>
+<div class="change-type-desc">Pre-approved, low risk, follows documented procedure. E.g., routine user creation, standard patching window.</div>
+</div>
+<div class="change-type">
+<div class="change-type-icon">🔄</div>
+<div class="change-type-name">Normal</div>
+<div class="change-type-desc">Requires full CAB review and approval. Planned in advance. E.g., kernel upgrade, SAN migration, cluster change.</div>
+</div>
+<div class="change-type">
+<div class="change-type-icon">🚨</div>
+<div class="change-type-name">Emergency</div>
+<div class="change-type-desc">Urgent fix to restore service. ECAB approves. Documented after implementation. E.g., emergency security patch.</div>
+</div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Workflow</div>
+<div class="lifecycle">
+<div class="lifecycle-step"><span class="lifecycle-item">📝 Raise RFC</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">⚖️ Risk Assessment</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">✅ CAB Approval</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🔧 Implement</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🧪 Validate</span><span class="lifecycle-arrow">→</span></div>
+<div class="lifecycle-step"><span class="lifecycle-item">🔒 PIR &amp; Close</span></div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Mandatory Change Ticket Fields</div>
+<div class="concept-grid">
+<div class="concept-card">
+<div class="concept-title">What</div>
+<div class="concept-body">Change description, reason, CI impacted, expected outcome</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">When</div>
+<div class="concept-body">Start date/time, end date/time, maintenance window</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">How</div>
+<div class="concept-body">Step-by-step implementation plan with commands</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">Risk</div>
+<div class="concept-body">Risk assessment, impact analysis, testing evidence</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">Rollback</div>
+<div class="concept-body">Detailed rollback plan if change fails (mandatory)</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">Who</div>
+<div class="concept-body">Implementer, reviewer, approver, stakeholder list</div>
+</div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Interview Q&amp;A</div>
+<div class="qa-list">
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is a CAB and who attends it?
+              </div>
+<div class="qa-answer">
+                CAB (Change Advisory Board) is a group that reviews and approves Normal changes. Attendees typically include: Change Manager (chair), Service Owners, Application Owners, Infrastructure Leads (Unix/Windows/Network/Storage), Security, Business Representatives. ECAB (Emergency CAB) is a subset that convenes for Emergency changes and can approve within hours.
+              </div>
+</div>
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is a Rollback Plan and when do you invoke it?
+              </div>
+<div class="qa-answer">
+                A Rollback Plan is a documented procedure to revert changes and return the system to its pre-change state. You invoke it when: the change fails validation, unexpected errors occur during implementation, SLA breach is imminent, or the business requests abort. For Unix: rollback may include restoring from snapshot, reverting RPM with <code>rpm -e</code> and reinstalling old version, restoring config files from backup, or failing back a cluster service group.
+              </div>
+</div>
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is a PIR (Post Implementation Review)?
+              </div>
+<div class="qa-answer">
+                PIR is a review conducted after a significant change to evaluate whether it achieved its objectives, caused any unintended side effects, and to capture lessons learned. For Unix teams: verify services are stable, performance metrics are normal, no new incidents created, and documentation is updated. PIR findings feed back into Change and Problem Management.
+              </div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="release">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">04</span>
+<div class="card-icon" style="background:rgba(165,94,234,0.15);">📦</div>
+<div class="card-title-group">
+<div class="card-title">Release Management</div>
+<div class="card-subtitle">Software deployment · Patching · RPM lifecycle</div>
+</div>
+<span class="card-badge badge-medium">Medium</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Objective</div>
+<div class="objective-box">
+            Plan, schedule, and control the movement of releases through test and live environments. Ensure the integrity of live environment and that correct components are released.
+          </div>
+</div>
+<div class="card-section">
+<div class="section-label">Activities in Unix Context</div>
+<div class="example-tags">
+<span class="example-tag">OS Patching (Critical/Regular)</span>
+<span class="example-tag">Kernel Upgrades</span>
+<span class="example-tag">RPM Package Installation</span>
+<span class="example-tag">Application Binary Deployment</span>
+<span class="example-tag">Configuration File Releases</span>
+<span class="example-tag">Script Deployments</span>
+<span class="example-tag">Firmware Updates</span>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Key Commands</div>
+<div class="cmd-grid">
+<div class="cmd-block">
+<div class="cmd-bar">rpm install</div>
+<div class="cmd-code">rpm -ivh package.rpm
+rpm -Uvh package.rpm  # upgrade</div>
+<div class="cmd-desc">Install / upgrade RPM package</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">rpm query</div>
+<div class="cmd-code">rpm -qa | grep &lt;pkg&gt;
+rpm -qi &lt;package&gt;
+rpm -ql &lt;package&gt;</div>
+<div class="cmd-desc">Query installed packages</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">rpm remove</div>
+<div class="cmd-code">rpm -e &lt;package&gt;
+rpm -e --nodeps &lt;pkg&gt;</div>
+<div class="cmd-desc">Remove package (rollback)</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">yum / dnf</div>
+<div class="cmd-code">yum update -y
+yum install &lt;pkg&gt;
+yum history undo &lt;id&gt;</div>
+<div class="cmd-desc">Package manager (RHEL/CentOS)</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">kernel info</div>
+<div class="cmd-code">uname -r
+rpm -qa | grep kernel
+grubby --default-kernel</div>
+<div class="cmd-desc">Kernel version and boot entry</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">patching flow</div>
+<div class="cmd-code"># Pre: snapshot / backup
+yum update -y
+reboot
+# Post: validate services</div>
+<div class="cmd-desc">Patching sequence</div>
+</div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Interview Q&amp;A</div>
+<div class="qa-list">
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                How do you approach critical kernel patching in production?
+              </div>
+<div class="qa-answer">
+                1) Raise a Normal Change ticket with full implementation plan. 2) Get CAB approval and maintenance window. 3) Take VM snapshot or backup. 4) Drain active connections / notify users. 5) If clustered, evacuate service groups to peer nodes (<code>hagrp -switch</code>). 6) Apply patch (<code>yum update kernel -y</code>). 7) Reboot. 8) Validate: check services, check new kernel with <code>uname -r</code>. 9) Fail back cluster resources. 10) Monitor for 30-60 mins. 11) If issues: rollback to previous kernel via GRUB.
+              </div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="request">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">05</span>
+<div class="card-icon" style="background:rgba(0,212,255,0.12);">🎫</div>
+<div class="card-title-group">
+<div class="card-title">Service Request Management</div>
+<div class="card-subtitle">User provisioning · Access · Scheduled tasks</div>
+</div>
+<span class="card-badge badge-medium">Medium</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Common Requests (Unix)</div>
+<div class="example-tags">
+<span class="example-tag">New User Account</span>
+<span class="example-tag">Password Reset</span>
+<span class="example-tag">Sudo Access Grant</span>
+<span class="example-tag">SSH Key Setup</span>
+<span class="example-tag">Cron Job Creation</span>
+<span class="example-tag">Group Membership</span>
+<span class="example-tag">Home Directory Setup</span>
+<span class="example-tag">NFS Mount Request</span>
+<span class="example-tag">Filesystem Extension</span>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Key Commands</div>
+<div class="cmd-grid">
+<div class="cmd-block">
+<div class="cmd-bar">user management</div>
+<div class="cmd-code">useradd -m -s /bin/bash user1
+passwd user1
+usermod -aG group1 user1
+userdel -r user1</div>
+<div class="cmd-desc">Create, modify, delete users</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">user info</div>
+<div class="cmd-code">id user1
+getent passwd user1
+finger user1
+last user1</div>
+<div class="cmd-desc">User details and login history</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">cron setup</div>
+<div class="cmd-code">crontab -e -u user1
+crontab -l -u user1
+# min hr dom mon dow cmd
+0 2 * * * /scripts/backup.sh</div>
+<div class="cmd-desc">Manage cron jobs</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="access">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">06</span>
+<div class="card-icon" style="background:rgba(57,255,20,0.1);">🔑</div>
+<div class="card-title-group">
+<div class="card-title">Access Management</div>
+<div class="card-subtitle">Least privilege · IAM · Authentication controls</div>
+</div>
+<span class="card-badge badge-high">High</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Objective</div>
+<div class="objective-box">
+            Grant authorized users the right to use a service while preventing access to non-authorized users. Implement Least Privilege: users get only the access they need to perform their role.
+          </div>
+</div>
+<div class="card-section">
+<div class="section-label">Key Commands</div>
+<div class="cmd-grid">
+<div class="cmd-block">
+<div class="cmd-bar">sudo management</div>
+<div class="cmd-code">visudo
+# Allow user specific cmds:
+user1 ALL=(ALL) /bin/df,/usr/bin/top
+# NOPASSWD:
+user1 ALL=(ALL) NOPASSWD: /sbin/service</div>
+<div class="cmd-desc">Edit sudoers safely</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">ssh key auth</div>
+<div class="cmd-code">ssh-keygen -t rsa -b 4096
+ssh-copy-id user@host
+# Or manually:
+cat id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys</div>
+<div class="cmd-desc">SSH key-based authentication</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">file permissions</div>
+<div class="cmd-code">chmod 750 /script.sh
+chown user:group /file
+setfacl -m u:user1:rx /dir
+getfacl /dir</div>
+<div class="cmd-desc">Permissions and ACLs</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">account lockout</div>
+<div class="cmd-code">passwd -l user1   # lock
+passwd -u user1   # unlock
+chage -l user1    # expiry info
+chage -E 2025-12-31 user1</div>
+<div class="cmd-desc">Lock accounts and manage expiry</div>
+</div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Interview Q&amp;A</div>
+<div class="qa-list">
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is the Principle of Least Privilege and how do you enforce it in Unix?
+              </div>
+<div class="qa-answer">
+                Least Privilege means users and processes get only the minimum access required to perform their job. In Unix: use sudo to grant specific commands (not full root), use ACLs for fine-grained file permissions, disable root SSH login (<code>PermitRootLogin no</code> in sshd_config), use PAM for authentication policies, regularly audit <code>/etc/sudoers</code> and remove stale entries, enforce password policies with <code>chage</code>.
+              </div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="cmdb">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">07</span>
+<div class="card-icon" style="background:rgba(255,215,0,0.12);">🗄️</div>
+<div class="card-title-group">
+<div class="card-title">Configuration Management (CMDB)</div>
+<div class="card-subtitle">CI inventory · Relationships · Single source of truth</div>
+</div>
+<span class="card-badge badge-medium">Medium</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Configuration Items (CIs)</div>
+<div class="concept-grid">
+<div class="concept-card"><div class="concept-title">Server CI</div><div class="concept-body">Hostname, IP, OS version, hardware specs, location</div></div>
+<div class="concept-card"><div class="concept-title">Storage CI</div><div class="concept-body">SAN LUNs, NFS shares, mount points, filesystem sizes</div></div>
+<div class="concept-card"><div class="concept-title">Application CI</div><div class="concept-body">App name, version, owner, dependencies, config files</div></div>
+<div class="concept-card"><div class="concept-title">Cluster CI</div><div class="concept-body">Cluster name, nodes, service groups, VIPs, disk groups</div></div>
+<div class="concept-card"><div class="concept-title">Network CI</div><div class="concept-body">Interfaces, bonding config, VLANs, firewall zones</div></div>
+<div class="concept-card"><div class="concept-title">Certificate CI</div><div class="concept-body">SSL certs, expiry dates, thumbprints, associated services</div></div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Commands to Gather CI Data</div>
+<div class="cmd-grid">
+<div class="cmd-block">
+<div class="cmd-bar">system identity</div>
+<div class="cmd-code">hostname -f
+uname -a
+cat /etc/os-release</div>
+<div class="cmd-desc">Hostname, kernel, OS version</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">hardware info</div>
+<div class="cmd-code">dmidecode -t system
+dmidecode -t memory
+lscpu
+lshw -short</div>
+<div class="cmd-desc">Hardware inventory</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">network config</div>
+<div class="cmd-code">ip addr show
+ip route
+cat /etc/hosts
+nmcli device show</div>
+<div class="cmd-desc">Network configuration</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">storage info</div>
+<div class="cmd-code">lsblk
+fdisk -l
+multipath -ll
+vgdisplay; lvdisplay</div>
+<div class="cmd-desc">Disk and volume info</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="availability">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">08</span>
+<div class="card-icon" style="background:rgba(46,213,115,0.12);">📊</div>
+<div class="card-title-group">
+<div class="card-title">Availability Management</div>
+<div class="card-subtitle">Uptime monitoring · HA clusters · SLA compliance</div>
+</div>
+<span class="card-badge badge-high">High</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Objective</div>
+<div class="objective-box">
+            Ensure IT services are available at the agreed times. Monitor, measure, and report on availability. Proactively improve availability through redundancy, HA design, and monitoring.
+          </div>
+</div>
+<div class="card-section">
+<div class="section-label">Key Metrics</div>
+<div class="concept-grid">
+<div class="concept-card"><div class="concept-title">MTTR</div><div class="concept-body">Mean Time To Repair — average time to restore service after failure</div></div>
+<div class="concept-card"><div class="concept-title">MTBF</div><div class="concept-body">Mean Time Between Failures — average time between incidents</div></div>
+<div class="concept-card"><div class="concept-title">Uptime %</div><div class="concept-body">99.9% = 8.76 hrs/yr downtime. 99.99% = 52.6 min/yr</div></div>
+<div class="concept-card"><div class="concept-title">MTTA</div><div class="concept-body">Mean Time To Acknowledge — response speed metric</div></div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Commands</div>
+<div class="cmd-grid">
+<div class="cmd-block">
+<div class="cmd-bar">system performance</div>
+<div class="cmd-code">top -bn1
+vmstat 1 10
+sar -u 1 5
+iostat -xz 1 5</div>
+<div class="cmd-desc">CPU, memory, I/O stats</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">cluster status</div>
+<div class="cmd-code">hastatus -sum
+hagrp -state
+hares -state
+hacf -verify /etc/VRTSvcs/conf</div>
+<div class="cmd-desc">VCS cluster health</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">multipath storage</div>
+<div class="cmd-code">multipath -ll
+multipathd -k"show paths"
+multipathd -k"show maps"</div>
+<div class="cmd-desc">SAN path availability</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">uptime / load</div>
+<div class="cmd-code">uptime
+w
+last reboot
+sar -q 1 5  # load average</div>
+<div class="cmd-desc">System uptime and load history</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="capacity">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">09</span>
+<div class="card-icon" style="background:rgba(0,198,255,0.12);">📈</div>
+<div class="card-title-group">
+<div class="card-title">Capacity Management</div>
+<div class="card-subtitle">Resource planning · Trend analysis · Forecasting</div>
+</div>
+<span class="card-badge badge-medium">Medium</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Objective</div>
+<div class="objective-box">
+            Ensure current and future capacity and performance needs of the business are delivered cost-effectively. Manage CPU, memory, disk, and network capacity through monitoring and planning.
+          </div>
+</div>
+<div class="card-section">
+<div class="section-label">Commands</div>
+<div class="cmd-grid">
+<div class="cmd-block">
+<div class="cmd-bar">cpu capacity</div>
+<div class="cmd-code">sar -u 1 10
+mpstat -P ALL 1 5
+nproc --all</div>
+<div class="cmd-desc">CPU utilization trending</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">memory capacity</div>
+<div class="cmd-code">sar -r 1 5
+free -m
+cat /proc/meminfo</div>
+<div class="cmd-desc">Memory usage and trends</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">disk capacity</div>
+<div class="cmd-code">df -kh
+sar -d 1 5  # disk I/O
+du -sh /data/* | sort -rh</div>
+<div class="cmd-desc">Storage utilization</div>
+</div>
+<div class="cmd-block">
+<div class="cmd-bar">network capacity</div>
+<div class="cmd-code">sar -n DEV 1 5
+ifstat 1 5
+iftop -i eth0</div>
+<div class="cmd-desc">Network throughput monitoring</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="dr">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">10</span>
+<div class="card-icon" style="background:rgba(255,71,87,0.12);">🛡️</div>
+<div class="card-title-group">
+<div class="card-title">Disaster Recovery Management</div>
+<div class="card-subtitle">RPO · RTO · Business Continuity Planning</div>
+</div>
+<span class="card-badge badge-critical">Critical</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Key Concepts</div>
+<div class="concept-grid">
+<div class="concept-card">
+<div class="concept-title">RPO</div>
+<div class="concept-body">Recovery Point Objective — Maximum acceptable data loss. E.g., RPO = 1 hour means backups must run every hour.</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">RTO</div>
+<div class="concept-body">Recovery Time Objective — Maximum time to restore service after disaster. Drives DR infrastructure investment.</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">BCP</div>
+<div class="concept-body">Business Continuity Plan — Broader plan ensuring business functions during/after disaster. DR is a subset of BCP.</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">MTPD</div>
+<div class="concept-body">Maximum Tolerable Period of Disruption — Business-defined absolute maximum outage time.</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">DR Tier 1</div>
+<div class="concept-body">Hot standby — real-time replication, failover in minutes. Used for critical production systems.</div>
+</div>
+<div class="concept-card">
+<div class="concept-title">DR Tier 2/3</div>
+<div class="concept-body">Warm/Cold standby — periodic sync or backup restore. Lower cost, longer RTO. Non-critical systems.</div>
+</div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">DR Procedures (Unix)</div>
+<div class="example-tags">
+<span class="example-tag">VCS Cluster Failover to DR Site</span>
+<span class="example-tag">Storage Replication Failover (SRDF/PPRC)</span>
+<span class="example-tag">DNS Cutover</span>
+<span class="example-tag">NFS Remount to DR Storage</span>
+<span class="example-tag">Service Validation Post-Failover</span>
+<span class="example-tag">Reverse Replication Setup</span>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Interview Q&amp;A</div>
+<div class="qa-list">
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                Explain RPO vs RTO with an example.
+              </div>
+<div class="qa-answer">
+                Example: A banking application. RPO = 15 minutes (means: in a disaster, they can afford to lose at most 15 min of transactions — so replication must run every ≤15 min). RTO = 2 hours (means: the service must be back online within 2 hours of a disaster declaration). In Unix context: RPO drives your backup/replication frequency; RTO drives your DR automation, runbook complexity, and pre-provisioned standby infrastructure.
+              </div>
+</div>
+<div class="qa-item">
+<div class="qa-question" onclick="toggleQA(this)">
+<span class="qa-q-mark">Q</span>
+                What is a DR drill and how do you prepare for it?
+              </div>
+<div class="qa-answer">
+                A DR drill tests the ability to fail over to DR and restore operations within RTO. Preparation: 1) Review and update DR runbooks. 2) Verify replication is healthy. 3) Raise a Change ticket (Normal change). 4) Coordinate with application, DB, and network teams. 5) Define success criteria and rollback plan. 6) Execute: failover, validate services, document any deviations. 7) Post-drill: update runbooks, raise incidents for gaps found, file RCA if RTO/RPO not met.
+              </div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="knowledge">
+<div class="card-header" onclick="toggleCard(this)">
+<span class="card-number">11</span>
+<div class="card-icon" style="background:rgba(90,122,154,0.2);">📚</div>
+<div class="card-title-group">
+<div class="card-title">Knowledge Management</div>
+<div class="card-subtitle">SOPs · RCAs · Build docs · DR procedures</div>
+</div>
+<span class="card-badge badge-low">Standard</span>
+<span class="card-chevron">▼</span>
+</div>
+<div class="card-body">
+<div class="card-section">
+<div class="section-label">Objective</div>
+<div class="objective-box">
+            Gather, analyze, store and share knowledge and information within the organization. Prevent knowledge loss, reduce time to resolve incidents, and support consistent service delivery.
+          </div>
+</div>
+<div class="card-section">
+<div class="section-label">Knowledge Artifacts (Unix Ops)</div>
+<div class="concept-grid">
+<div class="concept-card"><div class="concept-title">SOPs</div><div class="concept-body">Standard Operating Procedures for routine tasks: patching, user creation, backups, health checks</div></div>
+<div class="concept-card"><div class="concept-title">RCA Documents</div><div class="concept-body">Post-incident root cause analysis, timeline, contributing factors, preventive actions</div></div>
+<div class="concept-card"><div class="concept-title">Build Docs</div><div class="concept-body">Server build/commissioning procedures, OS hardening guides, standard configurations</div></div>
+<div class="concept-card"><div class="concept-title">DR Runbooks</div><div class="concept-body">Step-by-step failover procedures for each critical service/application</div></div>
+<div class="concept-card"><div class="concept-title">Topology Diagrams</div><div class="concept-body">Network, cluster, and storage architecture diagrams for quick incident triage</div></div>
+<div class="concept-card"><div class="concept-title">KEDB Entries</div><div class="concept-body">Known errors with symptoms, workarounds, and permanent fix status</div></div>
+</div>
+</div>
+<div class="card-section">
+<div class="section-label">Tip</div>
+<div class="tip-box">
+<strong>Interview tip:</strong> Mention that you maintain runbooks and contribute to KEDB. Say you document every P1/P2 incident with a brief RCA and update SOPs when procedures change. Interviewers love candidates who own documentation.
+          </div>
+</div>
+</div>
+</div><div class="content-section section-card" id="scenarios" style="scroll-margin-top:70px;">
+<div style="margin-bottom:20px; padding:16px 0;">
+<div class="header-tag">Advanced</div>
+<h2 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text-bright);margin-top:10px;">L3 Scenario Walkthroughs</h2>
+<p style="color:var(--text-dim);font-size:11px;margin-top:6px;">Expected to discuss: Incident handling · Troubleshooting · Change process · Rollback · RCA · Validation</p>
+</div>
+<div class="scenario-card">
+<div class="scenario-title"><span class="scenario-num">1</span>Filesystem 100% Full on Production Server</div>
+<div class="scenario-steps">
+<div class="scenario-step"><span class="step-phase phase-detect">Detect</span>Alert triggered — monitoring shows /data at 100%. Incident ticket raised (P2 or P1 if service impacted).</div>
+<div class="scenario-step"><span class="step-phase phase-triage">Triage</span>Run <code>df -kh</code> and <code>df -ih</code>. Confirm which filesystem. Check if inodes exhausted separately from space.</div>
+<div class="scenario-step"><span class="step-phase phase-fix">Fix</span>1) <code>lsof +L1</code> — free deleted-but-open files. 2) Find large files: <code>du -sh /data/* | sort -rh</code>. 3) Truncate/rotate old logs. 4) Move/archive old data. 5) If insufficient: raise Emergency Change to extend LV — <code>lvextend -L +20G /dev/vg01/data &amp;&amp; resize2fs</code>.</div>
+<div class="scenario-step"><span class="step-phase phase-validate">Validate</span>Confirm <code>df -kh</code> shows headroom. Verify application is writing successfully. Check no errors in app logs.</div>
+<div class="scenario-step"><span class="step-phase phase-rca">RCA</span>Identify root cause: log explosion? Missing log rotation? Data growth? Implement fix: logrotate policy, cron cleanup job, capacity alert at 80/90%.</div>
+</div>
+</div>
+<div class="scenario-card">
+<div class="scenario-title"><span class="scenario-num">2</span>VCS Service Group Failure / Cluster Failover Issue</div>
+<div class="scenario-steps">
+<div class="scenario-step"><span class="step-phase phase-detect">Detect</span>Alert: VCS service group FAULTED. Incident raised. Check <code>hastatus -sum</code> immediately.</div>
+<div class="scenario-step"><span class="step-phase phase-triage">Triage</span><code>hagrp -state &lt;group&gt;</code> — identify faulted resources. <code>hares -state</code> — pinpoint which resource failed (disk group, mount, IP, application). Check VCS engine log: <code>/var/VRTSvcs/log/engine_A.log</code>.</div>
+<div class="scenario-step"><span class="step-phase phase-fix">Fix</span>If autofailover didn't trigger: <code>hagrp -switch &lt;grp&gt; -to &lt;node2&gt;</code>. If resource fault blocking failover: <code>hares -clear &lt;resource&gt; -sys &lt;node&gt;</code> then retry. If disk group issue: <code>vxdg -g &lt;dg&gt; import</code> on target node. Check storage paths: <code>multipath -ll</code>.</div>
+<div class="scenario-step"><span class="step-phase phase-validate">Validate</span><code>hastatus -sum</code> shows ONLINE on new node. Application team confirms service is up. No data corruption. Monitor for 30 min.</div>
+<div class="scenario-step"><span class="step-phase phase-change">Change</span>Failback to original node during next maintenance window via Normal Change. Update CMDB with current active node.</div>
+<div class="scenario-step"><span class="step-phase phase-rca">RCA</span>Determine why resource faulted: storage path failure, network split-brain, resource timeout. Feed to Problem Management.</div>
+</div>
+</div>
+<div class="scenario-card">
+<div class="scenario-title"><span class="scenario-num">3</span>SAN Storage Migration</div>
+<div class="scenario-steps">
+<div class="scenario-step"><span class="step-phase phase-change">Change</span>Raise Normal Change ticket. Plan: source LUNs, target LUNs, migration tool (vxdg move, EMC SRDF, IBM FlashCopy). Get CAB approval. Schedule maintenance window.</div>
+<div class="scenario-step"><span class="step-phase phase-triage">Pre-check</span>Verify multipath is healthy on all paths (<code>multipath -ll</code>). Take filesystem/LVM/VG snapshot. Confirm backup is current. Document current <code>vgdisplay</code>, <code>lvdisplay</code>, <code>df -kh</code> baseline.</div>
+<div class="scenario-step"><span class="step-phase phase-fix">Migrate</span>1) Quiesce application I/O. 2) Unmount filesystem or take service group offline. 3) Migrate LUNs at storage layer. 4) Rescan: <code>echo "- - -" &gt; /sys/class/scsi_host/hostX/scan</code>. 5) Update multipath: <code>multipathd -k"reconfigure"</code>. 6) Import VG on new LUNs. 7) Mount filesystem. 8) Bring service group online.</div>
+<div class="scenario-step"><span class="step-phase phase-validate">Validate</span>Application I/O verified. <code>multipath -ll</code> shows all paths active. <code>df -kh</code> matches pre-migration. Run application-level smoke tests. Monitor I/O with <code>iostat -xz 2</code>.</div>
+<div class="scenario-step"><span class="step-phase phase-rca">Post</span>Update CMDB with new LUN IDs and storage array. Close change ticket. Archive migration runbook as KA article.</div>
+</div>
+</div>
+<div class="scenario-card">
+<div class="scenario-title"><span class="scenario-num">4</span>Critical Kernel Patching (Production)</div>
+<div class="scenario-steps">
+<div class="scenario-step"><span class="step-phase phase-change">Change</span>Raise Normal Change. Include: current kernel, target kernel, CVE details, test results from dev/UAT. CAB approval. Maintenance window agreed with app owners.</div>
+<div class="scenario-step"><span class="step-phase phase-triage">Pre-check</span>Verify: disk space for patch (<code>df -kh</code>), current running services (<code>systemctl list-units</code>), cluster status (<code>hastatus -sum</code>), backup/snapshot taken, rollback kernel identified in GRUB.</div>
+<div class="scenario-step"><span class="step-phase phase-fix">Implement</span>If clustered: evacuate service groups to peer node (<code>hagrp -switch</code>). Then: <code>yum update kernel -y</code> → verify in <code>grubby --default-kernel</code> → reboot → confirm boot on new kernel (<code>uname -r</code>).</div>
+<div class="scenario-step"><span class="step-phase phase-validate">Validate</span>All services started. <code>dmesg</code> clean. Application team smoke test passed. Cluster resources failed back. Monitor CPU/memory/IO baselines for 1 hour.</div>
+<div class="scenario-step"><span class="step-phase phase-rca">Rollback</span>If issues: reboot → select previous kernel in GRUB → <code>grubby --set-default=&lt;prev-kernel-path&gt;</code> → notify change manager → raise incident → document in change ticket.</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="key-concepts" style="scroll-margin-top:70px; margin-top:32px;">
+<div style="margin-bottom:16px;">
+<div class="header-tag">Quick Reference</div>
+<h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text-bright);margin-top:10px;">Key ITIL Concepts to Know</h2>
+</div>
+<div class="concept-grid">
+<div class="concept-card"><div class="concept-title">SLA</div><div class="concept-body">Service Level Agreement — formal agreement between IT and the business defining service targets</div></div>
+<div class="concept-card"><div class="concept-title">OLA</div><div class="concept-body">Operational Level Agreement — agreement between internal IT teams supporting the SLA</div></div>
+<div class="concept-card"><div class="concept-title">UC</div><div class="concept-body">Underpinning Contract — agreement with external vendors/suppliers supporting service delivery</div></div>
+<div class="concept-card"><div class="concept-title">CMDB</div><div class="concept-body">Configuration Management Database — single source of truth for all IT assets and their relationships</div></div>
+<div class="concept-card"><div class="concept-title">RFC</div><div class="concept-body">Request for Change — formal proposal to make a change; triggers the Change Management process</div></div>
+<div class="concept-card"><div class="concept-title">Known Error</div><div class="concept-body">A problem with a documented root cause and approved workaround, stored in the KEDB</div></div>
+<div class="concept-card"><div class="concept-title">CSI</div><div class="concept-body">Continual Service Improvement — ITIL discipline for ongoing improvement using metrics and feedback</div></div>
+<div class="concept-card"><div class="concept-title">ITSM Tool</div><div class="concept-body">ServiceNow, BMC Remedy, Jira Service Management — platforms implementing ITIL workflows</div></div>
+</div>
+</div>
+
+  </main>
+
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#incident" class="toc-link">Incident</a><a href="#problem" class="toc-link">Problem</a><a href="#change" class="toc-link">Change</a><a href="#release" class="toc-link">Release</a><a href="#request" class="toc-link">Request</a><a href="#access" class="toc-link">Access</a><a href="#cmdb" class="toc-link">Cmdb</a><a href="#availability" class="toc-link">Availability</a><a href="#capacity" class="toc-link">Capacity</a><a href="#dr" class="toc-link">Dr</a><a href="#knowledge" class="toc-link">Knowledge</a><a href="#scenarios" class="toc-link">L3 Scenario Walkthroughs</a><a href="#key-concepts" class="toc-link">Key ITIL Concepts to Know</a></nav>
+</div>
+
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer id="site-footer">
+  <span>StudyHub — Technical Reference Library</span>
+  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+</footer>
+
+<script>
+// Progress + back-to-top
+const pr = document.getElementById('prog');
+const bt = document.getElementById('btt');
+addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const m = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+  if (pr) pr.style.width = (m > 0 ? Math.min(s / m * 100, 100) : 0) + '%';
+  if (bt) bt.classList.toggle('vis', s > 280);
+}, {passive: true});
+
+// Nav toggle
+function toggleNav() {
+  const nav = document.getElementById('site-nav');
+  const ov = document.getElementById('mob-ov');
+  nav.classList.toggle('open');
+  ov.classList.toggle('on');
+}
+
+// Active ToC highlighting
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('.content-section[id]');
+function updateToc() {
+  const top = window.scrollY + 80;
+  let cur = null;
+  sections.forEach(s => { if (s.offsetTop <= top) cur = s.id; });
+  tocLinks.forEach(l => {
+    l.classList.toggle('active-toc', l.getAttribute('href') === '#' + cur);
+  });
+}
+if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
+
+
+</script>
+</body>
+</html>

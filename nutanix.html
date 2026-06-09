@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutanix Foundations Guide — StudyHub</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* ── site-wide overrides ── */
+:root { --topbar-h:58px; --sidebar-w:240px; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* topbar */
+#site-topbar {
+  position:fixed; top:0; left:0; right:0; z-index:9000;
+  height:var(--topbar-h); background:var(--navy);
+  display:flex; align-items:center; padding:0 20px; gap:14px;
+  border-bottom:2px solid var(--blue);
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo span { color:var(--accent); }
+.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.topbar-spacer { flex:1; }
+#menu-btn { display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
+
+/* progress bar */
+#prog { position:fixed; top:var(--topbar-h); left:0; height:3px; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--sky)); z-index:8999;
+  transition:width .08s linear; pointer-events:none; }
+
+/* back-to-top */
+#btt { position:fixed; bottom:24px; right:20px; width:42px; height:42px;
+  background:var(--blue); color:#fff; border:none; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; z-index:8998; opacity:0; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(27,79,138,.45); transition:opacity .2s,transform .2s; }
+#btt.vis { opacity:1; pointer-events:auto; }
+#btt:hover { background:var(--mid); transform:translateY(-2px); }
+
+/* layout */
+.site-body { display:flex; margin-top:var(--topbar-h); flex:1; min-height:calc(100vh - var(--topbar-h)); }
+
+/* left sidebar (page nav) */
+#site-nav {
+  width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.nav-sec { padding:10px 16px 2px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); }
+.nav-link { display:flex; align-items:center; gap:8px; padding:9px 16px;
+  color:var(--text2); text-decoration:none; font-size:.84rem; border-left:3px solid transparent;
+  transition:all .12s; }
+.nav-link:hover { background:rgba(255,255,255,.05); color:var(--text); border-left-color:var(--border2); }
+.nav-link.active { background:rgba(240,165,0,.09); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
+
+/* right toc sidebar */
+#toc-nav {
+  width:220px; flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  padding:16px 0; display:flex; flex-direction:column;
+}
+.toc-head { padding:0 16px 8px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); border-bottom:1px solid var(--border); margin-bottom:4px; }
+.toc-link { display:block; padding:6px 16px; color:var(--text3); text-decoration:none;
+  font-size:.78rem; line-height:1.35; transition:color .12s;
+  border-left:2px solid transparent; }
+.toc-link:hover { color:var(--sky); border-left-color:var(--sky); }
+.toc-link.h3 { padding-left:26px; font-size:.72rem; }
+
+/* main content */
+#main-content {
+  flex:1; padding:32px 40px; overflow-x:hidden; min-width:0;
+}
+.page-hero {
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.page-hero h1 { margin-bottom:6px; }
+.page-hero p { color:var(--text2); font-size:.95rem; margin:0; }
+.hero-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; }
+.badge-blue { background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:var(--green); border:1px solid rgba(16,185,129,.25); }
+.badge-gold { background:rgba(240,165,0,.15); color:var(--accent); border:1px solid rgba(240,165,0,.25); }
+.badge-purple { background:rgba(139,92,246,.15); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+
+/* content sections */
+.content-section { margin-bottom:40px; scroll-margin-top:calc(var(--topbar-h) + 16px); }
+.section-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px; margin-bottom:20px;
+}
+.section-card h2 { margin-top:0; }
+
+/* code blocks */
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; margin:12px 0 16px; }
+code { font-family:var(--font-mono); font-size:.82rem; color:var(--code-fg); }
+pre code { color:var(--code-fg); }
+:not(pre) > code { background:rgba(121,192,255,.1); color:var(--code-fg);
+  padding:2px 6px; border-radius:4px; font-size:.8em; }
+
+/* tables */
+table { width:100%; border-collapse:collapse; margin:12px 0 16px; font-size:.875rem; }
+th { background:rgba(27,79,138,.35); color:var(--sky); padding:9px 12px;
+  text-align:left; font-weight:600; border-bottom:2px solid var(--border2); font-size:.78rem; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,.025); }
+.tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid var(--border); margin:12px 0 16px; }
+.tbl-wrap table { margin:0; border:none; }
+
+/* Q&A cards */
+.qa-card {
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:12px; overflow:hidden;
+}
+.qa-q { padding:12px 16px; background:rgba(27,79,138,.2);
+  color:var(--text); font-weight:600; font-size:.9rem;
+  display:flex; gap:10px; align-items:flex-start; }
+.qa-q::before { content:"Q"; font-family:var(--font-mono); color:var(--accent);
+  font-size:.7rem; font-weight:700; background:rgba(240,165,0,.1);
+  border-radius:4px; padding:2px 6px; flex-shrink:0; margin-top:1px; }
+.qa-a { padding:12px 16px 14px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.qa-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+  font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-family:var(--font-mono); margin-left:8px; }
+.qa-badge-concept { background:rgba(74,159,213,.15); color:var(--sky); }
+.qa-badge-cmd { background:rgba(16,185,129,.15); color:var(--green); }
+.qa-badge-crit { background:rgba(239,68,68,.15); color:var(--red); }
+.qa-badge-task { background:rgba(240,165,0,.15); color:var(--accent); }
+.qa-badge-scenario { background:rgba(139,92,246,.15); color:var(--purple); }
+
+/* callout boxes */
+.callout { border-left:4px solid; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0; }
+.callout-note { border-color:var(--sky); background:rgba(74,159,213,.08); }
+.callout-warn { border-color:var(--accent); background:rgba(240,165,0,.08); }
+.callout-danger { border-color:var(--red); background:rgba(239,68,68,.08); }
+.callout-tip { border-color:var(--green); background:rgba(16,185,129,.08); }
+.callout-title { font-weight:700; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:4px; }
+
+/* topic tag */
+.topic-tag { display:inline-flex; align-items:center; padding:3px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:600; margin-bottom:10px; }
+
+/* section divider */
+.section-divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* version badges in RHEL */
+.ver-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem;
+  font-weight:700; font-family:var(--font-mono); margin-right:4px;
+  background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.2); }
+
+/* footer */
+#site-footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:20px 40px; display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--text3);
+}
+#site-footer a { color:var(--sky); text-decoration:none; }
+
+/* mobile overlay */
+#mob-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8800; }
+#mob-ov.on { display:block; }
+
+@media (max-width:1100px) {
+  #toc-nav { display:none; }
+}
+@media (max-width:768px) {
+  #site-nav { position:fixed; left:0; top:var(--topbar-h);
+    bottom:0; transform:translateX(-100%); z-index:8900;
+    transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  #site-nav.open { transform:translateX(0); }
+  #menu-btn { display:block; }
+  #main-content { padding:20px 16px; }
+  #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="site-topbar">
+  <a href="index.html" class="logo">Study<span>Hub</span></a>
+  <span class="page-title-bar">Nutanix HCI Foundations</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn" onclick="toggleNav()">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link ">🏠 Home</a>
+<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link active">☁️ Nutanix</a>
+
+  </nav>
+
+  <main id="main-content">
+    
+<div class="page-hero">
+  <h1>☁️ Nutanix Foundations Guide</h1>
+  <p>Complete Nutanix HCI foundations — infrastructure, Prism, data resiliency, networking and operations</p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">19 Sections</span>
+    <span class="badge badge-green">HCI · AHV · AOS</span>
+    <span class="badge badge-gold">Prism Element &amp; Central</span>
+    <span class="badge badge-purple">Foundation &amp; Imaging</span>
+  </div>
+</div>
+<main class="main __wrap __content">
+<div class="content-inner">
+<!-- ═══════════════════════════ COVER ═══════════════════════════ -->
+<div class="cover" id="cover">
+<div class="cover-grid"></div>
+<div class="cover-content">
+<div class="cover-badge">📘 Technical Learning Guide</div>
+<h1>Nutanix <span>Foundations</span></h1>
+<p class="cover-desc">Complete technical reference covering AOS, AHV, Prism Element, Prism Central, acli, ncli, Files, Flow, Leap, Calm, Foundation Imaging, and more.</p>
+<div class="cover-tags">
+<span class="cover-tag">AOS · AHV</span>
+<span class="cover-tag">Prism Element</span>
+<span class="cover-tag">Prism Central</span>
+<span class="cover-tag">acli · ncli</span>
+<span class="cover-tag">Nutanix Files</span>
+<span class="cover-tag">Flow · Leap</span>
+<span class="cover-tag">Self-Service</span>
+<span class="cover-tag">Foundation</span>
+<span class="cover-tag">DR · Protection</span>
+</div>
+<div class="cover-stats">
+<div class="cover-stat"><div class="val">20</div><div class="lbl">Sections</div></div>
+<div class="cover-stat"><div class="val">200+</div><div class="lbl">Terms Defined</div></div>
+<div class="cover-stat"><div class="val">60+</div><div class="lbl">CLI Commands</div></div>
+<div class="cover-stat"><div class="val">★</div><div class="lbl">Lab Cheat Sheet</div></div>
+</div>
+</div>
+</div>
+<!-- ═══════════════════════════ S1 ═══════════════════════════ -->
+<div class="section-block" id="s1">
+<div class="section-divider"><span class="sec-num">SECTION 01</span><h2 id="nut-introduction-evolution-of-enterprise-inf">Introduction &amp; Evolution of Enterprise Infrastructure</h2></div>
+<div class="h1">1. Introduction &amp; Evolution of Enterprise Infrastructure</div>
+<div class="h2">1.1 Traditional Data Center Architecture</div>
+<p class="body-text">Before Nutanix, enterprise IT relied on a three-tier architecture comprising separate silos: storage, compute, and networking. Each tier was independently purchased, managed, and scaled — leading to significant complexity and inefficiency.</p>
+<table class="def-table">
+<tr><td class="term-cell">Three-Tier Model</td><td class="def-cell">Storage Array (SAN/NAS) + Blade/Rack Servers + Fibre Channel / Ethernet switches — all managed separately</td></tr>
+<tr><td class="term-cell">Storage Array (SAN)</td><td class="def-cell">Centralized block storage connected via Fibre Channel or iSCSI. Examples: EMC VMAX, NetApp FAS, Pure Storage.</td></tr>
+<tr><td class="term-cell">NAS</td><td class="def-cell">Network Attached Storage — file-level access via NFS/CIFS/SMB. Shared file systems for general workloads.</td></tr>
+<tr><td class="term-cell">Hypervisor</td><td class="def-cell">VMware vSphere (ESXi), Microsoft Hyper-V, KVM — abstracts physical hardware into virtual machines (VMs).</td></tr>
+<tr><td class="term-cell">Storage Protocol</td><td class="def-cell">Fibre Channel (FC), iSCSI, NFS, SMB — transport data between compute and storage.</td></tr>
+<tr><td class="term-cell">Bottleneck</td><td class="def-cell">Storage I/O must traverse the network, adding latency. Scaling requires forklift upgrades.</td></tr>
+</table>
+<div class="h3">Key Challenges of the Three-Tier Model</div>
+<ul class="bullet-list">
+<li>Complex management: 3 separate teams, 3 separate toolsets, 3 separate upgrade cycles</li>
+<li>High CapEx: standalone SAN, network switches, and servers bought separately</li>
+<li>Poor scalability: scale-up storage arrays hit physical/cost limits</li>
+<li>Single points of failure: centralized storage is a critical dependency</li>
+<li>Performance bottleneck: all I/O travels across shared SAN fabric</li>
+<li>Long procurement cycles: months to deploy new capacity</li>
+</ul>
+<div class="h2">1.2 The HCI Revolution</div>
+<p class="body-text">Hyper-Converged Infrastructure (HCI) collapses the three tiers into a single software-defined platform running on commodity x86 nodes. Compute, storage, and networking are all integrated into one appliance managed by a unified software stack.</p>
+<table class="def-table">
+<tr><td class="term-cell">HCI</td><td class="def-cell">Hyper-Converged Infrastructure — collapse compute, storage, and networking into a single x86 node cluster.</td></tr>
+<tr><td class="term-cell">Software-Defined Storage (SDS)</td><td class="def-cell">Storage services (replication, dedup, compression) implemented in software, not dedicated hardware.</td></tr>
+<tr><td class="term-cell">Distributed Storage Fabric</td><td class="def-cell">Nutanix DSF — the storage layer that pools all local drives across nodes into a single logical datastore.</td></tr>
+<tr><td class="term-cell">Scale-Out</td><td class="def-cell">Add capacity and performance by adding nodes — no forklift upgrades required.</td></tr>
+<tr><td class="term-cell">Controller VM (CVM)</td><td class="def-cell">Nutanix software VM running on each node, managing local storage and serving as storage endpoint for the hypervisor.</td></tr>
+</table>
+<div class="h3">HCI Benefits vs. Three-Tier</div>
+<ul class="bullet-list">
+<li>Simplified operations: single pane of glass via Prism UI</li>
+<li>Linear scalability: add nodes to expand capacity and performance simultaneously</li>
+<li>Reduced CapEx/OpEx: commodity hardware, no separate SAN, fewer network components</li>
+<li>Faster deployment: nodes image in minutes; clusters form in 30–45 min</li>
+<li>Built-in resiliency: data distributed across nodes with configurable redundancy</li>
+</ul>
+<div class="h2">1.3 Nutanix Company &amp; Platform Overview</div>
+<p class="body-text">Founded in 2009, Nutanix pioneered enterprise HCI. The platform has evolved from pure HCI storage into a full cloud platform (cloud-native, DR, files, networking, databases, VDI).</p>
+<table class="def-table">
+<tr><td class="term-cell">AOS</td><td class="def-cell">Acropolis Operating System — the Nutanix storage and hypervisor management OS running on each node.</td></tr>
+<tr><td class="term-cell">AHV</td><td class="def-cell">Acropolis Hypervisor — Nutanix's own KVM-based hypervisor, included at no extra cost.</td></tr>
+<tr><td class="term-cell">DSF</td><td class="def-cell">Distributed Storage Fabric — pools node-local SSDs and HDDs into a distributed datastore.</td></tr>
+<tr><td class="term-cell">Prism Element (PE)</td><td class="def-cell">Per-cluster management UI — cluster-level operations, VM management, monitoring.</td></tr>
+<tr><td class="term-cell">Prism Central (PC)</td><td class="def-cell">Multi-cluster management plane — manage thousands of clusters from a single UI.</td></tr>
+<tr><td class="term-cell">NCC</td><td class="def-cell">Nutanix Cluster Check — automated health check and diagnostics framework.</td></tr>
+<tr><td class="term-cell">Foundation</td><td class="def-cell">Nutanix imaging tool — used to bootstrap bare-metal nodes and create clusters.</td></tr>
+<tr><td class="term-cell">Pulse</td><td class="def-cell">Optional telemetry service that sends diagnostic data to Nutanix support.</td></tr>
+</table>
+<div class="callout info"><span class="callout-icon">📘</span><div><strong>Key Concept</strong>Nutanix separates the data plane (AOS/DSF) from the management plane (Prism). Data continues to flow even if Prism is temporarily unavailable.</div></div>
+</div>
+<!-- ═══════════════════════════ S2 ═══════════════════════════ -->
+<div class="section-block" id="s2">
+<div class="section-divider"><span class="sec-num">SECTION 02</span><h2 id="nut-understanding-physical-construct-basic-b">Understanding Physical Construct &amp; Basic Behavior</h2></div>
+<div class="h1">2. Physical Construct &amp; Basic Behavior</div>
+<div class="h2">2.1 Node Anatomy</div>
+<p class="body-text">A Nutanix node is a standard 1U or 2U x86 server containing CPU, RAM, storage devices (NVMe/SSD/HDD), and a NIC. Each node runs a hypervisor and the CVM (Controller VM).</p>
+<table class="def-table">
+<tr><td class="term-cell">Node</td><td class="def-cell">Single physical server — the fundamental building block of a Nutanix cluster.</td></tr>
+<tr><td class="term-cell">Block</td><td class="def-cell">A chassis holding 1, 2, or 4 nodes. NX-1175S-G9 = 1-node; NX-3155G-G9 = 2-node; NX-3060-G9 = 4-node.</td></tr>
+<tr><td class="term-cell">CPU</td><td class="def-cell">Intel Xeon Scalable or AMD EPYC CPUs — multiple sockets supported.</td></tr>
+<tr><td class="term-cell">RAM</td><td class="def-cell">DDR4/DDR5 DIMMs — directly mapped to host/CVM/VMs.</td></tr>
+<tr><td class="term-cell">NVMe SSD</td><td class="def-cell">Fastest tier — PCIe-attached SSDs for hot data and metadata. Also called 'Tier 0'.</td></tr>
+<tr><td class="term-cell">SSD (SATA/SAS)</td><td class="def-cell">Performance tier — warm data. Used in all-flash or hybrid nodes.</td></tr>
+<tr><td class="term-cell">HDD</td><td class="def-cell">Capacity tier — cold data in hybrid nodes (SSD+HDD config).</td></tr>
+<tr><td class="term-cell">NIC</td><td class="def-cell">Network Interface Card — 10/25/40/100 GbE for VM traffic, storage replication, and management.</td></tr>
+<tr><td class="term-cell">IPMI/BMC</td><td class="def-cell">Baseboard Management Controller — out-of-band management (remote KVM, power control).</td></tr>
+<tr><td class="term-cell">Boot Drive</td><td class="def-cell">Dedicated SSD/HDD/M.2 or SD card for the hypervisor OS — separate from data drives.</td></tr>
+</table>
+<div class="h3">Node Storage Tiers</div>
+<ul class="bullet-list">
+<li><strong>Tier 0 — NVMe SSDs:</strong> Ultra-low latency metadata and hot data, CVM memory-tiered</li>
+<li><strong>Tier 1 — SATA/SAS SSD:</strong> Active working set, read cache (Extent Cache), warm data</li>
+<li><strong>Tier 2 — HDD (hybrid only):</strong> Bulk capacity for cold data, sequential workloads</li>
+</ul>
+<div class="h2">2.2 Cluster Architecture</div>
+<p class="body-text">A Nutanix cluster is a collection of 3 or more nodes (minimum 3 for redundancy) sharing a distributed storage pool. All nodes communicate over standard Ethernet.</p>
+<table class="def-table">
+<tr><td class="term-cell">Minimum Cluster Size</td><td class="def-cell">3 nodes (required for Replication Factor 2 — RF2).</td></tr>
+<tr><td class="term-cell">Cluster IP</td><td class="def-cell">Virtual IP (VIP) representing the cluster management endpoint — floats among CVMs.</td></tr>
+<tr><td class="term-cell">Data Services IP</td><td class="def-cell">iSCSI target IP used by external initiators (for guest-initiated iSCSI connections).</td></tr>
+<tr><td class="term-cell">Node Quorum</td><td class="def-cell">Majority of nodes must be online for cluster operations. Losing &gt;50% = cluster fenced.</td></tr>
+<tr><td class="term-cell">Zookeeper</td><td class="def-cell">Distributed coordination service running on CVMs — manages cluster state and configuration.</td></tr>
+<tr><td class="term-cell">Medusa</td><td class="def-cell">Nutanix metadata database (key-value store) — maps logical blocks to physical locations.</td></tr>
+<tr><td class="term-cell">Cassandra</td><td class="def-cell">Distributed NoSQL DB used by Medusa for metadata persistence across CVMs.</td></tr>
+</table>
+<div class="h2">2.3 Controller VM (CVM) Deep Dive</div>
+<p class="body-text">The CVM is a virtual machine that runs on every node, providing all storage I/O services. It intercepts storage requests from the hypervisor and fulfills them locally or via the distributed fabric.</p>
+<table class="def-table">
+<tr><td class="term-cell">CVM Role</td><td class="def-cell">Manages local storage devices, serves iSCSI/NFS to hypervisor, handles replication, runs metadata services.</td></tr>
+<tr><td class="term-cell">CVM Resources</td><td class="def-cell">4–32 vCPUs, 12–72 GB RAM (varies by AOS version and workload) — reserved exclusively for CVM.</td></tr>
+<tr><td class="term-cell">CVM IP</td><td class="def-cell">Static IP on the storage network — all hypervisor storage traffic is directed here.</td></tr>
+<tr><td class="term-cell">Passthrough</td><td class="def-cell">Physical NVMe/SSD/HDD devices are passed through directly to CVM (not shared with hypervisor).</td></tr>
+<tr><td class="term-cell">CVM HA</td><td class="def-cell">If CVM on one node fails, hypervisor redirects storage I/O to CVMs on other nodes automatically.</td></tr>
+<tr><td class="term-cell">CVM Tunnel</td><td class="def-cell">When local CVM is down, a backplane network path (192.168.5.x) routes I/O to other CVMs.</td></tr>
+</table>
+<div class="callout warning"><span class="callout-icon">⚠️</span><div><strong>Warning</strong>Never power off a CVM without first putting it into maintenance mode. Abruptly stopping the CVM disrupts local storage I/O and triggers remote I/O paths.</div></div>
+<div class="h2">2.4 Key CVM Services</div>
+<table class="def-table">
+<tr><td class="term-cell">Stargate</td><td class="def-cell">Primary I/O manager — handles all read/write operations, caching, deduplication, compression, erasure coding.</td></tr>
+<tr><td class="term-cell">Curator</td><td class="def-cell">Background housekeeping — runs MapReduce jobs for dedup, compression, tiering, disk balancing, and garbage collection.</td></tr>
+<tr><td class="term-cell">Medusa</td><td class="def-cell">Metadata abstraction layer — fronts Cassandra, provides consistent key-value API for all metadata lookups.</td></tr>
+<tr><td class="term-cell">Cassandra</td><td class="def-cell">Persistent metadata ring — stores vDisk extents, block mappings, and cluster topology data.</td></tr>
+<tr><td class="term-cell">Zookeeper</td><td class="def-cell">Cluster state management — leader election, distributed lock, configuration store.</td></tr>
+<tr><td class="term-cell">Cerebro</td><td class="def-cell">Replication and DR engine — manages protection domains, snapshots, async/sync replication.</td></tr>
+<tr><td class="term-cell">Acropolis</td><td class="def-cell">AHV management service — handles VM lifecycle, network, and storage attachment for AHV VMs.</td></tr>
+<tr><td class="term-cell">Prism Gateway</td><td class="def-cell">Web application server for Prism Element UI — proxies API calls to underlying services.</td></tr>
+<tr><td class="term-cell">Genesis</td><td class="def-cell">Cluster bootstrap service — initializes cluster on first start, manages CVM startup/stop.</td></tr>
+<tr><td class="term-cell">Mantle</td><td class="def-cell">Security service — key management, encryption at rest operations.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S3 ═══════════════════════════ -->
+<div class="section-block" id="s3">
+<div class="section-divider"><span class="sec-num">SECTION 03</span><h2 id="nut-logical-construct-detailed-behavior">Logical Construct &amp; Detailed Behavior</h2></div>
+<div class="h1">3. Logical Construct &amp; Detailed Behavior</div>
+<div class="h2">3.1 Distributed Storage Fabric (DSF)</div>
+<p class="body-text">DSF presents all node-local storage as a single unified storage pool. VMs see a logical datastore (NFS mount on AHV, VMware, or Hyper-V), while DSF handles data placement, protection, and tiering transparently.</p>
+<table class="def-table">
+<tr><td class="term-cell">Container</td><td class="def-cell">Logical storage pool presented to the hypervisor as a datastore. Maps to a subset (or all) of the Storage Pool.</td></tr>
+<tr><td class="term-cell">Storage Pool</td><td class="def-cell">Aggregate of all physical storage across all nodes in the cluster.</td></tr>
+<tr><td class="term-cell">vDisk</td><td class="def-cell">Virtual disk file (.vhdx / .vmdk / .qcow2) stored in a container. The disk image a VM uses.</td></tr>
+<tr><td class="term-cell">Extent</td><td class="def-cell">Fixed 1 MB chunk — basic unit of I/O in Nutanix. Each write is broken into extents.</td></tr>
+<tr><td class="term-cell">Extent Group</td><td class="def-cell">4 MB collection of extents — the unit of replication and deduplication.</td></tr>
+<tr><td class="term-cell">Oplog</td><td class="def-cell">Write buffer — volatile writes go here first (SSD-backed), then destaged to persistent storage.</td></tr>
+<tr><td class="term-cell">Extent Store</td><td class="def-cell">Persistent tier on SSD/HDD — final resting place for all data after Oplog destage.</td></tr>
+<tr><td class="term-cell">Unified Cache</td><td class="def-cell">Flash-based read cache in Stargate — caches hot extents for low-latency reads.</td></tr>
+</table>
+<div class="h2">3.2 I/O Path — Write Flow</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">VM issues a write → NFS/iSCSI write request to local CVM</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">CVM Stargate receives the write and acknowledges the guest VM</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Data is written to the local Oplog (SSD-backed) for low-latency response</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Simultaneously, data is replicated to remote CVMs' Oplogs (RF2=1 copy, RF3=2 copies)</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Write is acknowledged to the VM after replication is confirmed</div></div>
+<div class="step-item"><div class="step-num">6</div><div class="step-text">Curator destages Oplog data to Extent Store (SSD/HDD) during background operations</div></div>
+<div class="step-item"><div class="step-num">7</div><div class="step-text">Metadata in Cassandra is updated to reflect final data location</div></div>
+</div>
+<div class="callout info"><span class="callout-icon">📘</span><div><strong>Key Concept</strong>Nutanix uses a 'write locally, replicate immediately' model. The local Oplog provides fast write acknowledgment while async destage moves data to persistent storage.</div></div>
+<div class="h2">3.3 I/O Path — Read Flow</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">VM issues a read → NFS/iSCSI read request to local CVM</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Stargate checks Unified Cache — if hit, data returned immediately (~100 μs)</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">If cache miss, Stargate checks local SSD Extent Store</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">If not local, request forwarded to the CVM holding the data replica</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Data returned to requesting VM</div></div>
+<div class="step-item"><div class="step-num">6</div><div class="step-text">Hot data gets promoted to Unified Cache for future reads</div></div>
+</div>
+<div class="h2">3.4 Data Locality &amp; I/O Preference</div>
+<table class="def-table">
+<tr><td class="term-cell">Data Locality</td><td class="def-cell">Data belonging to a VM is preferentially stored on the node running that VM.</td></tr>
+<tr><td class="term-cell">Remote I/O</td><td class="def-cell">When data is not local (e.g., after VM migration), Stargate fetches from the remote node holding the replica.</td></tr>
+<tr><td class="term-cell">Intelligent Tiering</td><td class="def-cell">Curator automatically moves hot data to SSD and cold data to HDD based on access patterns.</td></tr>
+<tr><td class="term-cell">ILM</td><td class="def-cell">Information Lifecycle Management — the background process governing data movement between tiers.</td></tr>
+<tr><td class="term-cell">Oplog Draining</td><td class="def-cell">When Oplog reaches threshold, Curator drains it to Extent Store. Large sequential writes bypass Oplog entirely.</td></tr>
+</table>
+<div class="h2">3.5 Container &amp; vDisk Configuration</div>
+<table class="def-table">
+<tr><td class="term-cell">Compression</td><td class="def-cell">Container-level setting — inline or post-process. Reduces storage consumption.</td></tr>
+<tr><td class="term-cell">Deduplication</td><td class="def-cell">Container-level setting — removes duplicate data blocks. Effective for VDI/clone workloads.</td></tr>
+<tr><td class="term-cell">Erasure Coding</td><td class="def-cell">Container-level setting — replaces full copies with parity chunks. Reduces storage at the cost of CPU.</td></tr>
+<tr><td class="term-cell">RF2</td><td class="def-cell">Replication Factor 2 — 1 primary copy + 1 replica. Survives 1 node failure. Default.</td></tr>
+<tr><td class="term-cell">RF3</td><td class="def-cell">Replication Factor 3 — 1 primary + 2 replicas. Survives 2 node failures. Used for mission-critical VMs.</td></tr>
+<tr><td class="term-cell">Reserved Capacity</td><td class="def-cell">Minimum guaranteed capacity for a container — prevents starvation in multi-container clusters.</td></tr>
+<tr><td class="term-cell">Advertised Capacity</td><td class="def-cell">Maximum capacity a container can present to the hypervisor (includes logical savings).</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S4 ═══════════════════════════ -->
+<div class="section-block" id="s4">
+<div class="section-divider"><span class="sec-num">SECTION 04</span><h2 id="nut-how-data-resiliency-is-managed-by-nutani">How Data Resiliency Is Managed by Nutanix</h2></div>
+<div class="h1">4. Data Resiliency</div>
+<div class="h2">4.1 Replication Factor (RF)</div>
+<table class="def-table">
+<tr><td class="term-cell">RF2 (Default)</td><td class="def-cell">Data stored on 2 nodes. Tolerates failure of 1 node or 1 disk. Minimum cluster size: 3 nodes.</td></tr>
+<tr><td class="term-cell">RF3</td><td class="def-cell">Data stored on 3 nodes. Tolerates failure of 2 nodes simultaneously. Minimum cluster size: 5 nodes.</td></tr>
+<tr><td class="term-cell">Metadata RF</td><td class="def-cell">Metadata (Cassandra) uses RF3 regardless of data RF — ensures metadata consistency.</td></tr>
+<tr><td class="term-cell">Replica Placement</td><td class="def-cell">Replicas never placed on the same node, same block (chassis), or same rack (if rack-aware).</td></tr>
+<tr><td class="term-cell">Block Awareness</td><td class="def-cell">Nutanix places replicas across different chassis (blocks) to survive block-level failures.</td></tr>
+<tr><td class="term-cell">Rack Awareness</td><td class="def-cell">For deployments with rack diversity — replicas placed across different racks.</td></tr>
+</table>
+<div class="h2">4.2 Resilience Domains &amp; Failure Tolerance</div>
+<table class="def-table">
+<tr><td class="term-cell">Node Failure</td><td class="def-cell">CVM stops. Hypervisor routes storage I/O to remote CVM replicas. VMs continue running (brief I/O pause).</td></tr>
+<tr><td class="term-cell">Disk Failure</td><td class="def-cell">Failed disk detected by Stargate. Affected extents rebuilt from replicas on surviving nodes.</td></tr>
+<tr><td class="term-cell">Block Failure</td><td class="def-cell">Entire chassis fails. Block-aware RF2 still provides access via replicas on other blocks.</td></tr>
+<tr><td class="term-cell">Network Partition</td><td class="def-cell">Zookeeper quorum determines cluster health. Minority partition fences itself to prevent split-brain.</td></tr>
+<tr><td class="term-cell">CVM Failure (node alive)</td><td class="def-cell">Hypervisor redirects I/O via backplane tunnel to another CVM. VMs continue without interruption.</td></tr>
+<tr><td class="term-cell">Metro Failure</td><td class="def-cell">With Sync Rep/Metro Availability configured, secondary site takes over automatically.</td></tr>
+</table>
+<div class="callout info"><span class="callout-icon">📘</span><div><strong>Key Concept</strong>In RF2, losing 1 node puts the cluster in a 'degraded but available' state. Data is still accessible from the remaining replica, and Curator immediately begins rebuilding lost replicas.</div></div>
+<div class="h2">4.3 Rebuild &amp; Self-Healing</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Failure detected (hardware, heartbeat timeout, Zookeeper quorum)</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Medusa marks affected extents as 'under-replicated'</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Curator schedules MapReduce jobs to rebuild missing extents</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Surviving replicas are used to reconstruct data on remaining healthy nodes</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Data is redistributed to balance capacity across surviving nodes</div></div>
+<div class="step-item"><div class="step-num">6</div><div class="step-text">Cluster returns to full redundancy — no manual intervention required</div></div>
+</div>
+<div class="h2">4.4 Disk Balancing</div>
+<table class="def-table">
+<tr><td class="term-cell">Disk Balancing</td><td class="def-cell">Background process that migrates data extents to equalize usage across all disks and nodes.</td></tr>
+<tr><td class="term-cell">Trigger</td><td class="def-cell">Triggered when any node's disk usage deviates &gt;15% from cluster average, or on topology change.</td></tr>
+<tr><td class="term-cell">Impact</td><td class="def-cell">Low-priority background I/O — does not impact foreground VM workloads significantly.</td></tr>
+</table>
+<div class="h2">4.5 Erasure Coding (EC-X)</div>
+<table class="def-table">
+<tr><td class="term-cell">Erasure Coding</td><td class="def-cell">Breaks data into k data chunks and m parity chunks. Can reconstruct from any k chunks of k+m.</td></tr>
+<tr><td class="term-cell">EC-X Modes</td><td class="def-cell">3+1 (3 data, 1 parity — 1.33x overhead), 4+1 (1.25x overhead), 4+2 (1.5x overhead, survives 2 failures)</td></tr>
+<tr><td class="term-cell">When Applied</td><td class="def-cell">EC-X is applied to cold data by Curator during background operations — not to hot/active data.</td></tr>
+<tr><td class="term-cell">Hot Data</td><td class="def-cell">Hot/active data remains in RF2/RF3 full copies for lowest read latency; EC only on cold extents.</td></tr>
+<tr><td class="term-cell">Decode Overhead</td><td class="def-cell">Read of EC data requires reconstruction if a stripe is unavailable — slight read latency increase.</td></tr>
+<tr><td class="term-cell">Space Savings</td><td class="def-cell">EC 4+1 reduces overhead from 100% (RF2) to 25% — significant capacity savings at scale.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S5 ═══════════════════════════ -->
+<div class="section-block" id="s5">
+<div class="section-divider"><span class="sec-num">SECTION 05</span><h2 id="nut-space-optimization-features-impact-on-da">Space Optimization Features &amp; Impact on Data Path</h2></div>
+<div class="h1">5. Space Optimization Features</div>
+<div class="h2">5.1 Compression</div>
+<table class="def-table">
+<tr><td class="term-cell">Inline Compression</td><td class="def-cell">Data is compressed before being written to disk. Saves space immediately but adds CPU overhead on write path.</td></tr>
+<tr><td class="term-cell">Post-Process Compression</td><td class="def-cell">Data written uncompressed, then Curator compresses during background operations. Lower write latency.</td></tr>
+<tr><td class="term-cell">Compression Algorithm</td><td class="def-cell">LZ4 (fast, lower ratio) or Zlib/Deflate (higher ratio, more CPU). LZ4 default for performance.</td></tr>
+<tr><td class="term-cell">Typical Savings</td><td class="def-cell">30–60% reduction for most VM workloads. Already-compressed data (media, zip) sees minimal benefit.</td></tr>
+<tr><td class="term-cell">Container Level</td><td class="def-cell">Configured per container — can enable for some workloads, disable for others (e.g., databases).</td></tr>
+</table>
+<div class="h2">5.2 Deduplication</div>
+<table class="def-table">
+<tr><td class="term-cell">Inline Dedup</td><td class="def-cell">Duplicate detection before write. Fingerprinting performed in-memory — requires significant RAM.</td></tr>
+<tr><td class="term-cell">Post-Process Dedup</td><td class="def-cell">Curator identifies duplicates after data lands on SSD. More common and less RAM-intensive.</td></tr>
+<tr><td class="term-cell">Fingerprinting</td><td class="def-cell">SHA-1 hash computed for each extent. Matching fingerprints indicate duplicate data blocks.</td></tr>
+<tr><td class="term-cell">Best Use Case</td><td class="def-cell">VDI full clones, linked clones, similar OS images — where blocks repeat across many VMs.</td></tr>
+<tr><td class="term-cell">Dedup Ratio</td><td class="def-cell">Varies widely — VDI: 4–10x, mixed workloads: 1.2–2x, unique data (databases): ~1x.</td></tr>
+<tr><td class="term-cell">RAM Requirement</td><td class="def-cell">Dedup requires additional CVM RAM for fingerprint tables — plan accordingly.</td></tr>
+</table>
+<div class="h2">5.3 Thin Provisioning</div>
+<table class="def-table">
+<tr><td class="term-cell">Thin Provisioning</td><td class="def-cell">vDisks are created with a logical size larger than physical allocation. Space allocated as data is written.</td></tr>
+<tr><td class="term-cell">Thick Provisioning</td><td class="def-cell">Full logical capacity pre-allocated — no overcommit. Used for latency-sensitive workloads.</td></tr>
+<tr><td class="term-cell">Overcommit</td><td class="def-cell">Present more logical storage than physical. Relies on compression/dedup savings to satisfy workloads.</td></tr>
+<tr><td class="term-cell">Space Reclamation</td><td class="def-cell">When guest deletes files, Nutanix reclaims the physical space via TRIM/UNMAP operations.</td></tr>
+</table>
+<div class="h2">5.4 Feature Impact Comparison</div>
+<table class="data-table">
+<thead><tr><th>Feature</th><th>Write Impact</th><th>Read Impact</th><th>CPU Impact</th><th>Best Workload</th></tr></thead>
+<tbody>
+<tr><td>Inline Compression</td><td>Higher latency</td><td>Lower latency</td><td>Medium</td><td>Compressible data</td></tr>
+<tr><td>Post-Process Compression</td><td>Minimal</td><td>Minimal</td><td>Low (background)</td><td>General purpose</td></tr>
+<tr><td>Inline Dedup</td><td>Higher latency</td><td>Lower latency</td><td>High</td><td>VDI clones</td></tr>
+<tr><td>Post-Process Dedup</td><td>Minimal</td><td>Minimal</td><td>Medium (background)</td><td>Large clone farms</td></tr>
+<tr><td>Erasure Coding</td><td>No impact (cold only)</td><td>Slight increase</td><td>Low–Medium</td><td>Cold/archive data</td></tr>
+<tr><td>Thin Provisioning</td><td>Minimal</td><td>Minimal</td><td>Minimal</td><td>General purpose</td></tr>
+</tbody>
+</table>
+<div class="callout warning"><span class="callout-icon">⚠️</span><div><strong>Warning</strong>Do NOT enable inline dedup on databases or workloads with unique data. The fingerprinting overhead will reduce write performance with no space benefit.</div></div>
+</div>
+<!-- ═══════════════════════════ S6 ═══════════════════════════ -->
+<div class="section-block" id="s6">
+<div class="section-divider"><span class="sec-num">SECTION 06</span><h2 id="nut-basic-networking-concepts-related-to-nut">Basic Networking Concepts Related to Nutanix Architecture</h2></div>
+<div class="h1">6. Networking Concepts</div>
+<div class="h2">6.1 Nutanix Network Architecture</div>
+<p class="body-text">Nutanix uses standard Ethernet (10/25/40/100 GbE) for all traffic — no specialized SAN fabric required. All network functions are software-defined through the hypervisor.</p>
+<table class="def-table">
+<tr><td class="term-cell">IPMI Network</td><td class="def-cell">Out-of-band management for BMC — used for remote KVM, power control, Foundation imaging.</td></tr>
+<tr><td class="term-cell">CVM Network</td><td class="def-cell">Storage network — CVM IPs communicate with each other for replication and metadata sync.</td></tr>
+<tr><td class="term-cell">Host Network</td><td class="def-cell">Hypervisor management — AHV host IP, VMware ESXi management IP.</td></tr>
+<tr><td class="term-cell">VM Network</td><td class="def-cell">Guest VM traffic — VLAN-tagged or untagged network attached to VM vNICs.</td></tr>
+<tr><td class="term-cell">Backplane (192.168.5.x)</td><td class="def-cell">Internal CVM-to-host tunnel — used when CVM redirects I/O to remote CVM.</td></tr>
+<tr><td class="term-cell">Cluster VIP</td><td class="def-cell">Virtual IP floating among CVMs — represents the cluster management endpoint.</td></tr>
+<tr><td class="term-cell">Data Services IP</td><td class="def-cell">iSCSI target IP — for external initiators connecting block volumes.</td></tr>
+</table>
+<div class="h2">6.2 AHV Networking</div>
+<table class="def-table">
+<tr><td class="term-cell">Open vSwitch (OVS)</td><td class="def-cell">Software virtual switch used in AHV — provides L2 switching, VLAN tagging, bonding.</td></tr>
+<tr><td class="term-cell">Bridge (br0, br1…)</td><td class="def-cell">OVS bridge — logical L2 domain connecting host interfaces and VM vNICs.</td></tr>
+<tr><td class="term-cell">Uplink</td><td class="def-cell">Physical NIC port(s) connected to the OVS bridge for upstream connectivity.</td></tr>
+<tr><td class="term-cell">Bond</td><td class="def-cell">Combines multiple physical NICs for redundancy and/or bandwidth aggregation.</td></tr>
+<tr><td class="term-cell">Active-Backup Bond</td><td class="def-cell">One NIC active, others standby. Failover only — no bandwidth aggregation.</td></tr>
+<tr><td class="term-cell">Active-Active (LACP)</td><td class="def-cell">All NICs carry traffic simultaneously. Requires LACP on upstream switch.</td></tr>
+<tr><td class="term-cell">VLAN</td><td class="def-cell">802.1Q VLAN tagging on trunk uplinks — allows multiple L2 networks on one physical uplink.</td></tr>
+<tr><td class="term-cell">vNIC</td><td class="def-cell">Virtual NIC attached to a VM — connected to a specific OVS bridge/VLAN.</td></tr>
+<tr><td class="term-cell">Network (AHV)</td><td class="def-cell">Logical network object in Prism — defines VLAN ID, IP pool (optional), and DHCP settings.</td></tr>
+</table>
+<div class="h2">6.3 VLAN Configuration</div>
+<ul class="bullet-list">
+<li><strong>VLAN 0 (untagged):</strong> Native VLAN — packets have no 802.1Q tag</li>
+<li><strong>Tagged VLAN:</strong> Specify VLAN ID 1–4094 when creating a network in Prism</li>
+<li><strong>Trunk port:</strong> Switch port passes multiple VLANs to the node — required for tagged VMs</li>
+<li><strong>Access port:</strong> Switch port passes only one VLAN — used for management or single-VLAN hosts</li>
+</ul>
+<div class="h2">6.4 MTU &amp; Jumbo Frames</div>
+<table class="def-table">
+<tr><td class="term-cell">Standard MTU</td><td class="def-cell">1500 bytes — default Ethernet frame size.</td></tr>
+<tr><td class="term-cell">Jumbo Frames</td><td class="def-cell">MTU 9000 bytes — reduces CPU overhead for large I/O transfers. Recommended for storage traffic if switch supports it.</td></tr>
+<tr><td class="term-cell">CVM MTU</td><td class="def-cell">Should match the physical switch configuration — mismatched MTU causes silent packet drops.</td></tr>
+<tr><td class="term-cell">Flow Control</td><td class="def-cell">802.3x pause frames — can cause congestion. Nutanix recommends Priority Flow Control (PFC) for NVMe-oF.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S7 ═══════════════════════════ -->
+<div class="section-block" id="s7">
+<div class="section-divider"><span class="sec-num">SECTION 07</span><h2 id="nut-understanding-concepts-of-native-disaste">Understanding Concepts of Native Disaster Recovery</h2></div>
+<div class="h1">7. Native Disaster Recovery</div>
+<div class="h2">7.1 DR Concepts &amp; Terminology</div>
+<table class="def-table">
+<tr><td class="term-cell">RPO</td><td class="def-cell">Recovery Point Objective — maximum acceptable data loss (e.g., RPO=1hr means lose up to 1hr of data).</td></tr>
+<tr><td class="term-cell">RTO</td><td class="def-cell">Recovery Time Objective — maximum time to restore service after a disaster.</td></tr>
+<tr><td class="term-cell">Protection Domain (PD)</td><td class="def-cell">Logical grouping of VMs and vDisks for DR purposes — configured replication schedules.</td></tr>
+<tr><td class="term-cell">Snapshot</td><td class="def-cell">Point-in-time copy of VM data — can be local (for restore) or remote (for DR).</td></tr>
+<tr><td class="term-cell">Async Replication</td><td class="def-cell">Snapshots taken at scheduled intervals and replicated to remote site. RPO = snapshot interval.</td></tr>
+<tr><td class="term-cell">Sync Replication</td><td class="def-cell">Every write replicated synchronously to remote site before acknowledgment. RPO=0.</td></tr>
+<tr><td class="term-cell">Near-Sync</td><td class="def-cell">Replication every 1–15 minutes using lightweight change tracking. Sub-minute RPO options.</td></tr>
+<tr><td class="term-cell">Failover</td><td class="def-cell">Activating VMs at the DR site — planned (graceful) or unplanned (disaster recovery).</td></tr>
+<tr><td class="term-cell">Failback</td><td class="def-cell">Returning VMs to the original site after DR event is resolved.</td></tr>
+<tr><td class="term-cell">Test Failover</td><td class="def-cell">Non-disruptive test of DR capabilities without impacting production.</td></tr>
+</table>
+<div class="h2">7.2 Protection Policies</div>
+<table class="def-table">
+<tr><td class="term-cell">Consistency Group</td><td class="def-cell">Set of VMs that must be snapshotted together (crash-consistent) — ensures app-consistent recovery.</td></tr>
+<tr><td class="term-cell">Schedule</td><td class="def-cell">Defines snapshot frequency, retention count, and remote site replication target.</td></tr>
+<tr><td class="term-cell">Remote Site</td><td class="def-cell">A paired Nutanix cluster where replicas are sent. Configured in Prism Data Protection.</td></tr>
+<tr><td class="term-cell">Retention</td><td class="def-cell">How many snapshots are kept — local and remote retention can differ.</td></tr>
+<tr><td class="term-cell">Network Mapping</td><td class="def-cell">Maps source VM networks to target networks at DR site — applied during failover.</td></tr>
+<tr><td class="term-cell">VM Override</td><td class="def-cell">Per-VM custom settings that override Protection Domain defaults.</td></tr>
+</table>
+<div class="h2">7.3 Async vs. Sync Replication Comparison</div>
+<table class="data-table">
+<thead><tr><th>Aspect</th><th>Async Replication</th><th>Sync Replication (Metro)</th></tr></thead>
+<tbody>
+<tr><td>RPO</td><td>Minutes to Hours</td><td>Zero (RPO=0)</td></tr>
+<tr><td>RTO</td><td>Minutes to Hours</td><td>Sub-minute</td></tr>
+<tr><td>Distance</td><td>Unlimited (WAN)</td><td>&lt;5ms RTT (~300 miles)</td></tr>
+<tr><td>Write Impact</td><td>Minimal (async)</td><td>~2x write latency</td></tr>
+<tr><td>Use Case</td><td>DR, backup, compliance</td><td>Always-on HA, Metro clusters</td></tr>
+<tr><td>Nutanix Product</td><td>AOS DR (Cerebro)</td><td>Sync Rep / Leap</td></tr>
+</tbody>
+</table>
+<div class="h2">7.4 Nutanix Leap (Cloud DR)</div>
+<table class="def-table">
+<tr><td class="term-cell">Leap</td><td class="def-cell">Nutanix DR-as-a-Service — orchestrates failover/failback between on-premises clusters and cloud (AWS, Azure).</td></tr>
+<tr><td class="term-cell">Recovery Plan</td><td class="def-cell">Orchestrated runbook defining VM boot order, network mappings, and IP changes during failover.</td></tr>
+<tr><td class="term-cell">Failover Steps</td><td class="def-cell">1. Trigger failover  2. Apply network mappings  3. Boot VMs per recovery plan  4. Validate</td></tr>
+<tr><td class="term-cell">Test Failover</td><td class="def-cell">Brings up VMs at DR site on an isolated network — non-disruptive, validates RPO/RTO.</td></tr>
+<tr><td class="term-cell">Prism Central Required</td><td class="def-cell">Leap is managed from Prism Central — requires both source and target registered in PC.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S8 ═══════════════════════════ -->
+<div class="section-block" id="s8">
+<div class="section-divider"><span class="sec-num">SECTION 08</span><h2 id="nut-nutanix-files-self-service-flow-leap">Nutanix Files, Self-Service, Flow &amp; Leap</h2></div>
+<div class="h1">8. Nutanix Software Products</div>
+<div class="h2">8.1 Nutanix Files</div>
+<p class="body-text">Nutanix Files is a scale-out software-defined NAS solution deployed as a cluster of File Server VMs (FSVMs) on top of Nutanix.</p>
+<table class="def-table">
+<tr><td class="term-cell">FSVM</td><td class="def-cell">File Server VM — Nutanix-managed VM providing NFS and SMB file services. 3+ FSVMs per Files cluster.</td></tr>
+<tr><td class="term-cell">SMB</td><td class="def-cell">Server Message Block — Windows file sharing protocol. Nutanix Files supports SMB 2.0/3.0.</td></tr>
+<tr><td class="term-cell">NFS</td><td class="def-cell">Network File System — Linux/Unix file sharing. Nutanix Files supports NFS v3 and v4.</td></tr>
+<tr><td class="term-cell">Share</td><td class="def-cell">Logical file share exposed to clients — can be SMB or NFS. Distributed across FSVMs.</td></tr>
+<tr><td class="term-cell">Distributed Share</td><td class="def-cell">Files auto-balances data and load across all FSVMs — no single FSVM bottleneck.</td></tr>
+<tr><td class="term-cell">Home Share</td><td class="def-cell">Each user gets a dedicated home directory. Used for end-user file storage.</td></tr>
+<tr><td class="term-cell">General Share</td><td class="def-cell">Shared folder accessible by multiple users — departmental shares, application data.</td></tr>
+<tr><td class="term-cell">File Analytics</td><td class="def-cell">Optional add-on — provides audit trails, anomaly detection, ransomware protection for Files data.</td></tr>
+<tr><td class="term-cell">Scale-Out</td><td class="def-cell">Add FSVMs to expand capacity and throughput without downtime.</td></tr>
+<tr><td class="term-cell">Integration</td><td class="def-cell">Files storage is backed by Nutanix DSF — inherits all storage efficiency features.</td></tr>
+</table>
+<div class="h2">8.2 Nutanix Self-Service (Calm)</div>
+<p class="body-text">Nutanix Self-Service (SSP/Calm) is an application automation and orchestration platform that enables DevOps-style self-service provisioning of complex multi-cloud applications.</p>
+<table class="def-table">
+<tr><td class="term-cell">Blueprint</td><td class="def-cell">Template that defines an application's infrastructure, services, configuration, and lifecycle actions.</td></tr>
+<tr><td class="term-cell">Application</td><td class="def-cell">Deployed instance of a Blueprint — running with its full service topology.</td></tr>
+<tr><td class="term-cell">Service</td><td class="def-cell">Individual VM or group of VMs within an Application (e.g., web tier, DB tier).</td></tr>
+<tr><td class="term-cell">Action</td><td class="def-cell">Lifecycle operation defined in a Blueprint (Create, Delete, Start, Stop, Scale Out, Scale In, custom).</td></tr>
+<tr><td class="term-cell">Task</td><td class="def-cell">Individual step within an Action — can be shell script, PowerShell, HTTP, Nutanix, or VMware task.</td></tr>
+<tr><td class="term-cell">Variable</td><td class="def-cell">Parameterized input defined in Blueprint — can be static, dynamic, or user-entered at launch.</td></tr>
+<tr><td class="term-cell">Provider</td><td class="def-cell">Cloud target where Services are provisioned — Nutanix, AWS, Azure, GCP, VMware, K8s.</td></tr>
+<tr><td class="term-cell">Marketplace</td><td class="def-cell">Self-service catalog — published Blueprints available for users to launch with one click.</td></tr>
+<tr><td class="term-cell">Project</td><td class="def-cell">Tenant isolation unit in Calm — defines users, roles, resource limits, and providers.</td></tr>
+<tr><td class="term-cell">Policy Engine</td><td class="def-cell">Approval workflows, quota enforcement, and governance rules for Self-Service requests.</td></tr>
+<tr><td class="term-cell">NuCalm (Runbook)</td><td class="def-cell">Workflow automation for Day-2 operations without VM deployment — IT process automation.</td></tr>
+</table>
+<div class="h2">8.3 Nutanix Flow (Microsegmentation)</div>
+<p class="body-text">Nutanix Flow provides distributed, application-centric firewall policies implemented directly in the AHV OVS layer. No dedicated hardware appliance required.</p>
+<table class="def-table">
+<tr><td class="term-cell">Microsegmentation</td><td class="def-cell">Zero-trust security model — each VM's traffic is controlled by its own security policy at the vNIC level.</td></tr>
+<tr><td class="term-cell">Security Policy</td><td class="def-cell">Set of rules defining allowed/denied traffic for a group of VMs. Applied by OVS on each host.</td></tr>
+<tr><td class="term-cell">Application Security Policy</td><td class="def-cell">Policy scoped to an application — defines inbound/outbound rules per tier (web, app, db).</td></tr>
+<tr><td class="term-cell">Quarantine Policy</td><td class="def-cell">Isolates a potentially compromised VM — blocks all traffic except forensics/ICMP.</td></tr>
+<tr><td class="term-cell">Isolation Policy</td><td class="def-cell">Prevents two groups of VMs from communicating — e.g., dev and prod isolation.</td></tr>
+<tr><td class="term-cell">Category</td><td class="def-cell">Label applied to a VM (e.g., AppType=Web, Env=Prod). Policies target categories, not individual VMs.</td></tr>
+<tr><td class="term-cell">Service Chain</td><td class="def-cell">Redirect traffic through a third-party virtual network appliance (firewall, IDS) via policy.</td></tr>
+<tr><td class="term-cell">Allow List Mode</td><td class="def-cell">Deny all by default — only explicitly permitted traffic flows. Most secure posture.</td></tr>
+<tr><td class="term-cell">Monitor Mode</td><td class="def-cell">Policy evaluated but not enforced — used to audit traffic before enforcing.</td></tr>
+<tr><td class="term-cell">Flow Visualization</td><td class="def-cell">Prism Central Traffic Visualization — shows network flows between VMs as an interactive graph.</td></tr>
+</table>
+<div class="h2">8.4 Nutanix Leap — Recovery Plan Details</div>
+<table class="def-table">
+<tr><td class="term-cell">Recovery Plan</td><td class="def-cell">Defines VM boot order (stages), network mappings, IP address changes, and scripts.</td></tr>
+<tr><td class="term-cell">Stage</td><td class="def-cell">Group of VMs that boot together. Multiple stages enforce boot ordering (infra → app → web).</td></tr>
+<tr><td class="term-cell">IP Mapping</td><td class="def-cell">Maps production VM IPs to DR site IPs — can be 1:1, subnet change, or dynamic.</td></tr>
+<tr><td class="term-cell">Script</td><td class="def-cell">Custom PowerShell or shell scripts run during failover — DNS update, load balancer reconfiguration.</td></tr>
+<tr><td class="term-cell">Status Checks</td><td class="def-cell">Leap validates VM state, replication health, and network readiness before allowing failover.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S9 ═══════════════════════════ -->
+<div class="section-block" id="s9">
+<div class="section-divider"><span class="sec-num">SECTION 09</span><h2 id="nut-introduction-to-foundation-node-imaging">Introduction to Foundation &amp; Node Imaging</h2></div>
+<div class="h1">9. Foundation &amp; Node Imaging</div>
+<div class="h2">9.1 What is Foundation?</div>
+<p class="body-text">Foundation is the Nutanix tool used to image (install) bare-metal nodes with the chosen hypervisor (AHV, ESXi, Hyper-V) and AOS version, and then create or expand clusters.</p>
+<table class="def-table">
+<tr><td class="term-cell">Foundation VM</td><td class="def-cell">A pre-built VM (or physical laptop image) that hosts the Foundation application and web UI.</td></tr>
+<tr><td class="term-cell">Foundation App</td><td class="def-cell">Web-based wizard that discovers nodes via IPMI and orchestrates the imaging process.</td></tr>
+<tr><td class="term-cell">IPMI Discovery</td><td class="def-cell">Foundation connects to nodes via their IPMI/BMC IP to perform remote operations.</td></tr>
+<tr><td class="term-cell">Hypervisor Bundle</td><td class="def-cell">ISO or tarball containing the hypervisor (AHV.iso, VMware ESXi ISO) to install.</td></tr>
+<tr><td class="term-cell">AOS Bundle</td><td class="def-cell">Nutanix AOS software package (tar.gz) containing CVM image and AOS components.</td></tr>
+<tr><td class="term-cell">Cluster Creation</td><td class="def-cell">After imaging, Foundation creates the cluster — sets node IPs, cluster name, cluster VIP.</td></tr>
+<tr><td class="term-cell">Phoenix</td><td class="def-cell">Minimal Linux OS that boots on nodes during imaging — used to receive and install Foundation payloads.</td></tr>
+</table>
+<div class="h2">9.2 Foundation Process — Step by Step</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Pre-requisites: Network (IPMI, host, CVM IPs planned), DNS, NTP, hardware racked and powered</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Deploy Foundation VM on a laptop or management server on the IPMI network</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Open Foundation web UI (http://&lt;foundation-vm-ip&gt;:8000)</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Discover nodes via IPMI — provide IPMI IP range and credentials</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Select AOS version and hypervisor type/version</div></div>
+<div class="step-item"><div class="step-num">6</div><div class="step-text">Upload or provide URL to AOS and hypervisor bundles</div></div>
+<div class="step-item"><div class="step-num">7</div><div class="step-text">Assign node IPs (IPMI, Hypervisor Host, CVM) and cluster parameters (name, VIP, NTP, DNS)</div></div>
+<div class="step-item"><div class="step-num">8</div><div class="step-text">Run Foundation — nodes boot Phoenix, receive image payload, install, configure, reboot</div></div>
+<div class="step-item"><div class="step-num">9</div><div class="step-text">Cluster forms — CVMs negotiate, Zookeeper quorum establishes, Prism becomes available</div></div>
+<div class="step-item"><div class="step-num">10</div><div class="step-text">Access Prism Element at https://&lt;cluster-VIP&gt;:9440</div></div>
+</div>
+<div class="h2">9.3 Foundation Modes</div>
+<table class="def-table">
+<tr><td class="term-cell">Normal Foundation</td><td class="def-cell">Full imaging — wipes existing OS and installs fresh hypervisor and AOS.</td></tr>
+<tr><td class="term-cell">Re-Foundation</td><td class="def-cell">Re-image an existing Nutanix node — data will be DESTROYED. Used for recovery.</td></tr>
+<tr><td class="term-cell">Add Node</td><td class="def-cell">Image a new node and add it to an existing cluster without disrupting running VMs.</td></tr>
+<tr><td class="term-cell">1-Click Foundation</td><td class="def-cell">Automated discovery and imaging with minimal input — uses DHCP for bootstrap.</td></tr>
+<tr><td class="term-cell">Field Foundation</td><td class="def-cell">Foundation from a USB key — for environments with no network-based Foundation VM.</td></tr>
+<tr><td class="term-cell">Foundation Central</td><td class="def-cell">Centralized Foundation management for imaging nodes at remote locations at scale.</td></tr>
+</table>
+<div class="h2">9.4 Foundation Requirements</div>
+<ul class="bullet-list">
+<li>IPMI (BMC) access: Foundation VM must reach all node IPMI IPs</li>
+<li>L2 connectivity: Foundation VM, IPMI, and host management network on same broadcast domain or routable</li>
+<li>Correct AOS + hypervisor bundle: versions must be compatible (AOS Compatibility Matrix)</li>
+<li>DNS and NTP: required for cluster formation and ongoing operations</li>
+<li>Time sync: All nodes and Foundation VM must have synchronized time (&lt;5 min difference)</li>
+</ul>
+<div class="callout warning"><span class="callout-icon">⚠️</span><div><strong>Warning</strong>Foundation destroys all existing data on the target nodes. Always verify the correct IPMI IPs are selected before starting the imaging process.</div></div>
+</div>
+<!-- ═══════════════════════════ S10 ═══════════════════════════ -->
+<div class="section-block" id="s10">
+<div class="section-divider"><span class="sec-num">SECTION 10</span><h2 id="nut-portal-test-drive-university-certificati">Portal, Test Drive, University &amp; Certification</h2></div>
+<div class="h1">10. Nutanix Resources</div>
+<div class="h2">10.1 Nutanix Portal (support.nutanix.com)</div>
+<table class="def-table">
+<tr><td class="term-cell">Software Downloads</td><td class="def-cell">AOS, AHV, Foundation, NCC, Prism Central, Files, Flow, Calm packages.</td></tr>
+<tr><td class="term-cell">Knowledge Base (KB)</td><td class="def-cell">Searchable articles for known issues, upgrade procedures, and troubleshooting guides.</td></tr>
+<tr><td class="term-cell">Support Cases</td><td class="def-cell">Open, track, and update support cases. Attach logs (log bundles) to expedite resolution.</td></tr>
+<tr><td class="term-cell">NCC Checks</td><td class="def-cell">NCC plugin reference — understand what each health check validates.</td></tr>
+<tr><td class="term-cell">Compatibility Matrix</td><td class="def-cell">AOS ↔ AHV ↔ Prism Central ↔ third-party software version compatibility.</td></tr>
+<tr><td class="term-cell">Field Alerts</td><td class="def-cell">Proactive notifications for critical issues, required upgrades, and hardware advisories.</td></tr>
+<tr><td class="term-cell">License Management</td><td class="def-cell">View, allocate, and manage Nutanix software licenses (AOS, Prism Pro, Files, etc.).</td></tr>
+<tr><td class="term-cell">Log Collection</td><td class="def-cell">Guides for collecting logs via Prism or ncli for support case attachment.</td></tr>
+</table>
+<div class="h2">10.2 Nutanix Test Drive</div>
+<table class="def-table">
+<tr><td class="term-cell">Hosted Labs</td><td class="def-cell">Pre-provisioned Nutanix clusters in Nutanix's data center — access via browser.</td></tr>
+<tr><td class="term-cell">Available Products</td><td class="def-cell">AHV, Prism Element, Prism Central, Files, Flow, Calm/Self-Service — product-specific labs.</td></tr>
+<tr><td class="term-cell">Duration</td><td class="def-cell">60–90 minute sessions with guided walkthroughs.</td></tr>
+<tr><td class="term-cell">Use Case</td><td class="def-cell">Pre-sales evaluation, learning, demo preparation — no commitment required.</td></tr>
+<tr><td class="term-cell">No Hardware Required</td><td class="def-cell">Access via web browser — use RDP or direct browser-based console.</td></tr>
+</table>
+<div class="h2">10.3 Nutanix University &amp; Certification</div>
+<table class="def-table">
+<tr><td class="term-cell">NCP-MCI</td><td class="def-cell">Nutanix Certified Professional — Multicloud Infrastructure. Entry-level administrator cert.</td></tr>
+<tr><td class="term-cell">NCP-DB</td><td class="def-cell">NCP — Database Automation. Focuses on Era (database management).</td></tr>
+<tr><td class="term-cell">NCP-VDI</td><td class="def-cell">NCP — Virtual Desktop Infrastructure. Frame and AHV VDI deployments.</td></tr>
+<tr><td class="term-cell">NCX</td><td class="def-cell">Nutanix Certified Expert — advanced architecture and design. Requires NCP prerequisite.</td></tr>
+<tr><td class="term-cell">NPX</td><td class="def-cell">Nutanix Platform Expert — highest cert level. Requires NCX + design challenge.</td></tr>
+<tr><td class="term-cell">Free Courses</td><td class="def-cell">Nutanix University offers many free online courses — 'The Nutanix Bible', product courses.</td></tr>
+<tr><td class="term-cell">Exam Vouchers</td><td class="def-cell">Purchased through Nutanix University — proctored via Pearson VUE or online proctoring.</td></tr>
+<tr><td class="term-cell">Learning Path</td><td class="def-cell">Recommended: Free Foundation → NCP study → Practice labs → Exam.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S11 ═══════════════════════════ -->
+<div class="section-block" id="s11">
+<div class="section-divider"><span class="sec-num">SECTION 11</span><h2 id="nut-prism-element-ui-dashboard-operations">Prism Element UI Dashboard &amp; Operations</h2></div>
+<div class="h1">11. Prism Element (PE) UI</div>
+<div class="h2">11.1 Prism Architecture</div>
+<table class="def-table">
+<tr><td class="term-cell">Prism Element (PE)</td><td class="def-cell">Per-cluster management UI — runs on the cluster itself. URL: https://&lt;cluster-VIP&gt;:9440</td></tr>
+<tr><td class="term-cell">Prism Central (PC)</td><td class="def-cell">Multi-cluster management — deployed separately. URL: https://&lt;PC-IP&gt;:9440</td></tr>
+<tr><td class="term-cell">Prism Pro</td><td class="def-cell">License tier adding advanced analytics, automation, and X-Play capabilities to PC.</td></tr>
+<tr><td class="term-cell">REST API</td><td class="def-cell">All Prism operations available via REST API v2 (PE) and v3 (PC). API Explorer at /api/nutanix/v2.0</td></tr>
+<tr><td class="term-cell">Session Timeout</td><td class="def-cell">Default 15 minutes of inactivity. Configurable in Settings.</td></tr>
+<tr><td class="term-cell">Default Credentials</td><td class="def-cell">Username: admin  |  Password: set during cluster creation (Foundation).</td></tr>
+<tr><td class="term-cell">SSL Certificate</td><td class="def-cell">Self-signed by default. Replace with CA-signed cert via Settings &gt; SSL Certificate.</td></tr>
+</table>
+<div class="h2">11.2 Main Dashboard Widgets</div>
+<table class="def-table">
+<tr><td class="term-cell">Cluster Health Widget</td><td class="def-cell">NCC health score — green/yellow/red. Click to drill into health checks.</td></tr>
+<tr><td class="term-cell">Hardware Widget</td><td class="def-cell">Block diagram showing node/disk state — color coded by health status.</td></tr>
+<tr><td class="term-cell">Storage Summary</td><td class="def-cell">Total capacity, used, available, savings from dedup/compression.</td></tr>
+<tr><td class="term-cell">Performance Widget</td><td class="def-cell">Real-time IOPS, throughput (MB/s), and latency charts for the cluster.</td></tr>
+<tr><td class="term-cell">VM Summary</td><td class="def-cell">Count of VMs by state (running/stopped). Click to go to VM list.</td></tr>
+<tr><td class="term-cell">Alerts Widget</td><td class="def-cell">Recent critical/warning alerts with quick links to investigation.</td></tr>
+<tr><td class="term-cell">Data Resiliency Status</td><td class="def-cell">Shows current RF and if any data is under-replicated.</td></tr>
+</table>
+<div class="h2">11.3 Navigation Menu Reference</div>
+<table class="def-table">
+<tr><td class="term-cell">Home</td><td class="def-cell">Main dashboard — overview widgets as described above.</td></tr>
+<tr><td class="term-cell">VM</td><td class="def-cell">Virtual machine list — create, power on/off, clone, migrate, delete VMs.</td></tr>
+<tr><td class="term-cell">Storage</td><td class="def-cell">Container, vDisk, and Storage Pool management.</td></tr>
+<tr><td class="term-cell">Network</td><td class="def-cell">AHV network configuration — create/edit networks (VLAN), IP address management.</td></tr>
+<tr><td class="term-cell">Data Protection</td><td class="def-cell">Protection Domains, replication schedules, remote sites, snapshots.</td></tr>
+<tr><td class="term-cell">Hardware</td><td class="def-cell">Physical node/disk view — disk health, node status, alerts.</td></tr>
+<tr><td class="term-cell">Analysis</td><td class="def-cell">Performance analysis charts — custom time range, custom metrics.</td></tr>
+<tr><td class="term-cell">Alerts</td><td class="def-cell">All cluster alerts — filter by severity, category, acknowledge, resolve.</td></tr>
+<tr><td class="term-cell">Tasks</td><td class="def-cell">Background task tracker — imaging, snapshot, replication, upgrade tasks.</td></tr>
+<tr><td class="term-cell">Health</td><td class="def-cell">NCC health check results — individual check results and recommendations.</td></tr>
+<tr><td class="term-cell">Settings</td><td class="def-cell">Cluster configuration — NTP, DNS, SMTP, SSL, authentication, licensing.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S12 ═══════════════════════════ -->
+<div class="section-block" id="s12">
+<div class="section-divider"><span class="sec-num">SECTION 12</span><h2 id="nut-hands-on-cud-operations-create-update-de">Hands-On CUD Operations (Create, Update, Delete)</h2></div>
+<div class="h1">12. CUD Operations</div>
+<div class="h2">12.1 VM Lifecycle — Create</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Navigate to VM &gt; Create VM</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Enter VM Name, description</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Set vCPU count, number of cores per vCPU, and memory (GiB)</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Add disk: Click '+ Add New Disk' → Clone from Image Service or Empty disk → set size and bus type (SCSI/IDE)</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Add NIC: Click '+ Add New NIC' → select network → VLAN will be assigned</div></div>
+<div class="step-item"><div class="step-num">6</div><div class="step-text">Optional: Enable Guest Customization (cloud-init for Linux / Sysprep for Windows)</div></div>
+<div class="step-item"><div class="step-num">7</div><div class="step-text">Click Save → VM appears in list in 'Off' state</div></div>
+<div class="step-item"><div class="step-num">8</div><div class="step-text">Power on: Select VM → Actions &gt; Power On (or click power button)</div></div>
+</div>
+<div class="h2">12.2 VM Lifecycle — Update</div>
+<ul class="bullet-list">
+<li><strong>Hot-add vCPU/RAM (AHV):</strong> Some guests support hot-add without reboot — check guest OS support</li>
+<li><strong>Add disk:</strong> VM &gt; select VM &gt; Update &gt; + Add New Disk → save (live on AHV)</li>
+<li><strong>Resize disk:</strong> Update vDisk size from VM Update screen (expand only — no shrink)</li>
+<li><strong>Change network:</strong> Remove and re-add NIC or edit existing NIC VLAN assignment</li>
+<li><strong>Rename VM:</strong> Update VM name — does not affect guest hostname</li>
+<li><strong>Update CPU/RAM offline:</strong> Power off VM first if hot-add not supported</li>
+</ul>
+<div class="h2">12.3 VM Lifecycle — Delete</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Ensure VM is powered off</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Select VM → Actions &gt; Delete</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Optionally check 'Delete all snapshots' to remove associated protection snapshots</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Confirm deletion — this is irreversible if snapshots are not retained</div></div>
+</div>
+<div class="callout warning"><span class="callout-icon">⚠️</span><div><strong>Warning</strong>Deleting a VM only deletes the VM object and its vDisks. Independent vDisks or Images in the Image Service must be deleted separately.</div></div>
+<div class="h2">12.4 Image Management</div>
+<table class="def-table">
+<tr><td class="term-cell">Image Service</td><td class="def-cell">Nutanix central repository for disk images (ISO, qcow2, vmdk) — used as templates for VM creation.</td></tr>
+<tr><td class="term-cell">Upload Image</td><td class="def-cell">Settings &gt; Image Configuration &gt; + Upload Image → provide URL or file upload.</td></tr>
+<tr><td class="term-cell">Image Types</td><td class="def-cell">DISK (bootable vDisk template), ISO (CD-ROM for OS installation).</td></tr>
+<tr><td class="term-cell">Clone from Image</td><td class="def-cell">When creating a VM disk, select 'Clone from Image Service' → fastest way to deploy VMs.</td></tr>
+<tr><td class="term-cell">Delete Image</td><td class="def-cell">Settings &gt; Image Configuration → select image &gt; Delete. Frees storage used by the image.</td></tr>
+</table>
+<div class="h2">12.5 Container Management</div>
+<ul class="bullet-list">
+<li>Create Container: Storage &gt; + Storage Container → name, select storage pool, set RF, enable/disable features</li>
+<li>Edit Container: Select container &gt; Update → modify compression, dedup, EC settings</li>
+<li>Delete Container: Only possible if empty (no vDisks). Migrate VMs first.</li>
+<li>Mount Point: Container is auto-mounted on all AHV hosts as an NFS export at /var/lib/containers/&lt;name&gt;</li>
+</ul>
+</div>
+<!-- ═══════════════════════════ S13 ═══════════════════════════ -->
+<div class="section-block" id="s13">
+<div class="section-divider"><span class="sec-num">SECTION 13</span><h2 id="nut-day-2-operations">Day 2 Operations</h2></div>
+<div class="h1">13. Day 2 Operations</div>
+<div class="h2">13.1 Cluster Expansion (Add Node)</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Rack and cable new node(s), assign IPMI IP</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Use Foundation to image the new node(s) with the same AOS/hypervisor version</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">In Foundation, select 'Expand Cluster' and target the existing cluster</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Foundation images the node and adds it to the cluster automatically</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Curator runs disk balancing to redistribute data to the new node</div></div>
+</div>
+<div class="h2">13.2 One-Click Upgrades (LCM)</div>
+<table class="def-table">
+<tr><td class="term-cell">LCM</td><td class="def-cell">Life Cycle Manager — automated software inventory and upgrade framework in Prism.</td></tr>
+<tr><td class="term-cell">Inventory</td><td class="def-cell">LCM scans the cluster and identifies current versions and available upgrades.</td></tr>
+<tr><td class="term-cell">Upgrade Order</td><td class="def-cell">LCM follows safe upgrade order: NCC → Foundation → AOS → AHV → Firmware.</td></tr>
+<tr><td class="term-cell">Rolling Upgrade</td><td class="def-cell">One node at a time — VMs live-migrated off node, node upgraded, node rejoins cluster.</td></tr>
+<tr><td class="term-cell">Dark Site</td><td class="def-cell">LCM can operate without internet — upload upgrade bundles to LCM dark site server.</td></tr>
+<tr><td class="term-cell">Pre-check</td><td class="def-cell">NCC pre-upgrade health check runs before every upgrade — blocks upgrade if critical issues found.</td></tr>
+<tr><td class="term-cell">AHV Upgrade</td><td class="def-cell">Done via Prism Settings &gt; AHV Upgrade OR LCM. Requires at least 2 nodes for live migration.</td></tr>
+</table>
+<div class="h2">13.3 VM Live Migration</div>
+<ul class="bullet-list">
+<li>Manual: VM &gt; Select VM &gt; Migrate &gt; choose target host</li>
+<li>Automatic: ADS (Acropolis Dynamic Scheduler) automatically balances VM placement</li>
+<li>During node maintenance: put node in maintenance mode — all VMs auto-migrate off</li>
+</ul>
+<div class="h2">13.4 Host Maintenance Mode</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Prism: Hardware &gt; select node &gt; Enter Maintenance Mode</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">All running VMs live-migrate to other nodes</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">CVM on the node enters standby — I/O path redirected to cluster</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Perform maintenance (disk replacement, hardware repair, upgrade)</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Exit Maintenance Mode — CVM restarts, node rejoins cluster, VMs can migrate back</div></div>
+</div>
+<div class="h2">13.5 Capacity Planning &amp; Analysis</div>
+<table class="def-table">
+<tr><td class="term-cell">Runway Report</td><td class="def-cell">Prism Pro feature — projects when cluster will run out of storage or compute based on trends.</td></tr>
+<tr><td class="term-cell">What-If Analysis</td><td class="def-cell">Model adding nodes or VMs and see projected impact on cluster resources.</td></tr>
+<tr><td class="term-cell">Storage Efficiency</td><td class="def-cell">Monitor overall savings from compression/dedup/EC in the Storage Summary widget.</td></tr>
+<tr><td class="term-cell">Anomaly Detection</td><td class="def-cell">Prism Pro — detects unusual VM behavior and alerts on performance deviations.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S14 ═══════════════════════════ -->
+<div class="section-block" id="s14">
+<div class="section-divider"><span class="sec-num">SECTION 14</span><h2 id="nut-introduction-configuration-of-data-prote">Introduction &amp; Configuration of Data Protection</h2></div>
+<div class="h1">14. Data Protection Configuration</div>
+<div class="h2">14.1 Protection Domain Setup</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Navigate to Data Protection &gt; Protection Domains</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Click + Create Protection Domain &gt; Async DR (or Metro for sync)</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Name the Protection Domain</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Add VMs or vDisks to the Protection Domain (Entities tab)</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Create Consistency Groups — group VMs that must snapshot together</div></div>
+<div class="step-item"><div class="step-num">6</div><div class="step-text">Set Schedule: Click + Add a Schedule → define RPO, local retention, remote site, remote retention</div></div>
+<div class="step-item"><div class="step-num">7</div><div class="step-text">Optionally define Remote Site (if not already configured)</div></div>
+<div class="step-item"><div class="step-num">8</div><div class="step-text">Save — Protection Domain is active and will take snapshots per schedule</div></div>
+</div>
+<div class="h2">14.2 Remote Site Configuration</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Data Protection &gt; Remote Sites &gt; + Remote Site</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Enter remote cluster name, remote CVM/cluster IPs</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Enter remote cluster credentials</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Define bandwidth throttling if needed (limit replication bandwidth during business hours)</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Optionally configure network mapping (source VLAN → target VLAN)</div></div>
+<div class="step-item"><div class="step-num">6</div><div class="step-text">Save and validate connectivity</div></div>
+</div>
+<div class="h2">14.3 Snapshot Types</div>
+<table class="def-table">
+<tr><td class="term-cell">Crash-Consistent</td><td class="def-cell">Point-in-time copy — VM is not quiesced. Similar to pulling power. Safe for most workloads.</td></tr>
+<tr><td class="term-cell">Application-Consistent</td><td class="def-cell">Guest OS is notified via VSS (Windows) or pre/post scripts. Flushes I/O buffers for clean state.</td></tr>
+<tr><td class="term-cell">Local Snapshot</td><td class="def-cell">Stored on the local cluster — for fast restore. Doesn't protect against site failure.</td></tr>
+<tr><td class="term-cell">Remote Snapshot</td><td class="def-cell">Replicated to remote site — protects against site-level failure.</td></tr>
+<tr><td class="term-cell">Ad-hoc Snapshot</td><td class="def-cell">Manual snapshot outside of scheduled policy — taken on demand.</td></tr>
+</table>
+<div class="h2">14.4 Restore from Snapshot</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Data Protection &gt; Table &gt; select Protection Domain</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Select the snapshot to restore from (by date/time)</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Click Restore → choose: Restore to original location OR Clone to new VMs</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">For clone: provide new VM names and target container</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Restored/cloned VMs appear in the VM list — power on to verify</div></div>
+</div>
+</div>
+<!-- ═══════════════════════════ S15 ═══════════════════════════ -->
+<div class="section-block" id="s15">
+<div class="section-divider"><span class="sec-num">SECTION 15</span><h2 id="nut-health-analysis-alerts-tasks-in-prism-el">Health, Analysis, Alerts &amp; Tasks in Prism Element</h2></div>
+<div class="h1">15. Health, Analysis, Alerts &amp; Tasks</div>
+<div class="h2">15.1 Health (NCC)</div>
+<table class="def-table">
+<tr><td class="term-cell">NCC</td><td class="def-cell">Nutanix Cluster Check — collects diagnostic data and runs checks against known best practices/issues.</td></tr>
+<tr><td class="term-cell">Check Categories</td><td class="def-cell">Hardware, Software, Network, Cluster Services, Storage, Security, Configuration.</td></tr>
+<tr><td class="term-cell">Severity Levels</td><td class="def-cell">PASS (green), INFO, WARNING (yellow), FAIL (red), ERROR.</td></tr>
+<tr><td class="term-cell">Auto-Run</td><td class="def-cell">NCC runs automatically every 4 hours and on-demand via Prism or command line.</td></tr>
+<tr><td class="term-cell">Run from Prism</td><td class="def-cell">Health &gt; Run NCC &gt; select checks &gt; Run.</td></tr>
+<tr><td class="term-cell">Run from CLI</td><td class="def-cell">ncc health_checks run_all (on any CVM via SSH).</td></tr>
+<tr><td class="term-cell">Log Location</td><td class="def-cell">/home/nutanix/data/logs/ncc-output.log</td></tr>
+<tr><td class="term-cell">Plugins</td><td class="def-cell">NCC checks are plugin-based — updated independently of AOS via Portal download.</td></tr>
+</table>
+<div class="h2">15.2 Analysis (Performance Charts)</div>
+<table class="def-table">
+<tr><td class="term-cell">Add Chart</td><td class="def-cell">Analysis &gt; + Add Chart → select entity type and metric.</td></tr>
+<tr><td class="term-cell">Metrics</td><td class="def-cell">IOPS (read/write/total), Throughput (MB/s), Latency (ms), CPU %, Memory %, I/O queue depth.</td></tr>
+<tr><td class="term-cell">Time Range</td><td class="def-cell">Last 1 hour to 30 days. Custom time range supported.</td></tr>
+<tr><td class="term-cell">Entity Types</td><td class="def-cell">Cluster, Node, VM, Disk, Container, vDisk, Network.</td></tr>
+<tr><td class="term-cell">Baseline</td><td class="def-cell">Prism Pro feature — shows expected performance range; highlights anomalies.</td></tr>
+<tr><td class="term-cell">Export</td><td class="def-cell">Charts can be exported as PNG or data as CSV for reporting.</td></tr>
+</table>
+<div class="h2">15.3 Alerts</div>
+<table class="def-table">
+<tr><td class="term-cell">Alert Types</td><td class="def-cell">Critical (requires immediate action), Warning (investigate soon), Info (informational).</td></tr>
+<tr><td class="term-cell">Sources</td><td class="def-cell">NCC checks, hardware sensors (IPMI), software services, replication status, cluster state.</td></tr>
+<tr><td class="term-cell">Acknowledge</td><td class="def-cell">Mark alert as seen — alert remains in list but is no longer shown as 'new'.</td></tr>
+<tr><td class="term-cell">Resolve</td><td class="def-cell">Mark alert as resolved — removes from active alerts list.</td></tr>
+<tr><td class="term-cell">Alert Policies</td><td class="def-cell">Settings &gt; Alert Policies — customize thresholds, disable specific alerts.</td></tr>
+<tr><td class="term-cell">Email Alerts</td><td class="def-cell">Settings &gt; SMTP → configure mail server. Alert Policies → enable email notification.</td></tr>
+<tr><td class="term-cell">SNMP Traps</td><td class="def-cell">Settings &gt; SNMP → configure SNMP trap receiver for integration with monitoring systems.</td></tr>
+<tr><td class="term-cell">Webhook</td><td class="def-cell">Prism Central → Alerts &gt; Notification Policies → webhook for custom integrations.</td></tr>
+</table>
+<div class="h2">15.4 Tasks</div>
+<table class="def-table">
+<tr><td class="term-cell">Task Monitor</td><td class="def-cell">Prism &gt; Tasks — shows all running, completed, and failed background tasks.</td></tr>
+<tr><td class="term-cell">Task Types</td><td class="def-cell">VM create/delete, snapshot, replication, upgrade, disk add, clone, image upload.</td></tr>
+<tr><td class="term-cell">Task Status</td><td class="def-cell">Running (spinner), Succeeded (green), Failed (red), Queued (grey).</td></tr>
+<tr><td class="term-cell">Task Details</td><td class="def-cell">Click any task to see step-by-step progress and error messages on failure.</td></tr>
+<tr><td class="term-cell">API Task UUID</td><td class="def-cell">Each task has a UUID — can poll via REST API (/tasks/{uuid}) for automation.</td></tr>
+<tr><td class="term-cell">Retention</td><td class="def-cell">Completed tasks visible in Prism for 30 days by default.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S16 ═══════════════════════════ -->
+<div class="section-block" id="s16">
+<div class="section-divider"><span class="sec-num">SECTION 16</span><h2 id="nut-showcasing-failures-impact-on-cluster">Showcasing Failures &amp; Impact on Cluster</h2></div>
+<div class="h1">16. Failure Scenarios &amp; Impact Analysis</div>
+<div class="h2">16.1 Single Disk Failure</div>
+<table class="def-table">
+<tr><td class="term-cell">Detection</td><td class="def-cell">Stargate/SMART detects disk failure → alert in Prism, disk marked offline.</td></tr>
+<tr><td class="term-cell">Impact</td><td class="def-cell">Affected extents become under-replicated. Cluster remains fully operational.</td></tr>
+<tr><td class="term-cell">Auto-Heal</td><td class="def-cell">Curator rebuilds missing copies from surviving replicas on other nodes/disks.</td></tr>
+<tr><td class="term-cell">Time to Heal</td><td class="def-cell">Depends on amount of data on failed disk and cluster load — typically 1–4 hours.</td></tr>
+<tr><td class="term-cell">Admin Action</td><td class="def-cell">Replace failed disk. Nutanix auto-detects new disk and uses it for rebalancing.</td></tr>
+</table>
+<div class="h2">16.2 Single Node Failure</div>
+<table class="def-table">
+<tr><td class="term-cell">Detection</td><td class="def-cell">Node heartbeat timeout → Zookeeper removes node from quorum.</td></tr>
+<tr><td class="term-cell">VM Impact</td><td class="def-cell">VMs on failed node: AHV restarts them on surviving nodes (HA). Brief downtime (~30 sec).</td></tr>
+<tr><td class="term-cell">Storage Impact</td><td class="def-cell">Node's data replicas become unavailable → Curator rebuilds from surviving copies.</td></tr>
+<tr><td class="term-cell">Data State</td><td class="def-cell">RF2: cluster in 'degraded' state — no further node failure tolerated until rebuilt.</td></tr>
+<tr><td class="term-cell">Admin Action</td><td class="def-cell">Investigate hardware, replace node, use Foundation 'Expand Cluster' to re-add.</td></tr>
+</table>
+<div class="h2">16.3 CVM Failure (Node Alive)</div>
+<table class="def-table">
+<tr><td class="term-cell">Detection</td><td class="def-cell">Hypervisor detects CVM heartbeat loss.</td></tr>
+<tr><td class="term-cell">Impact</td><td class="def-cell">Local storage I/O redirected via backplane tunnel to other CVMs. Slight latency increase.</td></tr>
+<tr><td class="term-cell">VM Impact</td><td class="def-cell">VMs on the affected node continue running — no HA event, no VM restart.</td></tr>
+<tr><td class="term-cell">Auto-Recovery</td><td class="def-cell">CVM auto-restarts via hypervisor watchdog within 2–5 minutes.</td></tr>
+<tr><td class="term-cell">Admin Action</td><td class="def-cell">Check CVM logs: /home/nutanix/data/logs/. Investigate service failure.</td></tr>
+</table>
+<div class="h2">16.4 Network Failure</div>
+<table class="def-table">
+<tr><td class="term-cell">Switch Failure</td><td class="def-cell">With bonded NICs: traffic fails over to surviving NIC. VM network unaffected.</td></tr>
+<tr><td class="term-cell">CVM Network Partition</td><td class="def-cell">Isolated CVM cannot replicate → Zookeeper removes from quorum. I/O rerouted.</td></tr>
+<tr><td class="term-cell">Cluster Split-Brain</td><td class="def-cell">Minority partition fences itself — protects data integrity at cost of availability.</td></tr>
+<tr><td class="term-cell">Management Network Loss</td><td class="def-cell">Prism UI unavailable but cluster and VMs continue I/O normally.</td></tr>
+</table>
+<div class="callout info"><span class="callout-icon">📘</span><div><strong>Key Concept</strong>Prism Element is a management plane — its unavailability does NOT affect the data plane. VMs continue to run and I/O continues even if Prism is down.</div></div>
+<div class="h2">16.5 Cluster Shutdown &amp; Startup Procedure</div>
+<div class="h3">Graceful Shutdown</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Notify users and coordinate maintenance window</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">Power off or live-migrate all guest VMs</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">SSH to any CVM → execute: <code style="background:#EEF4FC;padding:2px 6px;border-radius:4px;font-family:monospace">cluster stop</code></div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Power off all nodes via IPMI or physical power</div></div>
+</div>
+<div class="h3">Cluster Startup</div>
+<div class="step-list">
+<div class="step-item"><div class="step-num">1</div><div class="step-text">Power on all nodes</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-text">CVMs boot automatically with the hypervisor</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-text">Zookeeper quorum establishes — cluster comes online (3–5 minutes)</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-text">Verify cluster health: <code style="background:#EEF4FC;padding:2px 6px;border-radius:4px;font-family:monospace">cluster status</code> from CVM</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-text">Power on guest VMs</div></div>
+</div>
+</div>
+<!-- ═══════════════════════════ S17 ═══════════════════════════ -->
+<div class="section-block" id="s17">
+<div class="section-divider"><span class="sec-num">SECTION 17</span><h2 id="nut-explaining-configuring-options-from-sett">Explaining &amp; Configuring Options from Settings</h2></div>
+<div class="h1">17. Settings Configuration</div>
+<div class="h2">17.1 Network Configuration</div>
+<table class="def-table">
+<tr><td class="term-cell">NTP Servers</td><td class="def-cell">Settings &gt; NTP Servers — add NTP server IPs or FQDNs. Recommend 3+ servers for resilience.</td></tr>
+<tr><td class="term-cell">DNS Servers</td><td class="def-cell">Settings &gt; Name Servers — add DNS server IPs for hostname resolution.</td></tr>
+<tr><td class="term-cell">Cluster Name</td><td class="def-cell">Settings &gt; Cluster Details — cluster display name (does not change IPs).</td></tr>
+<tr><td class="term-cell">Cluster VIP</td><td class="def-cell">Settings &gt; Cluster Details — virtual IP for management. Can be changed (brief downtime).</td></tr>
+<tr><td class="term-cell">SMTP</td><td class="def-cell">Settings &gt; SMTP Server — configure mail relay for alert emails.</td></tr>
+<tr><td class="term-cell">HTTP Proxy</td><td class="def-cell">Settings &gt; HTTP Proxy — for clusters behind proxy needing internet access (LCM, Pulse).</td></tr>
+</table>
+<div class="h2">17.2 Authentication &amp; Security</div>
+<table class="def-table">
+<tr><td class="term-cell">Local Users</td><td class="def-cell">Settings &gt; Local User Management — create, edit, delete local Prism user accounts.</td></tr>
+<tr><td class="term-cell">Roles</td><td class="def-cell">Admin (full access), User (read-only). Custom roles available in PC.</td></tr>
+<tr><td class="term-cell">Active Directory</td><td class="def-cell">Settings &gt; Authentication &gt; + New Directory — configure AD/LDAP for SSO.</td></tr>
+<tr><td class="term-cell">SAML/SSO</td><td class="def-cell">Settings &gt; Authentication &gt; SAML — configure SAML 2.0 identity providers.</td></tr>
+<tr><td class="term-cell">SSL Certificate</td><td class="def-cell">Settings &gt; SSL Certificate — replace self-signed cert with CA-signed certificate.</td></tr>
+<tr><td class="term-cell">Cluster Lockdown</td><td class="def-cell">Settings &gt; Cluster Lockdown — disable SSH password auth, require key-based auth.</td></tr>
+<tr><td class="term-cell">2FA (PC)</td><td class="def-cell">Prism Central supports two-factor authentication via TOTP (Google Authenticator).</td></tr>
+<tr><td class="term-cell">Data-at-Rest Encryption</td><td class="def-cell">Settings &gt; Data Encryption — enable Software Encryption or SEDs (hardware) with KMS.</td></tr>
+</table>
+<div class="h2">17.3 Licensing</div>
+<table class="def-table">
+<tr><td class="term-cell">License Tiers</td><td class="def-cell">Starter (basic), Pro (analytics, policies), Ultimate (all features). Applied per cluster.</td></tr>
+<tr><td class="term-cell">Apply License</td><td class="def-cell">Settings &gt; Licensing — enter license key or connect to license server.</td></tr>
+<tr><td class="term-cell">License Check</td><td class="def-cell">Settings &gt; Licensing shows current license state and feature entitlements.</td></tr>
+<tr><td class="term-cell">CE (Community Edition)</td><td class="def-cell">Free license for non-production/home lab use. Single-node or 3-node cluster.</td></tr>
+</table>
+<div class="h2">17.4 Pulse &amp; Remote Support</div>
+<table class="def-table">
+<tr><td class="term-cell">Pulse</td><td class="def-cell">Settings &gt; Pulse — enables anonymous diagnostic data transmission to Nutanix.</td></tr>
+<tr><td class="term-cell">Remote Support</td><td class="def-cell">Settings &gt; Remote Support — allows Nutanix support to tunnel into cluster for troubleshooting.</td></tr>
+<tr><td class="term-cell">Remote Tunnel</td><td class="def-cell">Creates a secure SSH tunnel from cluster to Nutanix support infrastructure.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S18 ═══════════════════════════ -->
+<div class="section-block" id="s18">
+<div class="section-divider"><span class="sec-num">SECTION 18</span><h2 id="nut-acli-ncli-additional-command-line-refere">acli, ncli &amp; Additional Command Line Reference</h2></div>
+<div class="h1">18. Command Line Interface Reference</div>
+<div class="h2">18.1 SSH Access</div>
+<table class="def-table">
+<tr><td class="term-cell">SSH to CVM</td><td class="def-cell">ssh nutanix@&lt;CVM-IP&gt;  (password: nutanix/4u or configured password)</td></tr>
+<tr><td class="term-cell">SSH to AHV Host</td><td class="def-cell">From CVM: ssh root@192.168.5.1  (AHV host internal IP)</td></tr>
+<tr><td class="term-cell">Cluster VIP SSH</td><td class="def-cell">Connects to whichever CVM currently holds the VIP</td></tr>
+</table>
+<div class="h2">18.2 acli — Acropolis CLI</div>
+<div class="h3">VM Operations</div>
+<div class="code-group">
+<div class="code-group-header"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FEBC2E"></div><div class="dot" style="background:#28C840"></div><span class="label">acli — VM commands</span></div>
+<div class="code-block">
+<span class="code-line">acli vm.list                                   <span class="comment"># List all VMs</span></span>
+<span class="code-line">acli vm.get &lt;vm-name&gt;                          <span class="comment"># Get VM details</span></span>
+<span class="code-line">acli vm.create &lt;vm-name&gt;                       <span class="comment"># Create VM</span></span>
+<span class="code-line">acli vm.on &lt;vm-name&gt;                           <span class="comment"># Power on</span></span>
+<span class="code-line">acli vm.off &lt;vm-name&gt;                          <span class="comment"># Power off (hard)</span></span>
+<span class="code-line">acli vm.shutdown &lt;vm-name&gt;                     <span class="comment"># ACPI shutdown</span></span>
+<span class="code-line">acli vm.clone &lt;vm-name&gt; clone_name=&lt;new-name&gt;  <span class="comment"># Clone a VM</span></span>
+<span class="code-line">acli vm.delete &lt;vm-name&gt;                       <span class="comment"># Delete VM</span></span>
+<span class="code-line">acli vm.migrate &lt;vm-name&gt; to_host=&lt;host-IP&gt;    <span class="comment"># Live migrate VM</span></span>
+<span class="code-line">acli vm.nic_list &lt;vm-name&gt;                     <span class="comment"># List VM NICs</span></span>
+<span class="code-line">acli vm.disk_list &lt;vm-name&gt;                    <span class="comment"># List VM disks</span></span>
+<span class="code-line">acli vm.update &lt;vm-name&gt; memory_mb=4096        <span class="comment"># Update memory</span></span>
+<span class="code-line">acli vm.update &lt;vm-name&gt; num_vcpus=4           <span class="comment"># Update vCPU</span></span>
+<span class="code-line">acli vm.snapshot.create &lt;vm-name&gt; snap_name=&lt;snap&gt;  <span class="comment"># Snapshot</span></span>
+<span class="code-line">acli vm.snapshot.list &lt;vm-name&gt;                <span class="comment"># List snapshots</span></span>
+<span class="code-line">acli vm.snapshot.revert &lt;vm-name&gt; snap_id=&lt;id&gt; <span class="comment"># Revert snapshot</span></span>
+</div>
+</div>
+<div class="h3">Network &amp; Image Operations (acli)</div>
+<div class="code-group">
+<div class="code-group-header"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FEBC2E"></div><div class="dot" style="background:#28C840"></div><span class="label">acli — network &amp; image</span></div>
+<div class="code-block">
+<span class="code-line">acli net.list                                  <span class="comment"># List AHV networks</span></span>
+<span class="code-line">acli net.create &lt;net-name&gt; vlan=&lt;id&gt;           <span class="comment"># Create VLAN network</span></span>
+<span class="code-line">acli net.delete &lt;net-name&gt;                     <span class="comment"># Delete network</span></span>
+<span class="code-line">acli net.add_dhcp_pool &lt;net-name&gt; start=&lt;ip&gt; end=&lt;ip&gt;  <span class="comment"># DHCP pool</span></span>
+<span class="code-line">acli image.list                                <span class="comment"># List images</span></span>
+<span class="code-line">acli image.create &lt;img-name&gt; image_type=kDiskImage source_url=&lt;url&gt;  <span class="comment"># Create image</span></span>
+<span class="code-line">acli image.delete &lt;img-name&gt;                   <span class="comment"># Delete image</span></span>
+</div>
+</div>
+<div class="h2">18.3 ncli — Nutanix CLI</div>
+<div class="h3">Cluster Information</div>
+<div class="code-group">
+<div class="code-group-header"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FEBC2E"></div><div class="dot" style="background:#28C840"></div><span class="label">ncli — cluster &amp; storage</span></div>
+<div class="code-block">
+<span class="code-line">ncli cluster info                              <span class="comment"># Cluster details, IPs, version</span></span>
+<span class="code-line">ncli cluster get-hypervisor-info              <span class="comment"># Hypervisor type and version</span></span>
+<span class="code-line">ncli cluster status                            <span class="comment"># Cluster services status</span></span>
+<span class="code-line">ncli host list                                 <span class="comment"># List all nodes</span></span>
+<span class="code-line">ncli disk list                                 <span class="comment"># List all disks</span></span>
+<span class="code-line">ncli disk get id=&lt;id&gt;                          <span class="comment"># Get disk details</span></span>
+<span class="code-line">ncli container list                            <span class="comment"># List all containers</span></span>
+<span class="code-line">ncli container create name=&lt;n&gt; sp-name=&lt;pool&gt; <span class="comment"># Create container</span></span>
+<span class="code-line">ncli sp list                                   <span class="comment"># List storage pools</span></span>
+<span class="code-line">ncli vdisk list                               <span class="comment"># List vDisks</span></span>
+<span class="code-line">ncli vm list                                  <span class="comment"># List VMs</span></span>
+<span class="code-line">ncli vm get name=&lt;vm&gt;                         <span class="comment"># Get VM details</span></span>
+<span class="code-line">ncli alert list                               <span class="comment"># List all alerts</span></span>
+<span class="code-line">ncli alert acknowledge id=&lt;id&gt;               <span class="comment"># Acknowledge alert</span></span>
+<span class="code-line">ncli alert resolve id=&lt;id&gt;                   <span class="comment"># Resolve alert</span></span>
+<span class="code-line">ncli event list                              <span class="comment"># Event log</span></span>
+<span class="code-line">ncli pd list                                 <span class="comment"># List protection domains</span></span>
+<span class="code-line">ncli pd get name=&lt;pd&gt;                        <span class="comment"># Get PD details</span></span>
+<span class="code-line">ncli pd list-snaps name=&lt;pd&gt;                 <span class="comment"># List snapshots</span></span>
+<span class="code-line">ncli pd restore-vm name=&lt;pd&gt; snap-id=&lt;id&gt; vm-names=&lt;vm&gt;  <span class="comment"># Restore VM</span></span>
+<span class="code-line">ncli pd add-vms name=&lt;pd&gt; vm-names=&lt;vm&gt;      <span class="comment"># Add VM to PD</span></span>
+</div>
+</div>
+<div class="h2">18.4 Bash Commands &amp; Diagnostics</div>
+<div class="code-group">
+<div class="code-group-header"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FEBC2E"></div><div class="dot" style="background:#28C840"></div><span class="label">CVM bash — cluster &amp; diagnostics</span></div>
+<div class="code-block">
+<span class="code-line">cluster status                                <span class="comment"># Show all service states on all CVMs</span></span>
+<span class="code-line">cluster start                                 <span class="comment"># Start cluster services</span></span>
+<span class="code-line">cluster stop                                  <span class="comment"># Stop cluster services</span></span>
+<span class="code-line">cluster version                               <span class="comment"># Show AOS version</span></span>
+<span class="code-line">genesis status                                <span class="comment"># Check genesis service</span></span>
+<span class="code-line">allssh genesis status                         <span class="comment"># Run command on ALL CVMs</span></span>
+<span class="code-line">allssh 'cluster status'                       <span class="comment"># Cluster status from all nodes</span></span>
+<span class="code-line">hostssh '&lt;command&gt;'                           <span class="comment"># Run on all AHV hosts</span></span>
+<span class="code-line">svmips                                        <span class="comment"># List all CVM IPs in cluster</span></span>
+<span class="code-line">ncc health_checks run_all                     <span class="comment"># Run all NCC checks</span></span>
+<span class="code-line">df -h                                         <span class="comment"># CVM disk usage</span></span>
+<span class="code-line">free -g                                       <span class="comment"># CVM memory usage</span></span>
+<span class="code-line">top                                           <span class="comment"># Real-time CPU/process</span></span>
+<span class="code-line">ovs-vsctl show                               <span class="comment"># OVS bridge config (run via hostssh)</span></span>
+<span class="code-line">ping -c 4 &lt;target-ip&gt;                         <span class="comment"># Connectivity test</span></span>
+</div>
+</div>
+<div class="h2">18.5 Key Log Locations</div>
+<div class="code-group">
+<div class="code-group-header"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FEBC2E"></div><div class="dot" style="background:#28C840"></div><span class="label">CVM log paths</span></div>
+<div class="code-block">
+<span class="code-line">/home/nutanix/data/logs/stargate.INFO          <span class="comment"># Stargate I/O logs</span></span>
+<span class="code-line">/home/nutanix/data/logs/curator.INFO           <span class="comment"># Curator scan logs</span></span>
+<span class="code-line">/home/nutanix/data/logs/cassandra/             <span class="comment"># Cassandra DB logs</span></span>
+<span class="code-line">/home/nutanix/data/logs/zookeeper/             <span class="comment"># Zookeeper logs</span></span>
+<span class="code-line">/home/nutanix/data/logs/ncc-output.log         <span class="comment"># Latest NCC output</span></span>
+<span class="code-line">/home/nutanix/data/logs/genesis.out            <span class="comment"># Genesis service log</span></span>
+</div>
+</div>
+</div>
+<!-- ═══════════════════════════ S19 ═══════════════════════════ -->
+<div class="section-block" id="s19">
+<div class="section-divider"><span class="sec-num">SECTION 19</span><h2 id="nut-introduction-to-prism-central-ui">Introduction to Prism Central UI</h2></div>
+<div class="h1">19. Prism Central (PC) UI</div>
+<div class="h2">19.1 Prism Central Overview</div>
+<p class="body-text">Prism Central is the centralized management plane for multiple Nutanix clusters. It provides a single UI, API, and policy engine for managing hundreds of clusters across data centers and clouds.</p>
+<table class="def-table">
+<tr><td class="term-cell">PC Deployment</td><td class="def-cell">PC is deployed as a VM (or 3-VM scale-out) on one of the managed clusters.</td></tr>
+<tr><td class="term-cell">PC Registration</td><td class="def-cell">Each PE cluster must be registered with PC: PE &gt; Settings &gt; Prism Central Registration.</td></tr>
+<tr><td class="term-cell">PC Scale-Out</td><td class="def-cell">Deploy 3 PC VMs for HA — supports larger environments with more performance.</td></tr>
+<tr><td class="term-cell">PC Version</td><td class="def-cell">PC has its own release cadence — updated independently of AOS via LCM.</td></tr>
+<tr><td class="term-cell">PC URL</td><td class="def-cell">https://&lt;PC-IP&gt;:9440  (or PC VIP for scale-out)</td></tr>
+<tr><td class="term-cell">Prism Pro</td><td class="def-cell">License tier for PC — unlocks advanced features: runways, X-Play, advanced analytics.</td></tr>
+<tr><td class="term-cell">X-Play (Playbooks)</td><td class="def-cell">Automated action engine in PC — trigger actions on alerts, schedule tasks, send notifications.</td></tr>
+</table>
+<div class="h2">19.2 PC Navigation Reference</div>
+<table class="def-table">
+<tr><td class="term-cell">Infrastructure &gt; Clusters</td><td class="def-cell">View all registered clusters — health, version, node count.</td></tr>
+<tr><td class="term-cell">Infrastructure &gt; Hosts</td><td class="def-cell">Cross-cluster host inventory — filter, search, view individual node metrics.</td></tr>
+<tr><td class="term-cell">Infrastructure &gt; VMs</td><td class="def-cell">Global VM inventory across all clusters — manage, search, filter all VMs.</td></tr>
+<tr><td class="term-cell">Compute &amp; Storage &gt; Images</td><td class="def-cell">Global image management — publish images across clusters.</td></tr>
+<tr><td class="term-cell">Compute &amp; Storage &gt; Categories</td><td class="def-cell">Define and manage VM categories for policy targeting.</td></tr>
+<tr><td class="term-cell">Policies &gt; Security</td><td class="def-cell">Flow microsegmentation policies — security, isolation, quarantine.</td></tr>
+<tr><td class="term-cell">Policies &gt; Protection</td><td class="def-cell">Leap protection policies — recovery plans for DR.</td></tr>
+<tr><td class="term-cell">Activity &gt; Tasks</td><td class="def-cell">Cross-cluster task monitor.</td></tr>
+<tr><td class="term-cell">Activity &gt; Alerts</td><td class="def-cell">Cross-cluster alert console.</td></tr>
+<tr><td class="term-cell">Operations &gt; Playbooks</td><td class="def-cell">X-Play automated response playbooks.</td></tr>
+<tr><td class="term-cell">Operations &gt; Analysis</td><td class="def-cell">Cross-cluster performance analytics.</td></tr>
+<tr><td class="term-cell">Operations &gt; Planning</td><td class="def-cell">Capacity planning and runway projections (Prism Pro).</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ S20 ═══════════════════════════ -->
+<div class="section-block" id="s20">
+<div class="section-divider"><span class="sec-num">SECTION 20</span><h2 id="nut-useful-options-for-simplified-operations">Useful Options for Simplified Operations from Prism Central</h2></div>
+<div class="h1">20. Prism Central — Simplified Operations</div>
+<div class="h2">20.1 Categories &amp; Policy-Based Management</div>
+<table class="def-table">
+<tr><td class="term-cell">Category</td><td class="def-cell">Key:Value pair applied to VMs. Example: Environment:Production, AppType:WebServer.</td></tr>
+<tr><td class="term-cell">System Categories</td><td class="def-cell">Pre-defined: AppType, Environment, AppTier — can be extended.</td></tr>
+<tr><td class="term-cell">Create Category</td><td class="def-cell">PC &gt; Administration &gt; Categories &gt; + New Category → define key and values.</td></tr>
+<tr><td class="term-cell">Apply Category</td><td class="def-cell">PC &gt; VMs &gt; select VM &gt; Actions &gt; Manage Categories → assign key:value pairs.</td></tr>
+<tr><td class="term-cell">Policy Targeting</td><td class="def-cell">Security policies, protection policies, and QoS target categories instead of individual VMs.</td></tr>
+</table>
+<div class="h2">20.2 Global VM Search &amp; Filter</div>
+<ul class="bullet-list">
+<li>PC &gt; VMs → use filter bar to search by name, category, power state, cluster, host</li>
+<li>Saved Filters: Save common filter combinations for quick access</li>
+<li>Bulk Actions: Select multiple VMs across clusters for bulk power on/off, category assignment</li>
+</ul>
+<div class="h2">20.3 X-Play (Playbooks — Automation)</div>
+<table class="def-table">
+<tr><td class="term-cell">Trigger</td><td class="def-cell">Alert-based (on specific alert), scheduled (cron), or manual.</td></tr>
+<tr><td class="term-cell">Actions</td><td class="def-cell">Email, Slack webhook, API call, VM power on/off/restart, snapshot, add memory, run script.</td></tr>
+<tr><td class="term-cell">Example Playbook</td><td class="def-cell">When VM CPU &gt; 95% for 5 minutes → increase memory by 2GB + send email alert.</td></tr>
+<tr><td class="term-cell">Use Cases</td><td class="def-cell">Auto-remediation, auto-scaling, compliance enforcement, report generation.</td></tr>
+<tr><td class="term-cell">No Code</td><td class="def-cell">Visual drag-and-drop workflow builder — no programming required.</td></tr>
+</table>
+<div class="h2">20.4 Capacity Runway (Prism Pro)</div>
+<table class="def-table">
+<tr><td class="term-cell">Runway</td><td class="def-cell">Prediction of when cluster will run out of storage, CPU, or memory based on growth trends.</td></tr>
+<tr><td class="term-cell">Storage Runway</td><td class="def-cell">Projects full date based on current growth rate + efficiency savings.</td></tr>
+<tr><td class="term-cell">Compute Runway</td><td class="def-cell">Projects when CPU or memory will be exhausted.</td></tr>
+<tr><td class="term-cell">What-If</td><td class="def-cell">Simulate adding nodes or VMs — see how it changes the runway.</td></tr>
+<tr><td class="term-cell">Alert</td><td class="def-cell">Runway alert triggered when projected full date falls within 90 days (configurable).</td></tr>
+</table>
+<div class="h2">20.5 Multi-Cluster Upgrade Orchestration</div>
+<ul class="bullet-list">
+<li>PC &gt; LCM &gt; Inventory — discover available upgrades for all clusters</li>
+<li>Stage upgrades: select clusters and schedule upgrade window</li>
+<li>PC applies rolling upgrades cluster by cluster with pre-checks</li>
+<li>Track all upgrade tasks from PC Tasks view</li>
+</ul>
+<div class="h2">20.6 Reports</div>
+<table class="def-table">
+<tr><td class="term-cell">Custom Reports</td><td class="def-cell">PC &gt; Operations &gt; Reports — create custom reports on VMs, storage, hosts.</td></tr>
+<tr><td class="term-cell">Scheduled Reports</td><td class="def-cell">Auto-generate and email reports on a schedule (daily/weekly/monthly).</td></tr>
+<tr><td class="term-cell">Templates</td><td class="def-cell">Pre-built report templates: Cluster Efficiency, VM Inventory, Compliance, Alerts Summary.</td></tr>
+<tr><td class="term-cell">Export</td><td class="def-cell">Reports export as PDF or CSV.</td></tr>
+</table>
+</div>
+<!-- ═══════════════════════════ CHEAT SHEET ═══════════════════════════ -->
+<div class="section-block" id="cheatsheet">
+<div class="section-divider" style="background:linear-gradient(90deg,#0D4A1E,#1A7A32)">
+<span class="sec-num">★ LAB</span><h2 id="nut-lab-cheat-sheet-quick-reference-for-hand">Lab Cheat Sheet — Quick Reference for Hands-On Practice</h2>
+</div>
+<div class="h1">Lab Cheat Sheet</div>
+<div class="cheatsheet-grid">
+<div class="cheat-card">
+<div class="cheat-card-header"><span class="icon">🔑</span><h4>Key Access Information</h4></div>
+<div class="cheat-card-body">
+<div class="cheat-row"><span class="ck">Prism Element</span><span class="cv">https://&lt;VIP&gt;:9440</span></div>
+<div class="cheat-row"><span class="ck">Prism Central</span><span class="cv">https://&lt;PC-IP&gt;:9440</span></div>
+<div class="cheat-row"><span class="ck">Default User</span><span class="cv">admin</span></div>
+<div class="cheat-row"><span class="ck">CVM SSH</span><span class="cv">ssh nutanix@&lt;CVM-IP&gt;</span></div>
+<div class="cheat-row"><span class="ck">CVM SSH Pass</span><span class="cv">nutanix/4u</span></div>
+<div class="cheat-row"><span class="ck">AHV Host SSH</span><span class="cv">ssh root@192.168.5.1</span></div>
+<div class="cheat-row"><span class="ck">Foundation UI</span><span class="cv">http://&lt;FndVM&gt;:8000</span></div>
+</div>
+</div>
+<div class="cheat-card">
+<div class="cheat-card-header"><span class="icon">🌐</span><h4>Key Port Reference</h4></div>
+<div class="cheat-card-body">
+<div class="cheat-row"><span class="ck">9440</span><span class="cv">Prism UI / REST API (HTTPS)</span></div>
+<div class="cheat-row"><span class="ck">22</span><span class="cv">SSH (CVM &amp; AHV host)</span></div>
+<div class="cheat-row"><span class="ck">2049</span><span class="cv">NFS (hypervisor → CVM)</span></div>
+<div class="cheat-row"><span class="ck">3260</span><span class="cv">iSCSI data path</span></div>
+<div class="cheat-row"><span class="ck">2100</span><span class="cv">Zookeeper quorum</span></div>
+<div class="cheat-row"><span class="ck">2888/3888</span><span class="cv">Zookeeper leader election</span></div>
+<div class="cheat-row"><span class="ck">8000</span><span class="cv">Foundation web UI</span></div>
+<div class="cheat-row"><span class="ck">80/443</span><span class="cv">Pulse, LCM, external comms</span></div>
+</div>
+</div>
+<div class="cheat-card">
+<div class="cheat-card-header"><span class="icon">⬆️</span><h4>LCM Upgrade Safety Order</h4></div>
+<div class="cheat-card-body">
+<div class="cheat-row"><span class="ck">Step 1</span><span class="cv">NCC (health check plugin)</span></div>
+<div class="cheat-row"><span class="ck">Step 2</span><span class="cv">Foundation</span></div>
+<div class="cheat-row"><span class="ck">Step 3</span><span class="cv">AOS (cluster software)</span></div>
+<div class="cheat-row"><span class="ck">Step 4</span><span class="cv">AHV Hypervisor</span></div>
+<div class="cheat-row"><span class="ck">Step 5</span><span class="cv">Firmware (BIOS/BMC/HDD)</span></div>
+<div class="cheat-row"><span class="ck">Step 6</span><span class="cv">Prism Central (separate)</span></div>
+</div>
+</div>
+<div class="cheat-card">
+<div class="cheat-card-header"><span class="icon">🔍</span><h4>RF &amp; Cluster Minimums</h4></div>
+<div class="cheat-card-body">
+<div class="cheat-row"><span class="ck">RF2 min nodes</span><span class="cv">3 nodes</span></div>
+<div class="cheat-row"><span class="ck">RF3 min nodes</span><span class="cv">5 nodes</span></div>
+<div class="cheat-row"><span class="ck">RF2 tolerates</span><span class="cv">1 node failure</span></div>
+<div class="cheat-row"><span class="ck">RF3 tolerates</span><span class="cv">2 node failures</span></div>
+<div class="cheat-row"><span class="ck">Metadata RF</span><span class="cv">Always RF3</span></div>
+<div class="cheat-row"><span class="ck">Quorum needed</span><span class="cv">&gt;50% of nodes</span></div>
+<div class="cheat-row"><span class="ck">Block Awareness</span><span class="cv">Replicas across chassis</span></div>
+</div>
+</div>
+</div>
+<div class="h2">📋 Daily Operations CLI Quick Reference</div>
+<div class="code-group">
+<div class="code-group-header"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FEBC2E"></div><div class="dot" style="background:#28C840"></div><span class="label">Most-used commands</span></div>
+<div class="code-block">
+<span class="code-line"><span class="comment">## HEALTH</span></span>
+<span class="code-line">ncc health_checks run_all              <span class="comment"># Full NCC run</span></span>
+<span class="code-line">cluster status                         <span class="comment"># Service status across all CVMs</span></span>
+<span class="code-line">allssh 'df -h'                         <span class="comment"># Disk space all CVMs</span></span>
+<span class="code-line">allssh 'free -g'                       <span class="comment"># RAM usage all CVMs</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="comment">## VM OPERATIONS (acli)</span></span>
+<span class="code-line">acli vm.list                           <span class="comment"># All VMs</span></span>
+<span class="code-line">acli vm.on &lt;name&gt;                      <span class="comment"># Power on</span></span>
+<span class="code-line">acli vm.off &lt;name&gt;                     <span class="comment"># Force off</span></span>
+<span class="code-line">acli vm.shutdown &lt;name&gt;                <span class="comment"># Graceful shutdown</span></span>
+<span class="code-line">acli vm.clone &lt;name&gt; clone_name=&lt;new&gt;  <span class="comment"># Clone VM</span></span>
+<span class="code-line">acli vm.migrate &lt;name&gt; to_host=&lt;ip&gt;   <span class="comment"># Live migrate</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="comment">## CLUSTER INFO (ncli)</span></span>
+<span class="code-line">ncli cluster info                      <span class="comment"># Cluster details</span></span>
+<span class="code-line">ncli host list                         <span class="comment"># Node list</span></span>
+<span class="code-line">ncli disk list                         <span class="comment"># Disk inventory</span></span>
+<span class="code-line">ncli alert list                        <span class="comment"># Active alerts</span></span>
+<span class="code-line">ncli pd list                           <span class="comment"># Protection domains</span></span>
+<span class="code-line">ncli container list                    <span class="comment"># Storage containers</span></span>
+</div>
+</div>
+<div class="h2">✅ Lab Checklist</div>
+<div style="background:var(--surface);border-radius:12px;border:1px solid var(--border);padding:1.5rem;margin:1rem 0;">
+<ul class="bullet-list" style="margin-left:0.5rem;list-style:none">
+<li>☐ Deploy Foundation VM → Access http://Foundation-IP:8000</li>
+<li>☐ Discovery nodes via IPMI → Assign Host, CVM, and Cluster IPs</li>
+<li>☐ Select AOS + hypervisor bundle → Start Foundation → Wait 45–60 min</li>
+<li>☐ Login to Prism Element → Verify cluster health (green)</li>
+<li>☐ Configure NTP: Settings &gt; NTP Servers</li>
+<li>☐ Configure DNS: Settings &gt; Name Servers</li>
+<li>☐ Create storage container with RF2 + inline compression</li>
+<li>☐ Upload image: Settings &gt; Image Configuration &gt; + Upload Image</li>
+<li>☐ Create AHV network (VLAN): Network &gt; Create Network</li>
+<li>☐ Create VM from image: VM &gt; Create VM</li>
+<li>☐ Verify VM boots, connect via console</li>
+<li>☐ Create Protection Domain → Add VM → Set schedule → Configure remote site</li>
+<li>☐ Take ad-hoc snapshot → Restore to new VM</li>
+<li>☐ Run NCC: Health &gt; Run NCC → review results</li>
+<li>☐ Check Analysis charts: select VM → last 1 hour → IOPS + Latency</li>
+<li>☐ Register cluster with Prism Central</li>
+<li>☐ Create category in PC → Apply to VM → Create Flow security policy</li>
+</ul>
+</div>
+<div class="h2">🚨 Troubleshooting Quick Guide</div>
+<table class="def-table">
+<tr><td class="term-cell">Prism UI unavailable</td><td class="def-cell">SSH to CVM → <code style="background:#EEF4FC;padding:1px 5px;border-radius:3px;font-family:monospace">genesis status</code> → check if prism service is running → <code style="background:#EEF4FC;padding:1px 5px;border-radius:3px;font-family:monospace">genesis restart prism</code></td></tr>
+<tr><td class="term-cell">CVM not starting</td><td class="def-cell">SSH to AHV host → <code style="background:#EEF4FC;padding:1px 5px;border-radius:3px;font-family:monospace">virsh list --all</code> → <code style="background:#EEF4FC;padding:1px 5px;border-radius:3px;font-family:monospace">virsh start &lt;cvm-name&gt;</code></td></tr>
+<tr><td class="term-cell">Disk failure</td><td class="def-cell">Prism &gt; Hardware &gt; select disk &gt; Remove Disk → physically replace → re-add via Prism</td></tr>
+<tr><td class="term-cell">Node unreachable</td><td class="def-cell">Ping IPMI IP → check power → use IPMI KVM to see console → check network cable</td></tr>
+<tr><td class="term-cell">Replication failing</td><td class="def-cell">Check remote site connectivity → <code style="background:#EEF4FC;padding:1px 5px;border-radius:3px;font-family:monospace">ncli pd list</code> → verify CVM reachability at remote site</td></tr>
+<tr><td class="term-cell">High CPU on CVM</td><td class="def-cell">Check Curator scan: <code style="background:#EEF4FC;padding:1px 5px;border-radius:3px;font-family:monospace">curator_cli get_last_successful_scan_stats</code> → check for ongoing rebuild</td></tr>
+<tr><td class="term-cell">Storage near full</td><td class="def-cell">Check thin provision overage → run Curator dedup/compression → add node or expand</td></tr>
+<tr><td class="term-cell">Under-replicated data</td><td class="def-cell">Check for node/disk failures → check rebuild progress: <code style="background:#EEF4FC;padding:1px 5px;border-radius:3px;font-family:monospace">curator_cli master_get_master_location</code></td></tr>
+<tr><td class="term-cell">VM not starting</td><td class="def-cell">Check if host has enough RAM → verify storage container accessible → <code style="background:#EEF4FC;padding:1px 5px;border-radius:3px;font-family:monospace">acli vm.get &lt;name&gt;</code></td></tr>
+</table>
+<div class="h2">📚 Full Terminology Glossary</div>
+<table class="data-table">
+<thead><tr><th>Term</th><th>Definition</th></tr></thead>
+<tbody>
+<tr><td>AOS</td><td>Acropolis Operating System — Nutanix cluster software</td></tr>
+<tr><td>AHV</td><td>Acropolis Hypervisor — Nutanix's KVM-based hypervisor</td></tr>
+<tr><td>CVM</td><td>Controller VM — manages storage I/O on each node</td></tr>
+<tr><td>DSF</td><td>Distributed Storage Fabric — pooled node-local storage</td></tr>
+<tr><td>RF</td><td>Replication Factor — number of data copies (RF2=2, RF3=3)</td></tr>
+<tr><td>PE</td><td>Prism Element — per-cluster management UI</td></tr>
+<tr><td>PC</td><td>Prism Central — multi-cluster management UI</td></tr>
+<tr><td>LCM</td><td>Life Cycle Manager — automated upgrade tool</td></tr>
+<tr><td>NCC</td><td>Nutanix Cluster Check — automated health check</td></tr>
+<tr><td>PD</td><td>Protection Domain — DR grouping of VMs</td></tr>
+<tr><td>EC-X</td><td>Erasure Coding — space optimization for cold data</td></tr>
+<tr><td>ILM</td><td>Information Lifecycle Management — auto data tiering</td></tr>
+<tr><td>Oplog</td><td>Write buffer — SSD-backed volatile write cache</td></tr>
+<tr><td>Extent</td><td>1 MB data chunk — basic I/O unit</td></tr>
+<tr><td>Extent Group</td><td>4 MB collection of extents — replication/dedup unit</td></tr>
+<tr><td>Stargate</td><td>CVM service managing data I/O</td></tr>
+<tr><td>Curator</td><td>CVM service for background maintenance tasks</td></tr>
+<tr><td>Cerebro</td><td>CVM service for DR replication</td></tr>
+<tr><td>Medusa</td><td>CVM metadata abstraction service</td></tr>
+<tr><td>Cassandra</td><td>Distributed metadata database on CVMs</td></tr>
+<tr><td>Zookeeper</td><td>Distributed coordination and cluster state manager</td></tr>
+<tr><td>Genesis</td><td>CVM bootstrap and service management</td></tr>
+<tr><td>Foundation</td><td>Nutanix node imaging and cluster creation tool</td></tr>
+<tr><td>Pulse</td><td>Optional telemetry/diagnostic data service</td></tr>
+<tr><td>FSVM</td><td>File Server VM — provides NFS/SMB in Nutanix Files</td></tr>
+<tr><td>OVS</td><td>Open vSwitch — software virtual switch in AHV</td></tr>
+<tr><td>VIP</td><td>Virtual IP — floating management IP for cluster</td></tr>
+<tr><td>NCP-MCI</td><td>Nutanix Certified Professional — Multicloud Infrastructure</td></tr>
+<tr><td>RPO</td><td>Recovery Point Objective — max acceptable data loss</td></tr>
+<tr><td>RTO</td><td>Recovery Time Objective — max time to restore service</td></tr>
+</tbody>
+</table>
+<div style="background:linear-gradient(135deg,var(--navy),#112F5A);border-radius:12px;padding:2rem;text-align:center;margin-top:2rem">
+<div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:0.5rem">End of Nutanix Foundations Technical Guide</div>
+<div style="color:#6B8AB0;font-size:0.82rem">20 Sections · 200+ Terms · 60+ CLI Commands · Lab Cheat Sheet · AOS · AHV · Prism Element · Prism Central</div>
+</div>
+</div>
+</div><!-- content-inner -->
+</main>
+
+  </main>
+
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#nut-introduction-evolution-of-enterprise-inf" class="toc-link">Introduction & Evolution of Enterprise Infrastructure</a><a href="#nut-understanding-physical-construct-basic-b" class="toc-link">Understanding Physical Construct & Basic Behavior</a><a href="#nut-logical-construct-detailed-behavior" class="toc-link">Logical Construct & Detailed Behavior</a><a href="#nut-how-data-resiliency-is-managed-by-nutani" class="toc-link">How Data Resiliency Is Managed by Nutanix</a><a href="#nut-space-optimization-features-impact-on-da" class="toc-link">Space Optimization Features & Impact on Data Path</a><a href="#nut-basic-networking-concepts-related-to-nut" class="toc-link">Basic Networking Concepts Related to Nutanix Architecture</a><a href="#nut-understanding-concepts-of-native-disaste" class="toc-link">Understanding Concepts of Native Disaster Recovery</a><a href="#nut-nutanix-files-self-service-flow-leap" class="toc-link">Nutanix Files, Self-Service, Flow & Leap</a><a href="#nut-introduction-to-foundation-node-imaging" class="toc-link">Introduction to Foundation & Node Imaging</a><a href="#nut-portal-test-drive-university-certificati" class="toc-link">Portal, Test Drive, University & Certification</a><a href="#nut-prism-element-ui-dashboard-operations" class="toc-link">Prism Element UI Dashboard & Operations</a><a href="#nut-hands-on-cud-operations-create-update-de" class="toc-link">Hands-On CUD Operations (Create, Update, Delete)</a><a href="#nut-day-2-operations" class="toc-link">Day 2 Operations</a><a href="#nut-introduction-configuration-of-data-prote" class="toc-link">Introduction & Configuration of Data Protection</a><a href="#nut-health-analysis-alerts-tasks-in-prism-el" class="toc-link">Health, Analysis, Alerts & Tasks in Prism Element</a><a href="#nut-showcasing-failures-impact-on-cluster" class="toc-link">Showcasing Failures & Impact on Cluster</a><a href="#nut-explaining-configuring-options-from-sett" class="toc-link">Explaining & Configuring Options from Settings</a><a href="#nut-acli-ncli-additional-command-line-refere" class="toc-link">acli, ncli & Additional Command Line Reference</a><a href="#nut-introduction-to-prism-central-ui" class="toc-link">Introduction to Prism Central UI</a><a href="#nut-useful-options-for-simplified-operations" class="toc-link">Useful Options for Simplified Operations from Prism Central</a><a href="#nut-lab-cheat-sheet-quick-reference-for-hand" class="toc-link">Lab Cheat Sheet — Quick Reference for Hands-On Practice</a></nav>
+</div>
+
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer id="site-footer">
+  <span>StudyHub — Technical Reference Library</span>
+  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+</footer>
+
+<script>
+// Progress + back-to-top
+const pr = document.getElementById('prog');
+const bt = document.getElementById('btt');
+addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const m = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+  if (pr) pr.style.width = (m > 0 ? Math.min(s / m * 100, 100) : 0) + '%';
+  if (bt) bt.classList.toggle('vis', s > 280);
+}, {passive: true});
+
+// Nav toggle
+function toggleNav() {
+  const nav = document.getElementById('site-nav');
+  const ov = document.getElementById('mob-ov');
+  nav.classList.toggle('open');
+  ov.classList.toggle('on');
+}
+
+// Active ToC highlighting
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('.content-section[id]');
+function updateToc() {
+  const top = window.scrollY + 80;
+  let cur = null;
+  sections.forEach(s => { if (s.offsetTop <= top) cur = s.id; });
+  tocLinks.forEach(l => {
+    l.classList.toggle('active-toc', l.getAttribute('href') === '#' + cur);
+  });
+}
+if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home — StudyHub</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* ── site-wide overrides ── */
+:root { --topbar-h:58px; --sidebar-w:240px; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* topbar */
+#site-topbar {
+  position:fixed; top:0; left:0; right:0; z-index:9000;
+  height:var(--topbar-h); background:var(--navy);
+  display:flex; align-items:center; padding:0 20px; gap:14px;
+  border-bottom:2px solid var(--blue);
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo span { color:var(--accent); }
+.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.topbar-spacer { flex:1; }
+#menu-btn { display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
+
+/* progress bar */
+#prog { position:fixed; top:var(--topbar-h); left:0; height:3px; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--sky)); z-index:8999;
+  transition:width .08s linear; pointer-events:none; }
+
+/* back-to-top */
+#btt { position:fixed; bottom:24px; right:20px; width:42px; height:42px;
+  background:var(--blue); color:#fff; border:none; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; z-index:8998; opacity:0; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(27,79,138,.45); transition:opacity .2s,transform .2s; }
+#btt.vis { opacity:1; pointer-events:auto; }
+#btt:hover { background:var(--mid); transform:translateY(-2px); }
+
+/* layout */
+.site-body { display:flex; margin-top:var(--topbar-h); flex:1; min-height:calc(100vh - var(--topbar-h)); }
+
+/* left sidebar (page nav) */
+#site-nav {
+  width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.nav-sec { padding:10px 16px 2px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); }
+.nav-link { display:flex; align-items:center; gap:8px; padding:9px 16px;
+  color:var(--text2); text-decoration:none; font-size:.84rem; border-left:3px solid transparent;
+  transition:all .12s; }
+.nav-link:hover { background:rgba(255,255,255,.05); color:var(--text); border-left-color:var(--border2); }
+.nav-link.active { background:rgba(240,165,0,.09); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
+
+/* right toc sidebar */
+#toc-nav {
+  width:220px; flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  padding:16px 0; display:flex; flex-direction:column;
+}
+.toc-head { padding:0 16px 8px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); border-bottom:1px solid var(--border); margin-bottom:4px; }
+.toc-link { display:block; padding:6px 16px; color:var(--text3); text-decoration:none;
+  font-size:.78rem; line-height:1.35; transition:color .12s;
+  border-left:2px solid transparent; }
+.toc-link:hover { color:var(--sky); border-left-color:var(--sky); }
+.toc-link.h3 { padding-left:26px; font-size:.72rem; }
+
+/* main content */
+#main-content {
+  flex:1; padding:32px 40px; overflow-x:hidden; min-width:0;
+}
+.page-hero {
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.page-hero h1 { margin-bottom:6px; }
+.page-hero p { color:var(--text2); font-size:.95rem; margin:0; }
+.hero-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; }
+.badge-blue { background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:var(--green); border:1px solid rgba(16,185,129,.25); }
+.badge-gold { background:rgba(240,165,0,.15); color:var(--accent); border:1px solid rgba(240,165,0,.25); }
+.badge-purple { background:rgba(139,92,246,.15); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+
+/* content sections */
+.content-section { margin-bottom:40px; scroll-margin-top:calc(var(--topbar-h) + 16px); }
+.section-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px; margin-bottom:20px;
+}
+.section-card h2 { margin-top:0; }
+
+/* code blocks */
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; margin:12px 0 16px; }
+code { font-family:var(--font-mono); font-size:.82rem; color:var(--code-fg); }
+pre code { color:var(--code-fg); }
+:not(pre) > code { background:rgba(121,192,255,.1); color:var(--code-fg);
+  padding:2px 6px; border-radius:4px; font-size:.8em; }
+
+/* tables */
+table { width:100%; border-collapse:collapse; margin:12px 0 16px; font-size:.875rem; }
+th { background:rgba(27,79,138,.35); color:var(--sky); padding:9px 12px;
+  text-align:left; font-weight:600; border-bottom:2px solid var(--border2); font-size:.78rem; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,.025); }
+.tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid var(--border); margin:12px 0 16px; }
+.tbl-wrap table { margin:0; border:none; }
+
+/* Q&A cards */
+.qa-card {
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:12px; overflow:hidden;
+}
+.qa-q { padding:12px 16px; background:rgba(27,79,138,.2);
+  color:var(--text); font-weight:600; font-size:.9rem;
+  display:flex; gap:10px; align-items:flex-start; }
+.qa-q::before { content:"Q"; font-family:var(--font-mono); color:var(--accent);
+  font-size:.7rem; font-weight:700; background:rgba(240,165,0,.1);
+  border-radius:4px; padding:2px 6px; flex-shrink:0; margin-top:1px; }
+.qa-a { padding:12px 16px 14px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.qa-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+  font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-family:var(--font-mono); margin-left:8px; }
+.qa-badge-concept { background:rgba(74,159,213,.15); color:var(--sky); }
+.qa-badge-cmd { background:rgba(16,185,129,.15); color:var(--green); }
+.qa-badge-crit { background:rgba(239,68,68,.15); color:var(--red); }
+.qa-badge-task { background:rgba(240,165,0,.15); color:var(--accent); }
+.qa-badge-scenario { background:rgba(139,92,246,.15); color:var(--purple); }
+
+/* callout boxes */
+.callout { border-left:4px solid; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0; }
+.callout-note { border-color:var(--sky); background:rgba(74,159,213,.08); }
+.callout-warn { border-color:var(--accent); background:rgba(240,165,0,.08); }
+.callout-danger { border-color:var(--red); background:rgba(239,68,68,.08); }
+.callout-tip { border-color:var(--green); background:rgba(16,185,129,.08); }
+.callout-title { font-weight:700; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:4px; }
+
+/* topic tag */
+.topic-tag { display:inline-flex; align-items:center; padding:3px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:600; margin-bottom:10px; }
+
+/* section divider */
+.section-divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* version badges in RHEL */
+.ver-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem;
+  font-weight:700; font-family:var(--font-mono); margin-right:4px;
+  background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.2); }
+
+/* footer */
+#site-footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:20px 40px; display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--text3);
+}
+#site-footer a { color:var(--sky); text-decoration:none; }
+
+/* mobile overlay */
+#mob-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8800; }
+#mob-ov.on { display:block; }
+
+@media (max-width:1100px) {
+  #toc-nav { display:none; }
+}
+@media (max-width:768px) {
+  #site-nav { position:fixed; left:0; top:var(--topbar-h);
+    bottom:0; transform:translateX(-100%); z-index:8900;
+    transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  #site-nav.open { transform:translateX(0); }
+  #menu-btn { display:block; }
+  #main-content { padding:20px 16px; }
+  #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="site-topbar">
+  <a href="index.html" class="logo">Study<span>Hub</span></a>
+  <span class="page-title-bar">Technical Reference Library</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn" onclick="toggleNav()">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link active">🏠 Home</a>
+<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
+
+  </nav>
+
+  <main id="main-content">
+    
+<div class="page-hero">
+  <h1>📚 StudyHub</h1>
+  <p>Technical Reference Library — Complete L3 SysAdmin Interview & Study Preparation</p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">10 Topics</span>
+    <span class="badge badge-green">500+ Q&amp;As</span>
+    <span class="badge badge-gold">RHEL · Solaris · HP-UX · CCNA · Nutanix</span>
+    <span class="badge badge-purple">Mumbai · 10+ Years Experience</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:40px">
+
+  <a href="rhel.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid var(--sky);cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='var(--sky)';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">🐧</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">RHEL Study Guide</h2>
+      <p style="margin:0;font-size:.85rem">Complete Red Hat Enterprise Linux reference — RHEL 6/7/8/9. Users, LVM, SELinux, Networking, Services &amp; more.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-blue">RHEL 6/7/8/9</span>
+        <span class="badge badge-green">12 Sections</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="linux-admin.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid var(--teal);cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='var(--teal)';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">💻</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">Linux Admin Interview Guide</h2>
+      <p style="margin:0;font-size:.85rem">LVM, SAN, Multipath, Scripting, Networking, Security, Performance — with commands and real-world Q&amp;As.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-blue">10 Topics</span>
+        <span class="badge badge-green">Commands</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="os-interview.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid var(--purple);cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='var(--purple)';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">🎯</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">OS Admin L3 Interview Prep</h2>
+      <p style="margin:0;font-size:.85rem">150+ Q&amp;As across 12 topics — Patching, Boot, LVM, Security, Performance, Networking, Scripting, VMware, Solaris, AIX.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-purple">150+ Q&amp;As</span>
+        <span class="badge badge-gold">L3 Level</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="solaris.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid #f59e0b;cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='#f59e0b';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">🌞</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">Oracle Solaris</h2>
+      <p style="margin:0;font-size:.85rem">Solaris 10/11, SPARC hardware, ZFS, Zones, LDOMs, IPMP, Veritas Cluster, kernel debugging with mdb &amp; DTrace.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-gold">15 Sections</span>
+        <span class="badge badge-blue">137+ Q&amp;As</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="hpux.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid #f97316;cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='#f97316';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">🟧</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">HP-UX &amp; Common Ops</h2>
+      <p style="margin:0;font-size:.85rem">HP-UX 11i, PA-RISC/Itanium, LVM/VxFS, Ignite-UX, plus cross-platform common operations and legacy reference.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-gold">HP-UX + Common</span>
+        <span class="badge badge-blue">66+ Q&amp;As</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="itil.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid var(--green);cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='var(--green)';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">⚙️</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">ITIL &amp; Unix Operations</h2>
+      <p style="margin:0;font-size:.85rem">ITIL processes mapped to Unix/Linux ops — Incident, Problem, Change, Release, CMDB, DR, and L3 scenario walkthroughs.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-green">11 ITIL Processes</span>
+        <span class="badge badge-blue">Scenarios</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="ccna.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid #00c9ff;cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='#00c9ff';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">🌐</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">CCNA Study Notes</h2>
+      <p style="margin:0;font-size:.85rem">31 topics — OSI/TCP-IP, IPv4/IPv6, VLANs, STP, OSPF, EIGRP, BGP, QoS, ACLs, Wireless, Network Automation &amp; Python.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-blue">31 Topics</span>
+        <span class="badge badge-green">CCNA Level</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="network-ref.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid var(--sky);cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='var(--sky)';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">📡</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">Network Study Reference</h2>
+      <p style="margin:0;font-size:.85rem">BGP, OSPF, EIGRP, VPN deep-dive reference notes for network professionals and advanced networking prep.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-blue">BGP·OSPF·EIGRP</span>
+        <span class="badge badge-gold">Advanced</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="nutanix.html" style="text-decoration:none">
+    <div class="section-card" style="border-top:3px solid var(--teal);cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='var(--teal)';this.style.transform=''">
+      <div style="font-size:2rem;margin-bottom:10px">☁️</div>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">Nutanix Foundations Guide</h2>
+      <p style="margin:0;font-size:.85rem">HCI fundamentals, Prism Element/Central, data resiliency, networking, Foundation imaging, and day-2 operations.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-blue">19 Sections</span>
+        <span class="badge badge-green">HCI · AHV</span>
+      </div>
+    </div>
+  </a>
+
+</div>
+
+<div class="section-card">
+  <h2>🎯 About This Library</h2>
+  <p>StudyHub is a comprehensive technical reference library compiled from multiple study guides and interview preparation documents. All content is organized by topic for easy navigation.</p>
+  <ul>
+    <li><strong>RHEL</strong> — Complete Red Hat Enterprise Linux administration reference covering versions 6 through 9</li>
+    <li><strong>Linux Admin Guide</strong> — Practical commands and real-world Q&amp;As for Linux/Unix sysadmin interviews</li>
+    <li><strong>OS Admin L3 Interview</strong> — 150+ interview questions covering all major OS platforms at L3 depth</li>
+    <li><strong>Solaris</strong> — Oracle Solaris deep dive with SPARC, ZFS, Zones, and enterprise features</li>
+    <li><strong>HP-UX &amp; Common</strong> — HP-UX 11i plus cross-platform operations and legacy systems reference</li>
+    <li><strong>ITIL &amp; Unix Ops</strong> — ITIL processes mapped to real Unix/Linux operational scenarios</li>
+    <li><strong>CCNA</strong> — 31-topic networking study guide from fundamentals through automation</li>
+    <li><strong>Network Reference</strong> — Advanced BGP, OSPF, EIGRP and VPN configuration reference</li>
+    <li><strong>Nutanix</strong> — HCI foundations, Prism operations, and Nutanix administration</li>
+  </ul>
+</div>
+
+  </main>
+
+  
+</div>
+
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer id="site-footer">
+  <span>StudyHub — Technical Reference Library</span>
+  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+</footer>
+
+<script>
+// Progress + back-to-top
+const pr = document.getElementById('prog');
+const bt = document.getElementById('btt');
+addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const m = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+  if (pr) pr.style.width = (m > 0 ? Math.min(s / m * 100, 100) : 0) + '%';
+  if (bt) bt.classList.toggle('vis', s > 280);
+}, {passive: true});
+
+// Nav toggle
+function toggleNav() {
+  const nav = document.getElementById('site-nav');
+  const ov = document.getElementById('mob-ov');
+  nav.classList.toggle('open');
+  ov.classList.toggle('on');
+}
+
+// Active ToC highlighting
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('.content-section[id]');
+function updateToc() {
+  const top = window.scrollY + 80;
+  let cur = null;
+  sections.forEach(s => { if (s.offsetTop <= top) cur = s.id; });
+  tocLinks.forEach(l => {
+    l.classList.toggle('active-toc', l.getAttribute('href') === '#' + cur);
+  });
+}
+if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OS Admin L3 Interview Prep — StudyHub</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* ── site-wide overrides ── */
+:root { --topbar-h:58px; --sidebar-w:240px; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* topbar */
+#site-topbar {
+  position:fixed; top:0; left:0; right:0; z-index:9000;
+  height:var(--topbar-h); background:var(--navy);
+  display:flex; align-items:center; padding:0 20px; gap:14px;
+  border-bottom:2px solid var(--blue);
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo span { color:var(--accent); }
+.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.topbar-spacer { flex:1; }
+#menu-btn { display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
+
+/* progress bar */
+#prog { position:fixed; top:var(--topbar-h); left:0; height:3px; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--sky)); z-index:8999;
+  transition:width .08s linear; pointer-events:none; }
+
+/* back-to-top */
+#btt { position:fixed; bottom:24px; right:20px; width:42px; height:42px;
+  background:var(--blue); color:#fff; border:none; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; z-index:8998; opacity:0; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(27,79,138,.45); transition:opacity .2s,transform .2s; }
+#btt.vis { opacity:1; pointer-events:auto; }
+#btt:hover { background:var(--mid); transform:translateY(-2px); }
+
+/* layout */
+.site-body { display:flex; margin-top:var(--topbar-h); flex:1; min-height:calc(100vh - var(--topbar-h)); }
+
+/* left sidebar (page nav) */
+#site-nav {
+  width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.nav-sec { padding:10px 16px 2px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); }
+.nav-link { display:flex; align-items:center; gap:8px; padding:9px 16px;
+  color:var(--text2); text-decoration:none; font-size:.84rem; border-left:3px solid transparent;
+  transition:all .12s; }
+.nav-link:hover { background:rgba(255,255,255,.05); color:var(--text); border-left-color:var(--border2); }
+.nav-link.active { background:rgba(240,165,0,.09); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
+
+/* right toc sidebar */
+#toc-nav {
+  width:220px; flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  padding:16px 0; display:flex; flex-direction:column;
+}
+.toc-head { padding:0 16px 8px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); border-bottom:1px solid var(--border); margin-bottom:4px; }
+.toc-link { display:block; padding:6px 16px; color:var(--text3); text-decoration:none;
+  font-size:.78rem; line-height:1.35; transition:color .12s;
+  border-left:2px solid transparent; }
+.toc-link:hover { color:var(--sky); border-left-color:var(--sky); }
+.toc-link.h3 { padding-left:26px; font-size:.72rem; }
+
+/* main content */
+#main-content {
+  flex:1; padding:32px 40px; overflow-x:hidden; min-width:0;
+}
+.page-hero {
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.page-hero h1 { margin-bottom:6px; }
+.page-hero p { color:var(--text2); font-size:.95rem; margin:0; }
+.hero-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; }
+.badge-blue { background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:var(--green); border:1px solid rgba(16,185,129,.25); }
+.badge-gold { background:rgba(240,165,0,.15); color:var(--accent); border:1px solid rgba(240,165,0,.25); }
+.badge-purple { background:rgba(139,92,246,.15); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+
+/* content sections */
+.content-section { margin-bottom:40px; scroll-margin-top:calc(var(--topbar-h) + 16px); }
+.section-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px; margin-bottom:20px;
+}
+.section-card h2 { margin-top:0; }
+
+/* code blocks */
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; margin:12px 0 16px; }
+code { font-family:var(--font-mono); font-size:.82rem; color:var(--code-fg); }
+pre code { color:var(--code-fg); }
+:not(pre) > code { background:rgba(121,192,255,.1); color:var(--code-fg);
+  padding:2px 6px; border-radius:4px; font-size:.8em; }
+
+/* tables */
+table { width:100%; border-collapse:collapse; margin:12px 0 16px; font-size:.875rem; }
+th { background:rgba(27,79,138,.35); color:var(--sky); padding:9px 12px;
+  text-align:left; font-weight:600; border-bottom:2px solid var(--border2); font-size:.78rem; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,.025); }
+.tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid var(--border); margin:12px 0 16px; }
+.tbl-wrap table { margin:0; border:none; }
+
+/* Q&A cards */
+.qa-card {
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:12px; overflow:hidden;
+}
+.qa-q { padding:12px 16px; background:rgba(27,79,138,.2);
+  color:var(--text); font-weight:600; font-size:.9rem;
+  display:flex; gap:10px; align-items:flex-start; }
+.qa-q::before { content:"Q"; font-family:var(--font-mono); color:var(--accent);
+  font-size:.7rem; font-weight:700; background:rgba(240,165,0,.1);
+  border-radius:4px; padding:2px 6px; flex-shrink:0; margin-top:1px; }
+.qa-a { padding:12px 16px 14px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.qa-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+  font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-family:var(--font-mono); margin-left:8px; }
+.qa-badge-concept { background:rgba(74,159,213,.15); color:var(--sky); }
+.qa-badge-cmd { background:rgba(16,185,129,.15); color:var(--green); }
+.qa-badge-crit { background:rgba(239,68,68,.15); color:var(--red); }
+.qa-badge-task { background:rgba(240,165,0,.15); color:var(--accent); }
+.qa-badge-scenario { background:rgba(139,92,246,.15); color:var(--purple); }
+
+/* callout boxes */
+.callout { border-left:4px solid; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0; }
+.callout-note { border-color:var(--sky); background:rgba(74,159,213,.08); }
+.callout-warn { border-color:var(--accent); background:rgba(240,165,0,.08); }
+.callout-danger { border-color:var(--red); background:rgba(239,68,68,.08); }
+.callout-tip { border-color:var(--green); background:rgba(16,185,129,.08); }
+.callout-title { font-weight:700; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:4px; }
+
+/* topic tag */
+.topic-tag { display:inline-flex; align-items:center; padding:3px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:600; margin-bottom:10px; }
+
+/* section divider */
+.section-divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* version badges in RHEL */
+.ver-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem;
+  font-weight:700; font-family:var(--font-mono); margin-right:4px;
+  background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.2); }
+
+/* footer */
+#site-footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:20px 40px; display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--text3);
+}
+#site-footer a { color:var(--sky); text-decoration:none; }
+
+/* mobile overlay */
+#mob-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8800; }
+#mob-ov.on { display:block; }
+
+@media (max-width:1100px) {
+  #toc-nav { display:none; }
+}
+@media (max-width:768px) {
+  #site-nav { position:fixed; left:0; top:var(--topbar-h);
+    bottom:0; transform:translateX(-100%); z-index:8900;
+    transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  #site-nav.open { transform:translateX(0); }
+  #menu-btn { display:block; }
+  #main-content { padding:20px 16px; }
+  #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="site-topbar">
+  <a href="index.html" class="logo">Study<span>Hub</span></a>
+  <span class="page-title-bar">L3 Interview Preparation Hub</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn" onclick="toggleNav()">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link ">🏠 Home</a>
+<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link active">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
+
+  </nav>
+
+  <main id="main-content">
+    
+<div class="page-hero">
+  <h1>🎯 OS Admin L3 Interview Prep</h1>
+  <p>Mumbai · 10+ Years · Complete Reference Guide — 150+ Questions · 12 Topics · 6 OS Types</p>
+  <div class="hero-badges">
+    <span class="badge badge-purple">150+ Questions</span>
+    <span class="badge badge-blue">12 Topics</span>
+    <span class="badge badge-gold">RHEL · Solaris · AIX · VMware · Linux · ITSM</span>
+    <span class="badge badge-green">OCA/OCP Certified</span>
+  </div>
+</div>
+<div class="content-section section-card" id="tab-overview">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#00d4ff22,#3b82f622)">🎯</div>
+<div>
+<div class="page-title">Interview Preparation Hub</div>
+<div class="page-desc">Complete OS Administration L3 interview guide covering RHEL, Solaris, AIX, VMware, LVM, Networking, Security, ITSM and more. All questions from your sessions organized by topic.</div>
+<div class="page-tags">
+<span class="tag" style="color:#00d4ff;border-color:#00d4ff40">OCA/OCP</span>
+<span class="tag" style="color:#10b981;border-color:#10b98140">RHCSA/RHCE</span>
+<span class="tag" style="color:#f59e0b;border-color:#f59e0b40">Solaris 10/11</span>
+<span class="tag" style="color:#8b5cf6;border-color:#8b5cf640">IBM AIX</span>
+<span class="tag" style="color:#3b82f6;border-color:#3b82f640">ITIL</span>
+<span class="tag" style="color:#ef4444;border-color:#ef444440">VMware</span>
+</div>
+</div>
+</div>
+</div>
+<div class="overview-grid">
+<div class="ov-card" onclick="showTab('patching')">
+<div class="ov-icon">🔧</div>
+<div class="ov-title">Patching &amp; Package Mgmt</div>
+<div class="ov-count">8 questions · RHEL / Solaris / AIX</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#10b981"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('boot')">
+<div class="ov-icon">🚀</div>
+<div class="ov-title">Boot Process &amp; GRUB</div>
+<div class="ov-count">6 questions · Kernel · initramfs</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#3b82f6"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('lvm')">
+<div class="ov-icon">💾</div>
+<div class="ov-title">LVM &amp; Storage</div>
+<div class="ov-count">10 questions · Multipath · Filesystem</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#8b5cf6"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('security')">
+<div class="ov-icon">🔐</div>
+<div class="ov-title">Security &amp; Hardening</div>
+<div class="ov-count">10 questions · SELinux · PAM · Auditd</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#ef4444"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('performance')">
+<div class="ov-icon">⚡</div>
+<div class="ov-title">Performance &amp; Troubleshoot</div>
+<div class="ov-count">12 questions · iostat · vmstat · iotop</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#f59e0b"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('networking')">
+<div class="ov-icon">🌐</div>
+<div class="ov-title">Networking &amp; DNS</div>
+<div class="ov-count">8 questions · Bonding · NFS · DNS</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#06b6d4"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('scripting')">
+<div class="ov-icon">📜</div>
+<div class="ov-title">Shell Scripting</div>
+<div class="ov-count">6 questions · Bash · Cron · Ansible</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#84cc16"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('errors')">
+<div class="ov-icon">🚨</div>
+<div class="ov-title">Common Errors &amp; Fixes</div>
+<div class="ov-count">10 errors · Production scenarios</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#f87171"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('vmware')">
+<div class="ov-icon">☁️</div>
+<div class="ov-title">VMware Administration</div>
+<div class="ov-count">10 questions · vMotion · Snapshots</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#60a5fa"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('solaris')">
+<div class="ov-icon">🌞</div>
+<div class="ov-title">Solaris 10/11 &amp; ZFS</div>
+<div class="ov-count">8 questions · Zones · SMF · ZFS</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#fbbf24"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('aix')">
+<div class="ov-icon">🔵</div>
+<div class="ov-title">IBM AIX</div>
+<div class="ov-count">6 questions · LVM · NIM · HACMP</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#a78bfa"></div></div>
+</div>
+<div class="ov-card" onclick="showTab('itsm')">
+<div class="ov-icon">📋</div>
+<div class="ov-title">ITSM &amp; Process</div>
+<div class="ov-count">8 questions · ITIL · Incidents · Change</div>
+<div class="ov-bar"><div class="ov-fill" style="width:100%;background:#34d399"></div></div>
+</div>
+</div>
+<div class="info-box" style="margin-bottom:1.5rem">
+<strong>How to use this guide:</strong> Click any topic card above or use the sidebar to navigate. Each section contains expandable Q&amp;A cards with exact commands, step-by-step answers, and interview tips. Questions marked <span style="color:#fbbf24">★ SCENARIO</span> are most commonly asked in L3 interviews.
+  </div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem">
+<div style="font-family:var(--head);font-weight:700;font-size:1rem;color:var(--text);margin-bottom:1rem">Key Interview Tips for OS Admin L3</div>
+<table class="data-table">
+<tr><th>Tip</th><th>Why It Matters</th></tr>
+<tr><td>Always cite exact command syntax</td><td class="green">Separates L3 from L2 engineers</td></tr>
+<tr><td>Use the STAR method for scenarios</td><td class="green">Structured, credible storytelling</td></tr>
+<tr><td>Quantify everything: "200 servers", "40% reduction"</td><td class="green">Shows real production scale</td></tr>
+<tr><td>Connect every answer to business impact</td><td class="green">Relevant in banking context</td></tr>
+<tr><td>Never make a production change without a change ticket</td><td class="yellow">Critical compliance point</td></tr>
+<tr><td>Mention rollback plan for every change</td><td class="yellow">Shows risk awareness</td></tr>
+<tr><td>State "I escalate to IS team first" for security incidents</td><td class="red">Mandatory in banking</td></tr>
+</table>
+</div>
+</div><div class="content-section section-card" id="tab-patching">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#10b98122,#06b6d422)">🔧</div>
+<div>
+<div class="page-title">Patching &amp; Package Management</div>
+<div class="page-desc">OS patching across Linux (RHEL/Oracle), Solaris 10/11, and IBM AIX. Covers quarterly patch cycles, emergency patching, vulnerability remediation, and package administration.</div>
+</div>
+</div>
+</div>
+<div class="search-bar" id="search-patching">
+<svg fill="none" height="16" stroke="currentColor" viewbox="0 0 24 24" width="16"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<input oninput="filterCards(this,'patching')" placeholder="Search questions in this section..." type="text"/>
+</div>
+<div id="cards-patching">
+<!-- Q1 -->
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">01</span>
+<span class="q-badge badge-concept">Concept</span>
+<span class="q-text">How do you perform Unix/Linux OS patching activity?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text">OS patching is a structured, multi-phase activity performed during approved maintenance windows. The approach varies by OS but follows the same discipline.</p>
+<div class="section-divider">Phase 1 — Pre-Patching Preparation</div>
+<ul class="step-list">
+<li>Identify applicable patches from vendor advisories, Red Hat Satellite, or internal patch baseline</li>
+<li>Download and stage patches in a local repository (avoid patching directly from internet on production)</li>
+<li>Raise a Change Request with implementation plan, rollback plan, and risk assessment</li>
+<li>Take VM snapshot or system backup before starting</li>
+<li>Notify application teams and obtain maintenance window approval from CAB</li>
+</ul>
+<div class="section-divider">Phase 2 — RHEL / Oracle Linux</div>
+<div class="code-block">
+<span class="comment"># Check available updates</span>
+<span class="cmd">yum check-update</span> <span class="comment"># RHEL 7</span>
+<span class="cmd">dnf check-update</span> <span class="comment"># RHEL 8/9</span>
+<span class="comment"># Apply all updates</span>
+<span class="cmd">yum update -y</span>
+<span class="comment"># Security patches only</span>
+<span class="cmd">yum update --security -y</span>
+<span class="comment"># Apply patch for specific CVE</span>
+<span class="cmd">yum update --cve CVE-2024-1234 -y</span>
+<span class="comment"># Check if reboot required</span>
+<span class="cmd">needs-restarting -r</span>
+<span class="comment"># View patch history</span>
+<span class="cmd">yum history</span>
+<span class="cmd">yum history info &lt;ID&gt;</span>
+<span class="cmd">yum history rollback &lt;ID&gt;</span> <span class="comment"># Rollback if needed</span></div>
+<div class="section-divider">Phase 2 — Solaris</div>
+<div class="code-block">
+<span class="comment"># Solaris 11 — IPS</span>
+<span class="cmd">pkg update</span> <span class="comment"># Update all</span>
+<span class="cmd">pkg update pkg://solaris/kernel</span> <span class="comment"># Specific package</span>
+<span class="cmd">pkg list -u</span> <span class="comment"># List updatable packages</span>
+<span class="comment"># Solaris 10 — patchadd</span>
+<span class="cmd">patchadd -M /patch_dir 123456-07</span>
+<span class="cmd">showrev -p | grep 123456</span> <span class="comment"># Verify patch applied</span></div>
+<div class="section-divider">Phase 2 — AIX</div>
+<div class="code-block">
+<span class="comment"># AIX — Apply TL/SP via NIM or smitty</span>
+<span class="cmd">smitty update_all</span> <span class="comment"># Apply all available updates</span>
+<span class="cmd">oslevel -s</span> <span class="comment"># Check current TL/SP level</span>
+<span class="cmd">alt_disk_install -b bosboot -d hdisk1</span> <span class="comment"># Zero-downtime via alt disk</span></div>
+<div class="section-divider">Phase 3 — Post-Patch Validation</div>
+<ul class="step-list">
+<li>Verify kernel version: <code style="font-family:var(--mono);color:#79c0ff">uname -r</code></li>
+<li>Check all services: <code style="font-family:var(--mono);color:#79c0ff">systemctl list-units --state=failed</code></li>
+<li>Review logs: <code style="font-family:var(--mono);color:#79c0ff">dmesg | tail -30</code>, <code style="font-family:var(--mono);color:#79c0ff">journalctl -p err -n 50</code></li>
+<li>Run application smoke tests with app team sign-off</li>
+<li>Delete snapshot after 48-hour stability confirmation</li>
+<li>Update change ticket, CMDB, and patch inventory</li>
+</ul>
+<div class="tip-box">Phased patching order: Dev → UAT/Staging → DR → Production. Never patch production without lower-env validation. Always have a rollback plan documented in the change ticket.</div>
+</div>
+</div>
+<!-- Q2 -->
+<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">02</span>
+<span class="q-badge badge-scenario">Scenario</span>
+<span class="q-text">Server not booting after patching — how do you troubleshoot and recover?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="section-divider">Step 1 — Access via Console</div>
+<ul class="step-list">
+<li>VM: Access VMware vCenter console (not SSH — network may be unavailable)</li>
+<li>Physical server: Access via iLO / DRAC / IPMI remote console</li>
+</ul>
+<div class="section-divider">Step 2 — Boot with Previous Kernel (Fastest Fix)</div>
+<ul class="step-list">
+<li>At GRUB menu, press <strong>Esc</strong> or hold <strong>Shift</strong> to interrupt automatic boot</li>
+<li>Select the previous kernel entry from the list</li>
+<li>If boots successfully → the new kernel caused the regression</li>
+</ul>
+<div class="code-block">
+<span class="comment"># After booting with old kernel, remove bad kernel:</span>
+<span class="cmd">rpm -q kernel</span> <span class="comment"># List installed kernels</span>
+<span class="cmd">yum remove kernel-&lt;new-version&gt;</span> <span class="comment"># Remove bad kernel</span>
+<span class="cmd">grub2-mkconfig -o /boot/grub2/grub.cfg</span> <span class="comment"># Regenerate GRUB config</span>
+<span class="cmd">grub2-set-default 0</span> <span class="comment"># Set default kernel</span></div>
+<div class="section-divider">Step 3 — GRUB Broken (Rescue Mode)</div>
+<div class="code-block">
+<span class="comment"># Boot from RHEL rescue ISO → Troubleshooting → Rescue</span>
+<span class="cmd">chroot /mnt/sysimage</span>
+<span class="comment"># Reinstall GRUB (BIOS system):</span>
+<span class="cmd">grub2-install /dev/sda</span>
+<span class="cmd">grub2-mkconfig -o /boot/grub2/grub.cfg</span>
+<span class="comment"># Reinstall GRUB (UEFI system):</span>
+<span class="cmd">grub2-install --target=x86_64-efi --efi-directory=/boot/efi</span>
+<span class="cmd">grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg</span></div>
+<div class="section-divider">Step 4 — Rebuild initramfs</div>
+<div class="code-block">
+<span class="cmd">dracut -f /boot/initramfs-$(uname -r).img $(uname -r)</span>
+<span class="comment"># Or for specific version:</span>
+<span class="cmd">dracut -f /boot/initramfs-4.18.0-305.el8.x86_64.img 4.18.0-305.el8.x86_64</span></div>
+<div class="section-divider">Step 5 — Emergency Shell (fstab UUID issue)</div>
+<div class="code-block">
+<span class="cmd">journalctl -xb</span> <span class="comment"># See exact mount error</span>
+<span class="cmd">blkid</span> <span class="comment"># Get correct UUIDs</span>
+<span class="cmd">vi /etc/fstab</span> <span class="comment"># Fix UUID mismatch</span>
+<span class="cmd">mount -a</span> <span class="comment"># Test before reboot</span></div>
+<div class="tip-box">Boot with previous kernel via GRUB is the fastest recovery path — know this step by heart. Always take a VM snapshot before patching.</div>
+</div>
+</div>
+<!-- Q3 -->
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">03</span>
+<span class="q-badge badge-concept">Concept</span>
+<span class="q-text">How do you manage quarterly patching on 100+ servers with minimal downtime?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<ul class="step-list">
+<li>Download patches to local Red Hat Satellite / YUM mirror — servers never hit internet directly</li>
+<li>Create a patch schedule coordinated with change management and application owners</li>
+<li>Test patches in UAT/Staging first — document any issues or conflicts</li>
+<li>Patch in waves: DR first → Staging → Production clusters (rolling, not all at once)</li>
+<li>Use Ansible playbooks to execute patching in parallel batches with health check validation between waves</li>
+<li>Take VMware snapshots before each wave; remove after 48-hour stability confirmation</li>
+<li>Submit post-patching report: patch compliance %, any failures, rollbacks performed</li>
+</ul>
+<div class="code-block">
+<span class="comment"># Ansible patch playbook (simplified logic)</span>
+<span class="comment">---</span>
+<span class="comment">- hosts: staging_servers</span>
+<span class="comment">  tasks:</span>
+<span class="comment">    - name: Apply security patches</span>
+<span class="comment">      yum: name=* state=latest security=yes</span>
+<span class="comment">    - name: Check if reboot needed</span>
+<span class="comment">      command: needs-restarting -r</span>
+<span class="comment">      register: reboot_needed</span>
+<span class="comment">    - name: Reboot if required</span>
+<span class="comment">      reboot: reboot_timeout=300</span>
+<span class="comment">      when: reboot_needed.rc == 1</span></div>
+<div class="tip-box">Mention phased approach and Ansible automation — shows you can handle scale efficiently.</div>
+</div>
+</div>
+<!-- Q4 -->
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">04</span>
+<span class="q-badge badge-critical">Critical</span>
+<span class="q-text">A critical CVE (CVSS 9.5) is released for OpenSSH. You have 4 hours to patch 20 production servers. What do you do?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<ul class="step-list">
+<li>Raise an Emergency Change Request immediately — get CAB or designated approver sign-off</li>
+<li>Download the patched OpenSSH package to local repo and verify checksum</li>
+<li>Test on one non-production server: update → verify SSH connectivity → check version</li>
+<li>Write a remediation script with automatic rollback if SSH connectivity fails post-update</li>
+<li>Execute in parallel batches using Ansible or pssh across all 20 servers</li>
+<li>Validate SSH on each server after patching; log results in real time</li>
+<li>Submit evidence report (before/after rpm -q openssh, CVE scan results) to security team within 24 hours</li>
+</ul>
+<div class="code-block">
+<span class="cmd">yum update openssh openssh-server -y</span>
+<span class="cmd">rpm -q openssh</span> <span class="comment"># Verify new version</span>
+<span class="cmd">systemctl restart sshd</span>
+<span class="cmd">ssh -o BatchMode=yes server01 'echo ok'</span> <span class="comment"># Test connectivity</span></div>
+<div class="warn-box">Always raise an emergency change ticket FIRST — even if it takes 15 minutes. Making production changes without authorization exposes you and the bank to audit risk.</div>
+</div>
+</div>
+<!-- Q5 -->
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">05</span>
+<span class="q-badge badge-concept">Concept</span>
+<span class="q-text">How do you perform vulnerability remediation?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table" style="margin-bottom:0.75rem">
+<tr><th>CVSS Score</th><th>Priority</th><th>Timeline</th><th>Change Type</th></tr>
+<tr><td class="red">≥ 9.0 Critical</td><td class="red">P1</td><td>72 hours</td><td>Emergency Change</td></tr>
+<tr><td class="yellow">7.0–8.9 High</td><td class="yellow">P2</td><td>7–14 days</td><td>Normal Change</td></tr>
+<tr><td>4.0–6.9 Medium</td><td>P3</td><td>Next quarterly cycle</td><td>Standard Change</td></tr>
+<tr><td class="green">&lt; 4.0 Low</td><td>P4</td><td>Annual review</td><td>Deferred</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># Check available security updates and CVEs:</span>
+<span class="cmd">yum updateinfo list security</span>
+<span class="cmd">yum update --cve CVE-2024-1234 -y</span>
+<span class="cmd">yum update --advisory RHSA-2024:1234 -y</span>
+<span class="comment"># Verify remediation:</span>
+<span class="cmd">rpm -q --changelog &lt;package&gt; | grep CVE</span>
+<span class="cmd">openssl s_client -connect server:443 2&gt;&amp;1 | grep Protocol</span></div>
+<div class="tip-box">Submit scan evidence after remediation — the security team runs a rescan and you must show the CVE is closed. Always document in the change ticket.</div>
+</div>
+</div>
+<!-- Q6 -->
+<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">06</span>
+<span class="q-badge badge-command">Commands</span>
+<span class="q-text">What is the difference between hotfix, patch, and service pack? How do you prioritize them?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Type</th><th>Scope</th><th>When Applied</th><th>Example</th></tr>
+<tr><td class="red">Hotfix</td><td>Single critical bug or CVE</td><td>Immediately / Emergency window</td><td>CVE OpenSSL patch</td></tr>
+<tr><td class="yellow">Patch</td><td>Multiple bug fixes, security updates</td><td>Scheduled monthly/quarterly</td><td>RHEL kernel update</td></tr>
+<tr><td class="green">Service Pack</td><td>All patches bundled for a version</td><td>Major maintenance window</td><td>RHEL 8.6 → 8.8 update, AIX TL</td></tr>
+</table>
+<p class="answer-text" style="margin-top:0.75rem">Prioritization is based on CVSS score. I never rely solely on vendor classification — I cross-reference with our asset inventory to determine actual exposure and impact.</p>
+</div>
+</div>
+</div><!-- end cards-patching -->
+</div><div class="content-section section-card" id="tab-boot">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#3b82f622,#6366f122)">🚀</div>
+<div>
+<div class="page-title">Boot Process, GRUB &amp; initramfs</div>
+<div class="page-desc">Linux boot sequence, GRUB2 configuration, initramfs role, kernel panic troubleshooting, and rescue mode recovery procedures.</div>
+</div>
+</div>
+</div>
+<div id="cards-boot">
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">01</span><span class="q-badge badge-concept">Concept</span>
+<span class="q-text">Explain the Linux boot process. What is the role of initramfs during boot?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer — 6 Stages</div>
+<table class="data-table">
+<tr><th>Stage</th><th>Component</th><th>What Happens</th><th>Failure Symptom</th></tr>
+<tr><td>1</td><td class="mono">BIOS/UEFI</td><td>POST, locates bootloader from MBR/EFI partition</td><td>No display, beep codes</td></tr>
+<tr><td>2</td><td class="mono">GRUB2</td><td>Loads vmlinuz + initramfs, passes kernel params</td><td>GRUB rescue prompt</td></tr>
+<tr><td>3</td><td class="mono">Kernel</td><td>Decompresses, hardware init, mounts initramfs</td><td>Kernel panic at early boot</td></tr>
+<tr><td>4</td><td class="mono">initramfs</td><td>Loads drivers, activates LVM, mounts real root</td><td>Emergency shell "cannot find root"</td></tr>
+<tr><td>5</td><td class="mono">systemd</td><td>PID 1 — starts services per default target</td><td>Services fail, partial boot</td></tr>
+<tr><td>6</td><td class="mono">Login</td><td>getty / sshd ready for user login</td><td>Login prompt not appearing</td></tr>
+</table>
+<div class="section-divider">Role of initramfs</div>
+<ul class="step-list">
+<li>initramfs = Initial RAM Filesystem — a compressed cpio archive in /boot/</li>
+<li>Provides minimal userspace environment BEFORE real root filesystem is accessible</li>
+<li>Contains: storage drivers (SCSI, NVMe, FC HBA), LVM tools (to activate VGs), encryption modules (LUKS), udev for device naming</li>
+<li>Without initramfs, kernel cannot access root on LVM, SAN, or encrypted disks</li>
+<li>After mounting real root → hands control to systemd on disk</li>
+</ul>
+<div class="code-block">
+<span class="comment"># Inspect initramfs contents:</span>
+<span class="cmd">lsinitrd /boot/initramfs-$(uname -r).img</span>
+<span class="comment"># Rebuild initramfs (RHEL — uses dracut):</span>
+<span class="cmd">dracut -f /boot/initramfs-$(uname -r).img $(uname -r)</span>
+<span class="cmd">dracut -f --regenerate-all</span> <span class="comment"># Rebuild for ALL kernels</span></div>
+</div>
+</div>
+<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">02</span><span class="q-badge badge-scenario">Scenario</span>
+<span class="q-text">Server boots to emergency shell: "Failed to mount /data". It's a production DB server. How do you recover?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<ul class="step-list">
+<li><strong>Emergency shell appears</strong> = systemd failed to mount a filesystem in /etc/fstab</li>
+<li>Run <code style="font-family:var(--mono);color:#79c0ff">journalctl -xb</code> to see the exact mount failure reason</li>
+<li>Run <code style="font-family:var(--mono);color:#79c0ff">blkid</code> to list all block devices and their UUIDs</li>
+</ul>
+<div class="code-block">
+<span class="comment"># Common cause — UUID mismatch in /etc/fstab:</span>
+<span class="cmd">blkid /dev/sdb1</span> <span class="comment"># Get actual UUID</span>
+<span class="cmd">vi /etc/fstab</span> <span class="comment"># Update UUID to match blkid output</span>
+<span class="cmd">mount -a</span> <span class="comment"># Test all mounts</span>
+<span class="cmd">exit</span> <span class="comment"># Continue boot</span>
+<span class="comment"># If SAN device missing — allow boot without /data:</span>
+<span class="comment"># Add 'nofail' option to /etc/fstab entry temporarily:</span>
+<span class="string">/dev/mapper/data  /data  xfs  defaults,nofail  0 0</span>
+<span class="comment"># Filesystem corruption — run fsck (filesystem unmounted):</span>
+<span class="cmd">fsck -y /dev/sdb1</span></div>
+<div class="tip-box">Know the 'nofail' mount option — it lets the system boot even if a non-critical disk is missing. Critical for banking systems where you need to restore service quickly.</div>
+</div>
+</div>
+<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">03</span><span class="q-badge badge-command">Commands</span>
+<span class="q-text">How do you reinstall GRUB and rebuild initramfs?</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="section-divider">Boot from Rescue ISO → Chroot</div>
+<div class="code-block">
+<span class="comment"># At ISO boot: Troubleshooting → Rescue → Option 1 (Continue)</span>
+<span class="cmd">chroot /mnt/sysimage</span> <span class="comment"># Enter the installed system</span></div>
+<div class="section-divider">Reinstall GRUB2</div>
+<div class="code-block">
+<span class="comment"># BIOS system (check: ls /sys/firmware/efi — if dir missing, it's BIOS):</span>
+<span class="cmd">grub2-install /dev/sda</span>
+<span class="cmd">grub2-mkconfig -o /boot/grub2/grub.cfg</span>
+<span class="comment"># UEFI system:</span>
+<span class="cmd">grub2-install --target=x86_64-efi --efi-directory=/boot/efi</span>
+<span class="cmd">grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg</span></div>
+<div class="section-divider">Rebuild initramfs</div>
+<div class="code-block">
+<span class="cmd">dracut -f /boot/initramfs-$(uname -r).img $(uname -r)</span>
+<span class="cmd">ls -lh /boot/</span> <span class="comment"># Verify files exist</span>
+<span class="cmd">exit &amp;&amp; reboot</span></div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header">
+<span class="q-num">04</span><span class="q-badge badge-critical">Critical</span>
+<span class="q-text">Explain the steps to troubleshoot kernel panic errors.</span>
+<span class="q-chevron">▾</span>
+</div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="section-divider">Step 1 — Capture with kdump</div>
+<div class="code-block">
+<span class="cmd">systemctl status kdump</span> <span class="comment"># Verify kdump is enabled</span>
+<span class="cmd">ls /var/crash/</span> <span class="comment"># vmcore dump files after crash</span></div>
+<div class="section-divider">Step 2 — Check panic message from previous boot</div>
+<div class="code-block">
+<span class="cmd">journalctl -b -1 | grep -i 'kernel panic\|oops\|Call Trace'</span>
+<span class="cmd">grep -i 'kernel panic\|BUG\|oops' /var/log/messages</span></div>
+<div class="section-divider">Step 3 — Analyze vmcore with crash utility</div>
+<div class="code-block">
+<span class="cmd">yum install crash kernel-debuginfo-$(uname -r) -y</span>
+<span class="cmd">crash /usr/lib/debug/lib/modules/$(uname -r)/vmlinux /var/crash/*/vmcore</span>
+<span class="comment"># Inside crash utility:</span>
+<span class="cmd">bt</span> <span class="comment"># Backtrace — shows kernel stack at panic</span>
+<span class="cmd">log</span> <span class="comment"># Kernel message buffer</span>
+<span class="cmd">ps</span> <span class="comment"># Processes at crash time</span>
+<span class="cmd">vm</span> <span class="comment"># Virtual memory info</span></div>
+<div class="section-divider">Common Causes &amp; Fixes</div>
+<table class="data-table">
+<tr><th>Panic Type</th><th>Visible In</th><th>Fix</th></tr>
+<tr><td>NULL pointer dereference</td><td>bt output — driver module</td><td class="green">Update or blacklist driver</td></tr>
+<tr><td>Hardware memory error</td><td>mcelog, EDAC dmesg</td><td class="yellow">Replace faulty DIMM</td></tr>
+<tr><td>OOM (Out of Memory)</td><td>oom-kill in /var/log/messages</td><td class="green">Tune vm.overcommit, add RAM</td></tr>
+<tr><td>SAN I/O error</td><td>HBA errors in dmesg</td><td class="yellow">Fix multipath, check SAN</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># Collect full diagnostic bundle for vendor support:</span>
+<span class="cmd">sosreport</span></div>
+</div>
+</div>
+</div><!-- cards-boot -->
+</div><div class="content-section section-card" id="tab-lvm">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#8b5cf622,#6366f122)">💾</div>
+<div>
+<div class="page-title">LVM, Storage &amp; Filesystem Management</div>
+<div class="page-desc">Logical Volume Management, multipathing (DM-Multipath), filesystem extension, repair, inode management, and NFS.</div>
+</div>
+</div>
+</div>
+<div id="cards-lvm">
+<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-command">Commands</span><span class="q-text">How do you extend LV and filesystem size?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># Step 1 — Check VG free space:</span>
+<span class="cmd">vgs</span> <span class="comment"># Check VFree column</span>
+<span class="cmd">vgdisplay vg_data</span> <span class="comment"># Detailed VG info</span>
+<span class="comment"># Step 2 — Extend LV + Resize filesystem (one command):</span>
+<span class="cmd">lvextend -L +20G -r /dev/vg_data/lv_app</span>
+<span class="comment"># -r flag: auto-resizes ext4 OR xfs filesystem after extend</span>
+<span class="comment"># Manual 2-step method:</span>
+<span class="cmd">lvextend -L +20G /dev/vg_data/lv_app</span>
+<span class="cmd">xfs_growfs /mountpoint</span> <span class="comment"># XFS — uses mountpoint</span>
+<span class="cmd">resize2fs /dev/vg_data/lv_app</span> <span class="comment"># ext4 — uses device</span>
+<span class="comment"># If VG has no space — add new disk first:</span>
+<span class="cmd">pvcreate /dev/sdc</span>
+<span class="cmd">vgextend vg_data /dev/sdc</span>
+<span class="cmd">lvextend -l +100%FREE -r /dev/vg_data/lv_app</span>
+<span class="comment"># VMware VM — expand disk without downtime:</span>
+<span class="comment"># 1. Expand virtual disk in vCenter (VM Settings → Hard disk)</span>
+<span class="cmd">echo 1 &gt; /sys/class/scsi_disk/0:0:0:0/device/rescan</span>
+<span class="cmd">partprobe /dev/sdb</span>
+<span class="cmd">pvcreate /dev/sdb</span>
+<span class="cmd">vgextend vg_data /dev/sdb</span>
+<span class="cmd">lvextend -l +100%FREE -r /dev/vg_data/lv_app</span>
+<span class="comment"># Verify:</span>
+<span class="cmd">df -h /mountpoint</span>
+<span class="cmd">lvdisplay /dev/vg_data/lv_app</span></div>
+<div class="tip-box">The -r flag (lvextend -r) is the shortcut that extends LV and resizes filesystem in one step — mention this in the interview.</div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-critical">Critical</span><span class="q-text">LVM Volumes not showing when we run vgs — what could be the reason and how do you fix it?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<ul class="step-list">
+<li class="danger">VG is inactive — most common reason after disk replacement, SAN path loss, or system migration</li>
+<li>PV device is not visible — underlying disk/LUN not accessible to the OS</li>
+<li>VG metadata corrupted — LVM metadata on the PV is missing or corrupt</li>
+<li>LVM filter in /etc/lvm/lvm.conf excludes the device</li>
+<li>Disk not scanned yet — new disk added but LVM hasn't discovered it</li>
+</ul>
+<div class="code-block">
+<span class="comment"># Check PVs including inactive:</span>
+<span class="cmd">pvs -a</span>
+<span class="cmd">pvdisplay</span>
+<span class="comment"># Check block devices visible to OS:</span>
+<span class="cmd">lsblk</span>
+<span class="cmd">ls /dev/sd*</span>
+<span class="comment"># Rescan for PVs:</span>
+<span class="cmd">pvscan</span>
+<span class="comment"># List all VGs including inactive:</span>
+<span class="cmd">vgs -a</span>
+<span class="cmd">vgdisplay --partial</span>
+<span class="comment"># FIX — Activate VG:</span>
+<span class="cmd">vgchange -ay vg_data</span> <span class="comment"># Activate specific VG</span>
+<span class="cmd">vgchange -ay</span> <span class="comment"># Activate ALL VGs</span>
+<span class="comment"># If VG moved from another system:</span>
+<span class="cmd">vgimport vg_data</span>
+<span class="cmd">vgchange -ay vg_data</span>
+<span class="comment"># Restore from LVM metadata backup:</span>
+<span class="cmd">vgcfgrestore -f /etc/lvm/backup/vg_data vg_data</span></div>
+<div class="warn-box">vgchange -ay is the first command to try whenever LVs are missing. Never use --partial flag in production without understanding the implications — it can activate a VG with missing PVs and potentially cause data corruption.</div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-critical">Critical</span><span class="q-text">Filesystem shows space free but no new files can be created. Why?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer — Inode Exhaustion</div>
+<p class="answer-text">When <code style="font-family:var(--mono);color:#79c0ff">df -h</code> shows available space but you get "No space left on device", the cause is <strong>inode exhaustion</strong> — the inode table is full.</p>
+<div class="code-block">
+<span class="comment"># Diagnose:</span>
+<span class="cmd">df -i</span> <span class="comment"># Show INODE usage — look for 100% in IUse%</span>
+<span class="cmd">df -ih</span> <span class="comment"># Human-readable</span>
+<span class="comment"># Find directory consuming most inodes (most files):</span>
+<span class="cmd">find / -xdev -printf '%h\n' | sort | uniq -c | sort -rn | head -20</span>
+<span class="comment"># Common culprits:</span>
+<span class="comment"># /var/spool/mail  /tmp  /var/spool/exim/input  app temp dirs</span>
+<span class="comment"># Fix — delete unnecessary small files:</span>
+<span class="cmd">rm -rf /var/spool/exim/input/*</span>
+<span class="cmd">find /tmp -mtime +7 -delete</span>
+<span class="comment"># Check inode settings:</span>
+<span class="cmd">tune2fs -l /dev/sda1 | grep -i inode</span> <span class="comment"># ext4</span>
+<span class="cmd">xfs_info /mountpoint</span> <span class="comment"># XFS</span></div>
+<div class="section-divider">Can filesystem space increase also increase inode count?</div>
+<table class="data-table">
+<tr><th>Filesystem</th><th>Can Extend Add Inodes?</th><th>Reason</th></tr>
+<tr><td class="mono">ext4</td><td class="red">NO</td><td>Inode count fixed at mkfs time — cannot change after creation</td></tr>
+<tr><td class="mono">XFS</td><td class="green">YES (effectively)</td><td>XFS allocates inodes dynamically from free space</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># Create ext4 with higher inode density (at mkfs time only):</span>
+<span class="cmd">mkfs.ext4 -i 8192 /dev/sdb1</span> <span class="comment"># 1 inode per 8KB (default is 16KB)</span>
+<span class="cmd">mkfs.ext4 -N 10000000 /dev/sdb1</span> <span class="comment"># Set explicit inode count</span></div>
+<div class="tip-box">This is a classic trick question — df -h looks fine but you cannot create files. Always check df -i when you see "No space left on device".</div>
+</div>
+</div>
+<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">04</span><span class="q-badge badge-command">Commands</span><span class="q-text">Explain about multipathing (DM-Multipath) on Linux.</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text">DM-Multipath provides multiple I/O paths between a server and SAN storage for redundancy and load balancing. If one path fails, I/O switches to alternate path — transparent to the application.</p>
+<div class="code-block">
+<span class="comment"># Check multipath status:</span>
+<span class="cmd">multipath -ll</span> <span class="comment"># Show all devices with path status</span>
+<span class="cmd">multipathd -k</span> <span class="comment"># Interactive console</span>
+<span class="comment"># Sample output interpretation:</span>
+<span class="output">mpatha (3600508b...) dm-0 HP,LOGICAL VOLUME</span>
+<span class="output">|-+- policy='round-robin 0' prio=1 status=active</span>
+<span class="output">| |- 2:0:0:1 sdb 8:16 active ready running   ← active path</span>
+<span class="output">| |- 3:0:0:1 sdc 8:32 active ready running   ← active path</span>
+<span class="output">`-+- policy='round-robin 0' prio=0 status=enabled</span>
+<span class="output">  |- 2:0:1:1 sdd 8:48 active ready running   ← standby path</span>
+<span class="comment"># Troubleshoot failed/ghost paths:</span>
+<span class="cmd">multipath -ll | grep -i 'fail\|ghost'</span>
+<span class="cmd">dmesg | grep -i 'multipathd\|scsi\|hba'</span>
+<span class="comment"># Flush and rediscover:</span>
+<span class="cmd">multipath -F &amp;&amp; multipath</span></div>
+<table class="data-table" style="margin-top:0.75rem">
+<tr><th>Policy</th><th>Behavior</th><th>Use Case</th></tr>
+<tr><td class="mono">failover</td><td>One active path, rest standby</td><td>Simple redundancy</td></tr>
+<tr><td class="mono">round-robin</td><td>Distribute I/O across all paths</td><td>Load balancing</td></tr>
+<tr><td class="mono">multibus</td><td>All paths in one group, all active</td><td>Max throughput</td></tr>
+</table>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">05</span><span class="q-badge badge-critical">Critical</span><span class="q-text">How do you repair a filesystem?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="warn-box">CRITICAL RULE: NEVER run fsck or xfs_repair on a MOUNTED filesystem. Always unmount first or do it from rescue mode for root filesystem.</div>
+<div class="section-divider">ext4 — fsck</div>
+<div class="code-block">
+<span class="cmd">umount /dev/sdb1</span> <span class="comment"># Unmount first!</span>
+<span class="cmd">fsck -n /dev/sdb1</span> <span class="comment"># Dry run — check only</span>
+<span class="cmd">fsck -y /dev/sdb1</span> <span class="comment"># Auto-repair all errors</span>
+<span class="cmd">e2fsck -fy /dev/sdb1</span> <span class="comment"># Force check + auto-repair</span></div>
+<div class="section-divider">XFS — xfs_repair</div>
+<div class="code-block">
+<span class="cmd">umount /dev/sdb1</span>
+<span class="cmd">xfs_repair /dev/sdb1</span> <span class="comment"># Repair XFS</span>
+<span class="cmd">xfs_repair -n /dev/sdb1</span> <span class="comment"># Dry run</span>
+<span class="comment"># If 'dirty log' error:</span>
+<span class="cmd">xfs_repair -L /dev/sdb1</span> <span class="comment"># Force clear log (LAST RESORT)</span></div>
+<div class="section-divider">Root filesystem (cannot unmount)</div>
+<div class="code-block">
+<span class="comment"># Boot from rescue ISO → chroot → run fsck</span>
+<span class="cmd">chroot /mnt/sysimage</span>
+<span class="cmd">fsck -y /dev/sda2</span></div>
+<div class="section-divider">Check disk health before repair</div>
+<div class="code-block">
+<span class="cmd">smartctl -a /dev/sda</span> <span class="comment"># Check SMART data for reallocated sectors</span>
+<span class="cmd">dmesg | grep -i 'I/O error\|EXT4-fs error\|XFS'</span></div>
+</div>
+</div>
+<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">06</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">/var filesystem hits 100% at 3 AM causing application failures. How do you recover?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># Immediate — identify top space consumers:</span>
+<span class="cmd">df -h</span> <span class="comment"># Confirm /var is full</span>
+<span class="cmd">du -sh /var/* | sort -rh | head -20</span> <span class="comment"># Find biggest directories</span>
+<span class="cmd">du -sh /var/log/* | sort -rh | head -10</span>
+<span class="comment"># Common culprits in banking environments:</span>
+<span class="comment"># /var/crash — core dumps (delete if not needed)</span>
+<span class="cmd">rm -rf /var/crash/*</span>
+<span class="comment"># /var/log — oversized application logs</span>
+<span class="cmd">find /var/log -name "*.log" -size +100M -mtime +3</span>
+<span class="cmd">gzip /var/log/app/app.log.2024*</span>
+<span class="comment"># Quick space via audit logs (only after security approval):</span>
+<span class="cmd">service auditd stop</span>
+<span class="cmd">truncate -s 0 /var/log/audit/audit.log</span>
+<span class="cmd">service auditd start</span>
+<span class="comment"># Extend LV if VG has space:</span>
+<span class="cmd">lvextend -L +10G -r /dev/vg_sys/lv_var</span></div>
+<ul class="step-list">
+<li>After recovery: implement 80% disk alert in monitoring tool</li>
+<li>Configure proper logrotate for offending application</li>
+<li>Document RCA and submit post-incident report</li>
+</ul>
+</div>
+</div>
+</div><!-- cards-lvm -->
+</div><div class="content-section section-card" id="tab-security">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#ef444422,#f59e0b22)">🔐</div>
+<div>
+<div class="page-title">Security &amp; Hardening</div>
+<div class="page-desc">Server hardening, SELinux, PAM, auditd, SSH security, user administration, sudo, and vulnerability management in banking environments.</div>
+</div>
+</div>
+</div>
+<div id="cards-security">
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What is your approach to server hardening as per bank security policy?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Area</th><th>Action</th><th>Commands/Files</th></tr>
+<tr><td>SSH</td><td>Disable root login, key-auth only, SSHv2, idle timeout</td><td class="mono">/etc/ssh/sshd_config</td></tr>
+<tr><td>SELinux</td><td>Set to Enforcing mode</td><td class="mono">setenforce 1, /etc/selinux/config</td></tr>
+<tr><td>Firewall</td><td>Default deny, allow only required ports</td><td class="mono">firewall-cmd --add-service</td></tr>
+<tr><td>PAM</td><td>Password complexity, account lockout, aging</td><td class="mono">/etc/security/limits.conf</td></tr>
+<tr><td>Audit</td><td>auditd for privileged commands, file integrity</td><td class="mono">/etc/audit/rules.d/</td></tr>
+<tr><td>Kernel</td><td>sysctl hardening, disable IP forwarding, SYN cookies</td><td class="mono">/etc/sysctl.conf</td></tr>
+<tr><td>Packages</td><td>Remove unused packages and services</td><td class="mono">yum remove, systemctl disable</td></tr>
+<tr><td>USB</td><td>Disable USB storage module</td><td class="mono">blacklist usb-storage in modprobe</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># Key sshd_config settings:</span>
+<span class="string">PermitRootLogin no</span>
+<span class="string">PasswordAuthentication no</span>
+<span class="string">PubkeyAuthentication yes</span>
+<span class="string">Protocol 2</span>
+<span class="string">ClientAliveInterval 300</span>
+<span class="string">ClientAliveCountMax 2</span>
+<span class="string">AllowUsers admin1 admin2</span>
+<span class="comment"># Kernel hardening (/etc/sysctl.conf):</span>
+<span class="string">net.ipv4.ip_forward = 0</span>
+<span class="string">net.ipv4.tcp_syncookies = 1</span>
+<span class="string">net.ipv4.conf.all.accept_redirects = 0</span>
+<span class="string">kernel.dmesg_restrict = 1</span>
+<span class="comment"># Validate compliance after hardening:</span>
+<span class="cmd">oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_cis_server_l1 /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml</span></div>
+<div class="tip-box">Mention OpenSCAP/CIS benchmarks and running a compliance scan post-hardening — shows process maturity beyond just making changes.</div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How can you provide permission to a user to run a command as root?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># ALWAYS use visudo — never edit /etc/sudoers directly</span>
+<span class="cmd">visudo</span>
+<span class="comment"># Allow user 'john' to run systemctl (with password):</span>
+<span class="string">john    ALL=(ALL)    /bin/systemctl</span>
+<span class="comment"># Allow without password prompt:</span>
+<span class="string">john    ALL=(ALL)    NOPASSWD: /bin/systemctl restart httpd</span>
+<span class="comment"># Allow group 'dba':</span>
+<span class="string">%dba    ALL=(ALL)    ALL</span>
+<span class="comment"># Preferred — drop-in file in /etc/sudoers.d/:</span>
+<span class="cmd">visudo -f /etc/sudoers.d/john</span>
+<span class="cmd">chmod 440 /etc/sudoers.d/john</span>
+<span class="comment"># Test the rule:</span>
+<span class="cmd">sudo -l -U john</span> <span class="comment"># What can john run?</span>
+<span class="comment"># View sudo audit trail:</span>
+<span class="cmd">grep sudo /var/log/secure</span>
+<span class="cmd">ausearch -m USER_CMD -sv yes</span></div>
+<ul class="step-list">
+<li class="warn">Use specific command paths — never give ALL without strong justification</li>
+<li class="warn">Avoid NOPASSWD for destructive commands (rm, dd, chmod, shutdown)</li>
+<li>All sudo usage is logged in /var/log/secure and auditd automatically</li>
+<li>Review sudo rules quarterly as part of access review process</li>
+</ul>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain PAM (Pluggable Authentication Modules) and how you use it.</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text">PAM is a framework that decouples authentication from applications. Configuration files are in /etc/pam.d/ — one per service (sshd, login, sudo).</p>
+<div class="code-block">
+<span class="comment"># Key PAM modules used in banking:</span>
+<span class="comment"># Password complexity — /etc/security/pwquality.conf:</span>
+<span class="string">minlen = 12</span>
+<span class="string">dcredit = -1     # At least 1 digit</span>
+<span class="string">ucredit = -1     # At least 1 uppercase</span>
+<span class="string">ocredit = -1     # At least 1 special char</span>
+<span class="string">lcredit = -1     # At least 1 lowercase</span>
+<span class="comment"># Account lockout (/etc/pam.d/sshd — pam_faillock):</span>
+<span class="string">auth required pam_faillock.so preauth deny=5 unlock_time=900</span>
+<span class="string">auth [default=die] pam_faillock.so authfail deny=5 unlock_time=900</span>
+<span class="comment"># Password history — prevent reuse of last 12:</span>
+<span class="string">password sufficient pam_unix.so remember=12</span>
+<span class="comment"># Unlock a locked account:</span>
+<span class="cmd">faillock --user john --reset</span>
+<span class="comment"># Check failed attempts:</span>
+<span class="cmd">faillock --user john</span></div>
+<div class="warn-box">Always keep a root session open while testing PAM changes — a misconfiguration can lock ALL users out of the system.</div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">04</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain about ulimit — what is it and how is it configured?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text">ulimit controls resource limits for processes — preventing a single user/process from consuming all system resources.</p>
+<div class="code-block">
+<span class="cmd">ulimit -a</span> <span class="comment"># View all current limits for session</span>
+<span class="cmd">ulimit -n 65536</span> <span class="comment"># Open file descriptors (nofile)</span>
+<span class="cmd">ulimit -u 16384</span> <span class="comment"># Max processes (nproc)</span>
+<span class="cmd">ulimit -c unlimited</span> <span class="comment"># Core dump size</span>
+<span class="comment"># Permanent — /etc/security/limits.conf:</span>
+<span class="string">oracle   soft   nofile   65536</span>
+<span class="string">oracle   hard   nofile   65536</span>
+<span class="string">oracle   soft   nproc    16384</span>
+<span class="string">oracle   hard   nproc    16384</span>
+<span class="string">oracle   soft   stack    10240</span>
+<span class="comment"># For systemd services — in unit file [Service] section:</span>
+<span class="string">LimitNOFILE=65536</span>
+<span class="string">LimitNPROC=16384</span>
+<span class="comment"># Check limits for a running process:</span>
+<span class="cmd">cat /proc/&lt;PID&gt;/limits</span></div>
+<table class="data-table" style="margin-top:0.75rem">
+<tr><th>Limit</th><th>Flag</th><th>Common Value</th><th>What It Controls</th></tr>
+<tr><td>nofile</td><td class="mono">-n</td><td>65536</td><td>Open file descriptors (critical for Oracle, Tomcat)</td></tr>
+<tr><td>nproc</td><td class="mono">-u</td><td>16384</td><td>Max processes (low value causes fork: retry error)</td></tr>
+<tr><td>core</td><td class="mono">-c</td><td>unlimited</td><td>Core dump size for debugging</td></tr>
+<tr><td>stack</td><td class="mono">-s</td><td>10240</td><td>Stack size in KB</td></tr>
+</table>
+</div>
+</div>
+<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">05</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">A service account is logging into production via SSH password — violating key-auth policy. What do you do?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<ul class="step-list">
+<li>First — gather evidence: grep the logs, document scope before taking any action</li>
+<li class="danger">Report to Information Security team IMMEDIATELY — this is a policy violation security incident</li>
+<li>After IS team authorization — enforce key-auth only for this account</li>
+<li>Coordinate with app team to implement proper key-based auth</li>
+<li>Scan all other servers for the same issue</li>
+</ul>
+<div class="code-block">
+<span class="comment"># Gather evidence:</span>
+<span class="cmd">grep &lt;service_account&gt; /var/log/secure | grep 'Accepted password'</span>
+<span class="cmd">last &lt;service_account&gt;</span> <span class="comment"># Login history</span>
+<span class="cmd">ausearch -m USER_AUTH -sv yes | grep &lt;account&gt;</span>
+<span class="comment"># Enforce key-auth only for specific account:</span>
+<span class="comment"># Add to /etc/ssh/sshd_config:</span>
+<span class="string">Match User svc_account</span>
+<span class="string">    PasswordAuthentication no</span>
+<span class="cmd">systemctl reload sshd</span>
+<span class="comment"># Scan all servers for password-auth logins:</span>
+<span class="cmd">for srv in $(cat /etc/server_list.txt); do</span>
+<span class="cmd">  ssh $srv "grep 'Accepted password' /var/log/secure | grep svc_account"</span>
+<span class="cmd">done</span></div>
+<div class="warn-box">Report to IS team FIRST — never take remediation action before authorization in a banking environment. Evidence preservation is as important as the fix.</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-performance">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#f59e0b22,#ef444422)">⚡</div>
+<div>
+<div class="page-title">Performance Monitoring &amp; Troubleshooting</div>
+<div class="page-desc">Server slowness diagnosis, disk I/O bottlenecks, memory pressure, CPU analysis, and systematic performance improvement techniques.</div>
+</div>
+</div>
+</div>
+<div id="cards-performance">
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How do you troubleshoot server slowness issues?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer — Layered Approach: CPU → Memory → Disk → Network</div>
+<div class="section-divider">Step 1 — CPU</div>
+<div class="code-block">
+<span class="cmd">uptime</span> <span class="comment"># Load avg vs CPU count</span>
+<span class="cmd">top</span> <span class="comment"># or</span> <span class="cmd">htop</span> <span class="comment"># Real-time CPU per process</span>
+<span class="cmd">mpstat -P ALL 1 3</span> <span class="comment"># Per-CPU stats</span>
+<span class="cmd">ps -eo pid,ppid,%cpu,%mem,cmd --sort=-%cpu | head -15</span></div>
+<div class="section-divider">Step 2 — Memory</div>
+<div class="code-block">
+<span class="cmd">free -h</span> <span class="comment"># Available RAM and swap</span>
+<span class="cmd">vmstat 1 5</span> <span class="comment"># si/so = swap in/out (bad if &gt; 0)</span>
+<span class="cmd">grep -i 'oom\|kill' /var/log/messages</span> <span class="comment"># OOM kills</span>
+<span class="cmd">ps -eo pid,%mem,cmd --sort=-%mem | head -10</span></div>
+<div class="section-divider">Step 3 — Disk I/O</div>
+<div class="code-block">
+<span class="cmd">iostat -xz 1 3</span> <span class="comment"># %iowait &gt;20% = bottleneck, await &gt;20ms = high</span>
+<span class="cmd">iotop -o</span> <span class="comment"># Per-process I/O (top for disk)</span></div>
+<div class="section-divider">Step 4 — Network</div>
+<div class="code-block">
+<span class="cmd">ss -s</span> <span class="comment"># Socket summary</span>
+<span class="cmd">netstat -s | grep -E 'retransmit|error'</span>
+<span class="cmd">sar -n DEV 1 3</span> <span class="comment"># Network throughput</span>
+<span class="cmd">ethtool eth0</span> <span class="comment"># NIC speed/duplex</span></div>
+<div class="section-divider">Step 5 — Recent Changes &amp; Logs</div>
+<div class="code-block">
+<span class="cmd">rpm -qa --last | head -20</span> <span class="comment"># Recent package changes</span>
+<span class="cmd">journalctl -p err -n 50</span>
+<span class="cmd">dmesg | tail -30</span>
+<span class="cmd">last reboot</span></div>
+<div class="tip-box">Always check if the slowness correlates with a recent change — patch, config change, or new cron job. 80% of slowness issues have a change-related root cause.</div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-critical">Critical</span><span class="q-text">How do you fix Disk I/O bottleneck issues?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># Confirm I/O bottleneck:</span>
+<span class="cmd">iostat -xz 1 5</span>
+<span class="comment"># Key metrics:</span>
+<span class="comment"># %iowait &gt; 20%  = CPU waiting for I/O</span>
+<span class="comment"># await (ms) &gt; 20ms on SSD = high latency</span>
+<span class="comment"># %util &gt; 80%    = disk near saturation</span>
+<span class="comment"># Identify process causing high I/O:</span>
+<span class="cmd">iotop -o</span>
+<span class="cmd">pidstat -d 1 5</span>
+<span class="cmd">lsof -p &lt;PID&gt;</span> <span class="comment"># Files the process has open</span>
+<span class="comment"># OS-level tuning:</span>
+<span class="comment"># Set I/O scheduler:</span>
+<span class="cmd">cat /sys/block/sda/queue/scheduler</span>
+<span class="cmd">echo 'mq-deadline' &gt; /sys/block/sda/queue/scheduler</span> <span class="comment"># Good for DB workloads</span>
+<span class="cmd">echo 'none' &gt; /sys/block/nvme0n1/queue/scheduler</span> <span class="comment"># NVMe SSDs</span>
+<span class="comment"># Increase read-ahead for sequential I/O:</span>
+<span class="cmd">blockdev --setra 4096 /dev/sda</span>
+<span class="comment"># Tune dirty page writeback:</span>
+<span class="cmd">sysctl vm.dirty_ratio=15</span>
+<span class="cmd">sysctl vm.dirty_background_ratio=5</span></div>
+<table class="data-table" style="margin-top:0.75rem">
+<tr><th>Cause</th><th>Symptom</th><th>Fix</th></tr>
+<tr><td>Runaway log writes</td><td>High w/s on app partition</td><td class="green">Log rotation, reduce verbosity</td></tr>
+<tr><td>Backup running</td><td>Sequential read spikes</td><td class="green">Reschedule to off-peak hours</td></tr>
+<tr><td>Memory too low / swapping</td><td>si/so in vmstat &gt; 0</td><td class="yellow">Increase RAM or swap</td></tr>
+<tr><td>VMware noisy neighbor</td><td>Latency, not throughput</td><td class="yellow">vMotion VM to less-loaded host</td></tr>
+<tr><td>SAN path degraded</td><td>Intermittent high await</td><td class="red">Check multipath -ll, escalate</td></tr>
+</table>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How do you improve server performance?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># Apply tuned performance profile:</span>
+<span class="cmd">tuned-adm list</span>
+<span class="cmd">tuned-adm profile throughput-performance</span> <span class="comment"># Best for servers</span>
+<span class="cmd">tuned-adm profile latency-performance</span> <span class="comment"># Low latency workloads</span>
+<span class="cmd">tuned-adm active</span> <span class="comment"># Check current profile</span>
+<span class="comment"># CPU — reduce swapping tendency:</span>
+<span class="cmd">sysctl vm.swappiness=10</span> <span class="comment"># Default 60, lower = less swapping</span>
+<span class="cmd">sysctl vm.vfs_cache_pressure=50</span> <span class="comment"># Retain VFS cache longer</span>
+<span class="comment"># HugePages for Oracle/Java (reduces TLB misses):</span>
+<span class="cmd">echo 1000 &gt; /proc/sys/vm/nr_hugepages</span>
+<span class="comment"># Disable services not needed:</span>
+<span class="cmd">systemctl disable bluetooth cups avahi-daemon --now</span>
+<span class="comment"># Network tuning:</span>
+<span class="cmd">sysctl net.core.rmem_max=16777216</span>
+<span class="cmd">sysctl net.core.wmem_max=16777216</span>
+<span class="cmd">sysctl net.ipv4.tcp_fin_timeout=15</span>
+<span class="comment"># Filesystem mount performance options:</span>
+<span class="comment"># Add noatime,nodiratime to /etc/fstab for non-OS partitions</span></div>
+<div class="tip-box">Always measure before and after tuning — use sar to collect baseline data for comparison. Performance changes without measurement data are just guesses.</div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">04</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What kernel parameters do you tune for an Oracle Database server?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># /etc/sysctl.conf — Oracle Database tuning:</span>
+<span class="string">kernel.shmmax = 68719476736     </span><span class="comment"># Max SHM segment (≥ SGA size)</span>
+<span class="string">kernel.shmall = 16777216        </span><span class="comment"># Total SHM pages</span>
+<span class="string">kernel.sem = 250 32000 100 128  </span><span class="comment"># Semaphores for Oracle processes</span>
+<span class="string">fs.file-max = 6815744           </span><span class="comment"># Max open file descriptors</span>
+<span class="string">net.core.rmem_max = 4194304     </span><span class="comment"># Network buffer</span>
+<span class="string">net.core.wmem_max = 1048576</span>
+<span class="string">vm.swappiness = 10              </span><span class="comment"># Minimize swapping for DB</span>
+<span class="string">vm.nr_hugepages = 1000          </span><span class="comment"># Pre-allocated HugePages for SGA</span>
+<span class="string">kernel.panic_on_oops = 1        </span><span class="comment"># Reboot on kernel oops</span>
+<span class="comment"># Apply permanently:</span>
+<span class="cmd">sysctl -p</span>
+<span class="comment"># Oracle pre-install RPM automates most of this:</span>
+<span class="cmd">yum install oracle-database-preinstall-19c</span></div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-networking">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#06b6d422,#3b82f622)">🌐</div>
+<div>
+<div class="page-title">Networking &amp; DNS</div>
+<div class="page-desc">NIC bonding/teaming, DNS resolution troubleshooting, multiple IPs on NIC, NFS mounts, and network performance analysis.</div>
+</div>
+</div>
+</div>
+<div id="cards-networking">
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-critical">Critical</span><span class="q-text">A server is unable to resolve domain names. How would you fix it?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer — Layered DNS Troubleshooting</div>
+<div class="code-block">
+<span class="comment"># Step 1 — Confirm the problem:</span>
+<span class="cmd">nslookup google.com</span>
+<span class="cmd">dig google.com</span>
+<span class="cmd">host google.com</span>
+<span class="comment"># Step 2 — Check DNS config:</span>
+<span class="cmd">cat /etc/resolv.conf</span>
+<span class="comment"># Should contain:</span>
+<span class="string">nameserver 192.168.1.1</span>
+<span class="string">nameserver 8.8.8.8</span>
+<span class="string">search company.local</span>
+<span class="comment"># Step 3 — Test DNS server reachability:</span>
+<span class="cmd">ping 192.168.1.1</span>
+<span class="cmd">dig @192.168.1.1 google.com</span> <span class="comment"># Query specific DNS server</span>
+<span class="cmd">nc -zv 192.168.1.1 53</span> <span class="comment"># Test port 53 connectivity</span>
+<span class="comment"># Step 4 — Check resolution order:</span>
+<span class="cmd">cat /etc/nsswitch.conf | grep hosts</span>
+<span class="comment"># Should be: hosts: files dns</span>
+<span class="comment"># Step 5 — Check /etc/hosts for conflicts:</span>
+<span class="cmd">cat /etc/hosts</span>
+<span class="comment"># Step 6 — Check NetworkManager / systemd-resolved:</span>
+<span class="cmd">systemctl status NetworkManager</span>
+<span class="cmd">resolvectl status</span>
+<span class="comment"># Fix — Set DNS permanently via nmcli:</span>
+<span class="cmd">nmcli con mod 'eth0' ipv4.dns '192.168.1.1 8.8.8.8'</span>
+<span class="cmd">nmcli con up 'eth0'</span></div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain NIC Bonding/Teaming modes and which mode do you use in banking production?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Mode</th><th>Name</th><th>Redundancy</th><th>Load Balance</th><th>Switch Config</th></tr>
+<tr><td class="mono">Mode 0</td><td>Round Robin</td><td class="red">No</td><td class="green">Yes</td><td>Required</td></tr>
+<tr><td class="mono">Mode 1</td><td>Active-Backup</td><td class="green">Yes</td><td class="red">No</td><td>None needed</td></tr>
+<tr><td class="mono">Mode 2</td><td>XOR</td><td class="green">Yes</td><td class="green">Yes</td><td>Required</td></tr>
+<tr><td class="mono">Mode 4</td><td>802.3ad / LACP</td><td class="green">Yes</td><td class="green">Yes</td><td>LACP required</td></tr>
+<tr><td class="mono">Mode 5</td><td>Adaptive TLB</td><td class="green">Yes</td><td class="green">Tx only</td><td>None needed</td></tr>
+<tr><td class="mono">Mode 6</td><td>Adaptive LB</td><td class="green">Yes</td><td class="green">Yes</td><td>None needed</td></tr>
+</table>
+<div class="info-box" style="margin-top:0.75rem"><strong>Banking production:</strong> Mode 4 (LACP/802.3ad) for app servers needing throughput + redundancy. Mode 1 (Active-Backup) for management interfaces or where switch LACP config is not possible.</div>
+<div class="code-block">
+<span class="comment"># Check bond status:</span>
+<span class="cmd">cat /proc/net/bonding/bond0</span> <span class="comment"># Active interface, mode, link status</span>
+<span class="cmd">ip addr show bond0</span></div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Is it possible to add multiple IP addresses to one single NIC card?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text">Yes — called IP aliasing or secondary IPs. A single NIC can have multiple IP addresses, all sharing the same MAC address and physical link.</p>
+<div class="code-block">
+<span class="comment"># Method 1 — Temporary (lost on reboot):</span>
+<span class="cmd">ip addr add 192.168.1.101/24 dev eth0</span>
+<span class="cmd">ip addr add 192.168.1.102/24 dev eth0</span>
+<span class="cmd">ip addr show eth0</span> <span class="comment"># Verify all IPs</span>
+<span class="comment"># Method 2 — Permanent via NetworkManager:</span>
+<span class="cmd">nmcli con mod 'eth0' +ipv4.addresses 192.168.1.101/24</span>
+<span class="cmd">nmcli con mod 'eth0' +ipv4.addresses 192.168.1.102/24</span>
+<span class="cmd">nmcli con up 'eth0'</span>
+<span class="comment"># Method 3 — Legacy ifcfg alias (RHEL 6/7):</span>
+<span class="comment"># Create /etc/sysconfig/network-scripts/ifcfg-eth0:1</span>
+<span class="string">DEVICE=eth0:1</span>
+<span class="string">IPADDR=192.168.1.101</span>
+<span class="string">NETMASK=255.255.255.0</span>
+<span class="string">ONBOOT=yes</span></div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-scripting">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#84cc1622,#10b98122)">📜</div>
+<div>
+<div class="page-title">Shell Scripting &amp; Automation</div>
+<div class="page-desc">Bash scripting, for loops, cron job management, automation with Ansible, and monitoring script design.</div>
+</div>
+</div>
+</div>
+<div id="cards-scripting">
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Do you have shell scripting knowledge? What is a for loop?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># Basic for loop syntax:</span>
+<span class="cmd">for variable in list; do</span>
+<span class="cmd">    commands</span>
+<span class="cmd">done</span>
+<span class="comment"># Example 1 — Check disk on multiple servers:</span>
+<span class="cmd">#!/bin/bash</span>
+<span class="string">SERVERS="server01 server02 server03"</span>
+<span class="cmd">for SERVER in $SERVERS; do</span>
+<span class="cmd">    echo "=== $SERVER ==="</span>
+<span class="cmd">    ssh -o ConnectTimeout=5 $SERVER 'df -h | grep -vE "tmpfs|devtmpfs"'</span>
+<span class="cmd">    [ $? -ne 0 ] &amp;&amp; echo "WARNING: Cannot reach $SERVER"</span>
+<span class="cmd">done</span>
+<span class="comment"># Example 2 — C-style counter loop:</span>
+<span class="cmd">for ((i=1; i&lt;=10; i++)); do</span>
+<span class="cmd">    echo "Iteration $i"</span>
+<span class="cmd">done</span>
+<span class="comment"># Example 3 — Loop over files (compress old logs):</span>
+<span class="cmd">for FILE in /var/log/app/*.log; do</span>
+<span class="cmd">    [ -f "$FILE" ] &amp;&amp; gzip "$FILE" &amp;&amp; echo "Compressed: $FILE"</span>
+<span class="cmd">done</span>
+<span class="comment"># Example 4 — Loop from file (server list):</span>
+<span class="cmd">while IFS= read -r SERVER; do</span>
+<span class="cmd">    ssh $SERVER 'uptime'</span>
+<span class="cmd">done &lt; /etc/server_list.txt</span></div>
+</div>
+</div>
+<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-command">Commands</span><span class="q-text">How do you use awk, sed, and grep for log analysis?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># grep — pattern matching:</span>
+<span class="cmd">grep -i error /var/log/messages | grep -v kernel</span>
+<span class="cmd">grep -c 'Failed password' /var/log/secure</span> <span class="comment"># Count occurrences</span>
+<span class="cmd">grep -A 5 'FATAL' /app/logs/app.log</span> <span class="comment"># 5 lines after match</span>
+<span class="cmd">grep -n 'ORA-' /var/log/oracle.log</span> <span class="comment"># With line numbers</span>
+<span class="comment"># awk — field-based parsing:</span>
+<span class="comment"># Extract source IPs from SSH brute force — sort by frequency:</span>
+<span class="cmd">awk '/Failed password/ {print $11}' /var/log/secure | sort | uniq -c | sort -rn</span>
+<span class="comment"># Sum a numeric column:</span>
+<span class="cmd">awk '{sum += $5} END {print "Total:", sum}' /var/log/transfer.log</span>
+<span class="comment"># Print specific time range:</span>
+<span class="cmd">awk '$3 &gt;= "08:00:00" &amp;&amp; $3 &lt;= "09:00:00"' /var/log/messages</span>
+<span class="comment"># sed — in-place text manipulation:</span>
+<span class="comment"># Extract time window from log:</span>
+<span class="cmd">sed -n '/Oct 1 08:00/,/Oct 1 09:00/p' /var/log/messages</span>
+<span class="comment"># Replace config value:</span>
+<span class="cmd">sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config</span>
+<span class="comment"># Combined — unique Oracle errors with timestamps:</span>
+<span class="cmd">grep 'ORA-' /app/logs/app.log | awk '{print $1, $2, $NF}' | sort -u</span></div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Shell scripting vs Ansible — when do you use each?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Criteria</th><th>Shell Script</th><th>Ansible</th></tr>
+<tr><td>Style</td><td>Procedural</td><td class="green">Declarative (desired state)</td></tr>
+<tr><td>Idempotency</td><td class="red">Must code manually</td><td class="green">Built-in — safe to run twice</td></tr>
+<tr><td>Scale</td><td>1–few servers</td><td class="green">Hundreds of servers in parallel</td></tr>
+<tr><td>Agent</td><td>None needed</td><td>None (agentless via SSH)</td></tr>
+<tr><td>Use case</td><td>Monitoring, log mgmt, ad-hoc tasks</td><td class="green">Config deployment, patch orchestration</td></tr>
+<tr><td>Availability</td><td>Always available</td><td>Requires Ansible installed</td></tr>
+</table>
+<div class="info-box" style="margin-top:0.75rem"><strong>My practice:</strong> Shell scripts for monitoring, log management, and single-server tasks. Ansible playbooks for configuration deployment (NTP, SSH hardening, sudoers), rolling patch cycles, and compliance enforcement across the entire server fleet.</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-errors">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#ef444422,#f87171))">🚨</div>
+<div>
+<div class="page-title">Common Errors &amp; Production Fixes</div>
+<div class="page-desc">Real production error messages with exact diagnostic commands and fixes. These are the most frequently asked scenario-based questions in L3 interviews.</div>
+</div>
+</div>
+</div>
+<div id="cards-errors">
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-critical">Error</span><span class="q-text">"Too many open files" error</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Cause &amp; Fix</div>
+<p class="answer-text"><strong>Cause:</strong> Process exceeded its 'nofile' ulimit — max open file descriptors limit reached.</p>
+<div class="code-block">
+<span class="cmd">lsof -p &lt;PID&gt; | wc -l</span> <span class="comment"># Count open files for PID</span>
+<span class="cmd">cat /proc/&lt;PID&gt;/limits</span> <span class="comment"># Current limits for the process</span>
+<span class="cmd">ulimit -n</span> <span class="comment"># Current session limit</span>
+<span class="comment"># Fix — /etc/security/limits.conf:</span>
+<span class="string">appuser  soft  nofile  65536</span>
+<span class="string">appuser  hard  nofile  65536</span>
+<span class="comment"># For systemd service:</span>
+<span class="string">LimitNOFILE=65536</span> <span class="comment"># In [Service] section of unit file</span>
+<span class="cmd">systemctl daemon-reload &amp;&amp; systemctl restart &lt;service&gt;</span></div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-critical">Error</span><span class="q-text">"bash: fork: retry: Resource temporarily unavailable"</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Cause &amp; Fix</div>
+<p class="answer-text"><strong>Cause:</strong> nproc ulimit reached — max number of processes for the user is exhausted. Often caused by a process creating too many threads or a fork bomb.</p>
+<div class="code-block">
+<span class="cmd">ulimit -u</span> <span class="comment"># Current nproc limit</span>
+<span class="cmd">ps -u &lt;username&gt; | wc -l</span> <span class="comment"># Count user's processes</span>
+<span class="cmd">ps -eo pid,ppid,user,cmd | grep &lt;user&gt; | head -20</span>
+<span class="comment"># Fix — /etc/security/limits.conf:</span>
+<span class="string">username  soft  nproc  16384</span>
+<span class="string">username  hard  nproc  16384</span>
+<span class="comment"># Kill runaway processes consuming slots:</span>
+<span class="cmd">pkill -u &lt;username&gt; &lt;processname&gt;</span></div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-critical">Error</span><span class="q-text">"No space left on device" — related to inodes</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Cause &amp; Fix</div>
+<p class="answer-text"><strong>Cause:</strong> Inode table is full — millions of small files (sessions, temp files, mail spools) have exhausted the inode count even though disk space is available.</p>
+<div class="code-block">
+<span class="cmd">df -i</span> <span class="comment"># Check IUse% — if 100%, inode exhaustion</span>
+<span class="cmd">find / -xdev -printf '%h\n' | sort | uniq -c | sort -rn | head -20</span>
+<span class="comment"># Fix:</span>
+<span class="cmd">rm -rf /var/spool/exim/input/*</span>
+<span class="cmd">find /tmp -mtime +1 -type f -delete</span>
+<span class="cmd">find /var/log -name "*.log" -mtime +30 -delete</span></div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">04</span><span class="q-badge badge-critical">Error</span><span class="q-text">"Cannot allocate memory"</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Cause &amp; Fix</div>
+<p class="answer-text"><strong>Cause:</strong> System is out of physical RAM and swap, OOM killer is active, or virtual address space is exhausted.</p>
+<div class="code-block">
+<span class="cmd">free -h</span> <span class="comment"># Available RAM and swap</span>
+<span class="cmd">vmstat 1 3</span> <span class="comment"># Check si/so columns</span>
+<span class="cmd">dmesg | grep -i 'oom\|kill'</span> <span class="comment"># OOM killer activity</span>
+<span class="cmd">ps -eo pid,%mem,cmd --sort=-%mem | head -10</span>
+<span class="comment"># Quick fix — add temporary swap:</span>
+<span class="cmd">dd if=/dev/zero of=/swapfile bs=1G count=4</span>
+<span class="cmd">mkswap /swapfile &amp;&amp; chmod 600 /swapfile</span>
+<span class="cmd">swapon /swapfile</span>
+<span class="comment"># Kill top memory consumer (after app team approval):</span>
+<span class="cmd">kill -9 &lt;PID&gt;</span></div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">05</span><span class="q-badge badge-critical">Error</span><span class="q-text">"device is busy" when unmounting filesystem</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Cause &amp; Fix</div>
+<p class="answer-text"><strong>Cause:</strong> Files or processes are still using the filesystem — open file handles, processes with working directory inside the mount.</p>
+<div class="code-block">
+<span class="cmd">fuser -mv /mountpoint</span> <span class="comment"># Show all processes using the mount</span>
+<span class="cmd">lsof /mountpoint</span> <span class="comment"># Open files on the filesystem</span>
+<span class="comment"># Fix — close application cleanly, then unmount:</span>
+<span class="cmd">fuser -km /mountpoint</span> <span class="comment"># Kill processes (use with care!)</span>
+<span class="cmd">umount /mountpoint</span>
+<span class="comment"># Lazy unmount — detaches when all handles close:</span>
+<span class="cmd">umount -l /mountpoint</span></div>
+</div>
+</div>
+<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">06</span><span class="q-badge badge-critical">Error</span><span class="q-text">"LVM Volume not found / inactive"</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Cause &amp; Fix</div>
+<div class="code-block">
+<span class="cmd">pvs -a</span> <span class="comment"># Check PVs including inactive</span>
+<span class="cmd">lsblk</span> <span class="comment"># Check block device availability</span>
+<span class="cmd">pvscan</span> <span class="comment"># Rescan for PVs</span>
+<span class="comment"># Activate VG:</span>
+<span class="cmd">vgchange -ay vg_data</span>
+<span class="cmd">vgchange -ay</span> <span class="comment"># All VGs</span>
+<span class="comment"># If moved from another system:</span>
+<span class="cmd">vgimport vg_data &amp;&amp; vgchange -ay vg_data</span></div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-vmware">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#60a5fa22,#3b82f622)">☁️</div>
+<div>
+<div class="page-title">VMware Administration</div>
+<div class="page-desc">VM snapshots, templates, vMotion, VMware Tools, CPU ready analysis, ESXi host maintenance, and performance troubleshooting.</div>
+</div>
+</div>
+</div>
+<div id="cards-vmware">
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How do you take a VM snapshot and what are the rules?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># PowerCLI — Create snapshot:</span>
+<span class="cmd">New-Snapshot -VM 'server01' -Name 'Pre-Patch-2025-10-15' -Quiesce -Memory:$false</span>
+<span class="comment"># Revert (rollback):</span>
+<span class="cmd">Set-VM -VM 'server01' -Snapshot (Get-Snapshot -VM 'server01' -Name 'Pre-Patch-2025-10-15')</span>
+<span class="comment"># Delete snapshot (after validating stability):</span>
+<span class="cmd">Remove-Snapshot -Snapshot (Get-Snapshot -VM 'server01' -Name 'Pre-Patch') -Confirm:$false</span>
+<span class="comment"># List all snapshots:</span>
+<span class="cmd">Get-Snapshot -VM 'server01'</span>
+<span class="comment"># Consolidate snapshots (if needed):</span>
+<span class="comment"># vCenter: Right-click VM → Snapshots → Consolidate</span></div>
+<div class="warn-box">Maximum snapshot age in production: 48 hours. Stale snapshots grow indefinitely (redirect-on-write) and can fill datastores. Never run production VMs in snapshot state long-term.</div>
+<div class="info-box" style="margin-top:0.5rem"><strong>Quiesce option:</strong> Freezes guest filesystem I/O before snapshot for consistency — requires VMware Tools to be installed and running.</div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What if VM snapshot fails?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Cause</th><th>Fix</th></tr>
+<tr><td>Datastore out of space</td><td class="green">Free datastore space, or extend; check Storage → Datastores → Monitor</td></tr>
+<tr><td>VMware Tools not installed/old</td><td class="green">Install/update open-vm-tools inside guest OS</td></tr>
+<tr><td>Snapshot consolidation needed</td><td class="green">Right-click VM → Snapshots → Consolidate</td></tr>
+<tr><td>Too many existing snapshots</td><td class="yellow">Delete old snapshots first (max recommended: 3-4)</td></tr>
+<tr><td>Backup running (disk locked)</td><td class="yellow">Wait for NetBackup/Veeam backup to complete</td></tr>
+<tr><td>Guest OS quiesce failure</td><td class="green">Check /var/log/vmware-vmsvc.log inside guest</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># Check VMware Tools inside guest:</span>
+<span class="cmd">systemctl status vmtoolsd</span>
+<span class="cmd">vmware-toolbox-cmd -v</span>
+<span class="comment"># Update VMware Tools:</span>
+<span class="cmd">yum update open-vm-tools -y</span></div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What is vMotion? Explain the types.</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text">vMotion is VMware's live migration technology — moves a running VM from one ESXi host/datastore to another with zero downtime (typically &lt; 1 second interruption).</p>
+<table class="data-table">
+<tr><th>Type</th><th>Moves</th><th>Requirement</th></tr>
+<tr><td>vMotion</td><td>CPU + Memory (compute)</td><td>Shared storage between hosts</td></tr>
+<tr><td>Storage vMotion</td><td>VM disk files</td><td>VM stays on same host</td></tr>
+<tr><td>Enhanced vMotion</td><td>Compute + Storage</td><td>No shared storage needed</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># Requirements:</span>
+<span class="comment"># - Shared storage (SAN/NFS) accessible by both hosts</span>
+<span class="comment"># - Dedicated VMkernel port with vMotion enabled (10GbE recommended)</span>
+<span class="comment"># - Compatible CPU families or EVC mode on cluster</span>
+<span class="comment"># - vCenter required (cannot do vMotion from ESXi directly)</span>
+<span class="comment"># PowerCLI — Migrate VM:</span>
+<span class="cmd">Move-VM -VM 'server01' -Destination (Get-VMHost 'esxi02')</span></div>
+<div class="tip-box">Banking use case: use vMotion to evacuate all VMs from an ESXi host before patching it. DRS automates vMotion for load balancing across the cluster.</div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">04</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Can you explain about VM templates?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text">A VM template is a master golden image for deploying new VMs consistently. It is a non-runnable copy of a configured VM.</p>
+<table class="data-table">
+<tr><th>Item</th><th>Template</th><th>Snapshot</th><th>Clone</th></tr>
+<tr><td>Purpose</td><td class="green">New VM deployments</td><td class="yellow">Rollback point</td><td>Copy for testing</td></tr>
+<tr><td>Runnable?</td><td class="red">No</td><td class="green">Yes (parent VM)</td><td class="green">Yes</td></tr>
+<tr><td>Uses</td><td>Gold image for fleet</td><td>Pre-change safety net</td><td>Dev/test copies</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># Convert VM to template:</span>
+<span class="comment"># vCenter: Right-click VM → Template → Convert to Template</span>
+<span class="comment"># PowerCLI — Deploy from template:</span>
+<span class="cmd">New-VM -Name 'newserver01' -Template 'RHEL8-Gold-Template' -VMHost 'esxi01' -Datastore 'DS01'</span>
+<span class="comment"># Update template (quarterly):</span>
+<span class="comment"># 1. Convert template back to VM</span>
+<span class="comment"># 2. Power on → apply patches → harden → power off</span>
+<span class="comment"># 3. Convert back to template</span>
+<span class="comment"># 4. Document template version in naming convention</span></div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">05</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain about VMware Tools — why is it important?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Function</th><th>Why It Matters</th></tr>
+<tr><td>Time synchronization</td><td class="green">Critical for Kerberos, Oracle RAC, banking timestamps</td></tr>
+<tr><td>Quiesced snapshots</td><td class="green">Consistent backup — requires VMware Tools</td></tr>
+<tr><td>Graceful shutdown/restart</td><td class="green">vCenter can cleanly shut down VM (not force power off)</td></tr>
+<tr><td>Memory balloon driver</td><td class="yellow">Hypervisor reclaims unused guest memory under pressure</td></tr>
+<tr><td>VMXNET3 NIC driver</td><td class="green">Paravirtual — much faster than emulated e1000</td></tr>
+<tr><td>PVSCSI driver</td><td class="green">High I/O performance for Oracle/SQL Server</td></tr>
+<tr><td>Guest metrics</td><td class="green">vCenter shows OS-level CPU/memory/disk inside guest</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># Install (preferred — open-vm-tools, in standard repos):</span>
+<span class="cmd">yum install open-vm-tools -y</span>
+<span class="cmd">systemctl enable vmtoolsd --now</span>
+<span class="comment"># Verify:</span>
+<span class="cmd">systemctl status vmtoolsd</span>
+<span class="cmd">vmware-toolbox-cmd -v</span></div>
+</div>
+</div>
+<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">06</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">VMware vCenter shows 90% CPU Ready on a VM. The application team says it's slow. Diagnose and resolve.</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text"><strong>CPU Ready</strong> means the vCPU is ready to run but the physical CPU is not available — the hypervisor host is overcommitted.</p>
+<div class="code-block">
+<span class="comment"># In esxtop (on ESXi host) — press 'v' for VM view:</span>
+<span class="comment"># %RDY &gt; 5% = concerning, &gt; 20% = severe</span>
+<span class="comment"># %CSTP = co-stop for multi-vCPU VMs</span>
+<span class="comment"># At OS level — CPU Ready shows as steal time:</span>
+<span class="cmd">top</span> <span class="comment"># st% column (steal time) in CPU stats</span>
+<span class="comment"># PowerCLI — check CPU Ready stats:</span>
+<span class="cmd">Get-Stat -Entity $vm -Stat cpu.ready.summation -Start (Get-Date).AddHours(-4)</span></div>
+<ul class="step-list">
+<li>Check if the ESXi host cluster is overcommitted (too many vCPUs vs physical cores)</li>
+<li>Coordinate with VMware team to vMotion the VM to a less-loaded host immediately</li>
+<li>Consider reducing vCPU count — fewer vCPUs = less co-scheduling pressure (counterintuitive but effective)</li>
+<li>Escalate for capacity addition if entire cluster is consistently overloaded</li>
+<li>Document correlation between CPU Ready % and application response time for capacity report</li>
+</ul>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-solaris">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#fbbf2422,#f59e0b22)">🌞</div>
+<div>
+<div class="page-title">Oracle Solaris 10/11 &amp; ZFS</div>
+<div class="page-desc">Solaris administration, zones management, SMF, ZFS filesystem, IPS packaging, and RBAC configuration.</div>
+</div>
+</div>
+</div>
+<div id="cards-solaris">
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What are the key administrative tasks you perform on Solaris 10 and 11?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Task</th><th>Solaris 10</th><th>Solaris 11</th></tr>
+<tr><td>Patching</td><td class="mono">patchadd, patchrm</td><td class="mono">pkg update</td></tr>
+<tr><td>Package install</td><td class="mono">pkgadd</td><td class="mono">pkg install</td></tr>
+<tr><td>Service management</td><td class="mono">svcadm, svcs</td><td class="mono">svcadm, svcs (same)</td></tr>
+<tr><td>Zones</td><td class="mono">zoneadm, zonecfg</td><td class="mono">zoneadm, zonecfg</td></tr>
+<tr><td>Network</td><td class="mono">ifconfig, ndd</td><td class="mono">ipadm, dladm</td></tr>
+<tr><td>ZFS</td><td class="mono">zfs, zpool</td><td class="mono">zfs, zpool (same)</td></tr>
+<tr><td>Deployment</td><td class="mono">JumpStart</td><td class="mono">AI (Automated Installer)</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># SMF — Service Management Facility:</span>
+<span class="cmd">svcs -a</span> <span class="comment"># All services status</span>
+<span class="cmd">svcs -xv svc:/network/ssh:default</span> <span class="comment"># Detailed service info</span>
+<span class="cmd">svcadm enable svc:/network/ssh:default</span>
+<span class="cmd">svcadm restart svc:/network/ssh:default</span>
+<span class="cmd">svcadm disable svc:/network/ssh:default</span>
+<span class="comment"># Zones management:</span>
+<span class="cmd">zoneadm list -cv</span> <span class="comment"># List all zones with status</span>
+<span class="cmd">zoneadm -z zone01 boot</span> <span class="comment"># Boot a zone</span>
+<span class="cmd">zlogin zone01</span> <span class="comment"># Login to zone console</span>
+<span class="cmd">zoneadm -z zone01 halt</span> <span class="comment"># Halt a zone</span>
+<span class="comment"># Network (Solaris 11):</span>
+<span class="cmd">ipadm show-addr</span> <span class="comment"># Show IP addresses</span>
+<span class="cmd">dladm show-link</span> <span class="comment"># Show network links</span></div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain ZFS on Solaris — key features and how you use them.</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Feature</th><th>Benefit</th><th>Command</th></tr>
+<tr><td>Copy-on-Write</td><td>Crash consistency, instant recovery</td><td class="mono">Built-in</td></tr>
+<tr><td>Snapshots</td><td>Instant, space-efficient backups</td><td class="mono">zfs snapshot pool/ds@snap</td></tr>
+<tr><td>Clones</td><td>Writable copy of snapshot</td><td class="mono">zfs clone pool/ds@snap pool/new</td></tr>
+<tr><td>Compression</td><td>2-4x storage savings for logs</td><td class="mono">zfs set compression=lz4</td></tr>
+<tr><td>Quotas</td><td>Capacity management per dataset</td><td class="mono">zfs set quota=100G</td></tr>
+<tr><td>RAIDZ</td><td>Native disk redundancy</td><td class="mono">zpool create -o ashift=12 raidz2</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># ZFS pool and dataset management:</span>
+<span class="cmd">zpool status</span> <span class="comment"># Pool health</span>
+<span class="cmd">zpool iostat -v 1</span> <span class="comment"># I/O per disk</span>
+<span class="cmd">zfs list</span> <span class="comment"># List all datasets with space</span>
+<span class="cmd">zfs list -t snapshot</span> <span class="comment"># List snapshots</span>
+<span class="comment"># Create and manage snapshots:</span>
+<span class="cmd">zfs snapshot data/app@pre-deploy-2024-10-15</span>
+<span class="cmd">zfs rollback data/app@pre-deploy-2024-10-15</span> <span class="comment"># Instant rollback!</span>
+<span class="cmd">zfs destroy data/app@pre-deploy-2024-10-15</span> <span class="comment"># Remove snapshot</span>
+<span class="comment"># Set compression and quotas:</span>
+<span class="cmd">zfs set compression=lz4 data/logs</span>
+<span class="cmd">zfs set quota=200G data/app</span>
+<span class="cmd">zfs set reservation=50G data/app</span>
+<span class="comment"># Scrub (verify data integrity):</span>
+<span class="cmd">zpool scrub data</span>
+<span class="cmd">zpool status data</span> <span class="comment"># Check scrub results</span></div>
+<div class="tip-box">ZFS snapshot + rollback is one of the most powerful features for OS admins — instant deployment rollback without backup restore time. Mention real-world use: rolling back a failed application deployment in seconds.</div>
+</div>
+</div>
+<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">A Solaris zone is consuming excessive CPU/memory, impacting other zones. How do you resolve?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="code-block">
+<span class="comment"># Identify which zone is consuming resources:</span>
+<span class="cmd">prstat -Z</span> <span class="comment"># Zone-level resource summary</span>
+<span class="cmd">zonestat 1</span> <span class="comment"># Per-zone resource statistics</span>
+<span class="comment"># Identify which process inside the zone:</span>
+<span class="cmd">prstat -z zone01 1</span>
+<span class="comment"># Apply immediate CPU cap (from global zone):</span>
+<span class="cmd">prctl -n zone.cpu-cap -v 200 -i zone zone01</span> <span class="comment"># Limit to 200% (2 CPUs)</span>
+<span class="comment"># Permanent — configure resource controls via zonecfg:</span>
+<span class="cmd">zonecfg -z zone01</span>
+<span class="comment">  set cpu-shares=10</span>
+<span class="comment">  add capped-cpu</span>
+<span class="comment">  set ncpus=2</span>
+<span class="comment">  end</span>
+<span class="comment">  add capped-memory</span>
+<span class="comment">  set physical=4g</span>
+<span class="comment">  set swap=8g</span>
+<span class="comment">  end</span>
+<span class="comment">  commit</span>
+<span class="cmd">zoneadm -z zone01 apply</span> <span class="comment"># Apply without zone reboot</span></div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-aix">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#a78bfa22,#8b5cf622)">🔵</div>
+<div>
+<div class="page-title">IBM AIX Administration</div>
+<div class="page-desc">AIX LVM, NIM for deployments and patching, PowerHA/HACMP clusters, performance monitoring, and IBM-specific tools.</div>
+</div>
+</div>
+</div>
+<div id="cards-aix">
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain AIX's LVM architecture and how it differs from Linux LVM.</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<table class="data-table">
+<tr><th>Concept</th><th>Linux LVM</th><th>AIX LVM</th></tr>
+<tr><td>Allocation unit</td><td>Physical Extents (PE) — 4MB default, fixed</td><td>Physical Partitions (PP) — 4–128MB, configurable per VG</td></tr>
+<tr><td>VG types</td><td>Standard only</td><td>Original (32 PVs), Big (128), Scalable (1024)</td></tr>
+<tr><td>Mirroring</td><td>Via RAID or dm-mirror</td><td class="green">Native — mklvcopy</td></tr>
+<tr><td>Metadata</td><td>/etc/lvm/</td><td class="mono">ODM (Object Data Manager)</td></tr>
+<tr><td>Filesystem</td><td>ext4, XFS</td><td class="mono">JFS2 (preferred)</td></tr>
+</table>
+<div class="code-block">
+<span class="comment"># AIX LVM commands:</span>
+<span class="cmd">lsvg</span> <span class="comment"># List Volume Groups</span>
+<span class="cmd">lsvg -l rootvg</span> <span class="comment"># List LVs in VG</span>
+<span class="cmd">lspv</span> <span class="comment"># List Physical Volumes (hdisks)</span>
+<span class="cmd">extendvg rootvg hdisk1</span> <span class="comment"># Add disk to VG</span>
+<span class="cmd">mklv -t jfs2 datavg 100</span> <span class="comment"># Create LV (100 PPs)</span>
+<span class="cmd">chfs -a size=+1G /data</span> <span class="comment"># Extend filesystem</span>
+<span class="comment"># AIX LVM mirroring:</span>
+<span class="cmd">mklvcopy lv_data 2</span> <span class="comment"># Create mirror copy</span>
+<span class="cmd">syncvg datavg</span> <span class="comment"># Sync mirror after disk replacement</span>
+<span class="comment"># Check ODM consistency:</span>
+<span class="cmd">lsvgdb rootvg</span>
+<span class="comment"># AIX performance monitoring:</span>
+<span class="cmd">topas</span> <span class="comment"># AIX equivalent of top</span>
+<span class="cmd">nmon</span> <span class="comment"># Comprehensive performance tool</span>
+<span class="cmd">errpt -a | head -50</span> <span class="comment"># Hardware/software error report</span></div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What is NIM (Network Installation Management) and how have you used it?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<p class="answer-text">NIM is AIX's network-based infrastructure management system for OS installation, cloning, and updates across LPAR environments.</p>
+<div class="code-block">
+<span class="comment"># NIM resources:</span>
+<span class="comment"># LPP_SOURCE — installation media</span>
+<span class="comment"># SPOT       — Shared Product Object Tree (network boot image)</span>
+<span class="comment"># MKSYSB     — system backup images for cloning</span>
+<span class="comment"># Check NIM master status:</span>
+<span class="cmd">lsnim -l</span> <span class="comment"># List all NIM objects</span>
+<span class="cmd">lsnim -t lpp_source</span> <span class="comment"># List available installation sources</span>
+<span class="comment"># Update client via NIM:</span>
+<span class="cmd">nim -o update -a lpp_source=lpp_7200_03 -a fixes=all lpar01</span>
+<span class="comment"># Zero-downtime patching with alt_disk_install:</span>
+<span class="cmd">alt_disk_install -b bosboot -d hdisk1</span> <span class="comment"># Install new AIX on alternate disk</span>
+<span class="comment"># System runs on original disk while patching alternate disk</span>
+<span class="comment"># Rollback: simply boot from original disk if new disk fails</span>
+<span class="comment"># Create system backup (MKSYSB):</span>
+<span class="cmd">mksysb -i /dev/rmt0</span> <span class="comment"># Backup to tape</span>
+<span class="cmd">mksysb /tmp/server01.mksysb</span> <span class="comment"># Backup to file</span></div>
+<div class="tip-box">alt_disk_install is AIX's unique zero-downtime upgrade feature — the system continues running on the original disk while the new TL/SP is installed on an alternate disk. Instant rollback by simply booting from the original.</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-itsm">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#34d39922,#10b98122)">📋</div>
+<div>
+<div class="page-title">ITSM, Incident Management &amp; Change Control</div>
+<div class="page-desc">ITIL processes, major incident handling, change management, SLA tracking, and client reporting in a banking environment.</div>
+</div>
+</div>
+</div>
+<div id="cards-itsm">
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How do you handle a Major Incident (P1) involving multiple teams?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<ul class="step-list">
+<li>Join the P1 bridge call immediately and declare technical lead for the OS layer</li>
+<li>Perform initial triage within first 15 minutes: server health, network, service status, recent changes</li>
+<li>Maintain a live incident timeline — document every action with timestamps</li>
+<li>Coordinate with App, DBA, Network, and Storage teams — prevent siloed working</li>
+<li>Apply 5-Why methodology to drill to root cause while simultaneously restoring service</li>
+<li>Update the incident manager every 15–30 minutes with status</li>
+<li>After resolution: draft RCA document and present PIR within 48 hours</li>
+</ul>
+<table class="data-table" style="margin-top:0.5rem">
+<tr><th>Priority</th><th>Response Time</th><th>Resolution Target</th><th>Update Frequency</th></tr>
+<tr><td class="red">P1 — Critical</td><td>15 minutes</td><td>4 hours</td><td>Every 15–30 min</td></tr>
+<tr><td class="yellow">P2 — High</td><td>30 minutes</td><td>8 hours</td><td>Every 1 hour</td></tr>
+<tr><td>P3 — Medium</td><td>4 hours</td><td>24 hours</td><td>Daily</td></tr>
+<tr><td class="green">P4 — Low</td><td>Next business day</td><td>72 hours</td><td>On request</td></tr>
+</table>
+</div>
+</div>
+<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">02</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">A developer asks you to open a firewall port on production urgently with no change ticket. What do you do?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<ul class="step-list">
+<li>Empathize with the urgency but firmly explain that production changes require a change ticket — this is compliance, not bureaucracy</li>
+<li>Guide the developer/manager to raise an Emergency Change Request (ECR) immediately — can be approved in 30–60 minutes</li>
+<li>While ticket is being raised, collect technical details: source IP, destination IP, port, protocol, business justification — ready to implement the moment approval arrives</li>
+<li class="danger">Do NOT make the change without an approved ticket — this exposes the bank to audit risk and potential security breach</li>
+<li>Once approved: implement, document in the ticket, update firewall rule inventory, and schedule post-implementation review</li>
+</ul>
+<div class="warn-box">This is a test of your process discipline under pressure. The answer is ALWAYS: raise the ECR first, then implement. Your job security and the bank's compliance depend on it.</div>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Are you using any monitoring tools? What alerts do you usually get?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<div class="sub-title">Tools Used:</div>
+<ul class="step-list">
+<li>IBM Tivoli Monitoring (ITM) / Netcool — enterprise monitoring in banking</li>
+<li>Nagios / Icinga — threshold-based service and resource alerting</li>
+<li>Zabbix — agent-based monitoring with dashboards</li>
+<li>HP Operations Manager (HPOM) — event correlation</li>
+<li>vCenter performance alerts — VMware-specific metrics</li>
+<li>Custom shell scripts + cron + mailx — lightweight targeted monitoring</li>
+</ul>
+<div class="sub-title">Common Alerts &amp; Actions:</div>
+<table class="data-table">
+<tr><th>Alert</th><th>Threshold</th><th>My Action</th></tr>
+<tr><td>CPU High</td><td>&gt;85% sustained 5min</td><td>Identify top process, escalate to app team</td></tr>
+<tr><td>Memory High</td><td>&gt;90%</td><td>Check for leak, add swap temporarily</td></tr>
+<tr><td>Disk Warning</td><td>&gt;80%</td><td>du -sh, clean or extend LV</td></tr>
+<tr><td class="red">Disk Critical</td><td>&gt;90%</td><td>Immediate cleanup, alert app team</td></tr>
+<tr><td class="red">Filesystem Full</td><td>100%</td><td>Emergency cleanup, P1 ticket</td></tr>
+<tr><td>Inode Exhaustion</td><td>&gt;90% IUse</td><td>Find small file consumer, clean up</td></tr>
+<tr><td>Service Down</td><td>Immediate</td><td>systemctl restart, RCA if recurring</td></tr>
+<tr><td>Backup Failed</td><td>Next morning</td><td>Retry, fix root cause, document</td></tr>
+<tr><td>SSH Brute Force</td><td>&gt;10 fails/min</td><td>Check secure log, block source IP</td></tr>
+</table>
+</div>
+</div>
+<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-header"><span class="q-num">04</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How has your ITIL certification influenced the way you work?</span><span class="q-chevron">▾</span></div>
+<div class="q-body">
+<div class="answer-label">Answer</div>
+<ul class="step-list">
+<li><strong>Incident Management:</strong> I prioritize tickets by impact × urgency matrix, not by who shouts loudest. SLA adherence is tracked and reported weekly.</li>
+<li><strong>Change Management:</strong> All production changes go through RFC → CAB → Implementation → PIR. No exceptions — this protects both the bank and me personally.</li>
+<li><strong>Problem Management:</strong> When I see the same incident recurring, I raise a Problem ticket to find and eliminate the root cause. Example: I noticed 80% of disk-full tickets on a cluster came from unmanaged log growth — implemented systematic log rotation that eliminated the recurring incidents entirely.</li>
+<li><strong>Continual Service Improvement (CSI):</strong> I track SLA trends monthly and identify improvement opportunities. Automation initiatives I've implemented have reduced manual ticket handling by 40%.</li>
+<li><strong>Knowledge Management:</strong> Every resolved incident gets documented in the knowledge base with RCA and resolution steps — reduces time-to-resolve for repeat issues.</li>
+</ul>
+<div class="tip-box">Connect ITIL principles to real examples — "I applied ITIL problem management when..." shows genuine application, not just passing the exam.</div>
+</div>
+</div>
+</div>
+</div><div class="content-section section-card" id="tab-quickref">
+<div class="page-header">
+<div class="page-header-row">
+<div class="page-icon" style="background:linear-gradient(135deg,#00d4ff22,#06b6d422)">⚡</div>
+<div>
+<div class="page-title">Quick Command Reference</div>
+<div class="page-desc">Essential commands organized by category for rapid pre-interview review.</div>
+</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+<div style="font-family:var(--mono);font-size:0.7rem;color:var(--accent3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Performance</div>
+<div class="code-block" style="margin:0">
+<span class="cmd">top / htop</span> <span class="comment"># CPU/memory</span>
+<span class="cmd">vmstat 1 5</span> <span class="comment"># System overview</span>
+<span class="cmd">iostat -xz 1 3</span> <span class="comment"># Disk I/O</span>
+<span class="cmd">iotop -o</span> <span class="comment"># Per-process I/O</span>
+<span class="cmd">sar -A</span> <span class="comment"># Historical stats</span>
+<span class="cmd">mpstat -P ALL 1</span> <span class="comment"># Per-CPU</span>
+<span class="cmd">pidstat -d 1</span> <span class="comment"># Per-process I/O</span>
+<span class="cmd">free -h</span> <span class="comment"># Memory</span>
+<span class="cmd">uptime</span> <span class="comment"># Load average</span></div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+<div style="font-family:var(--mono);font-size:0.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Storage / LVM</div>
+<div class="code-block" style="margin:0">
+<span class="cmd">pvs / pvcreate</span> <span class="comment"># Physical volumes</span>
+<span class="cmd">vgs / vgextend</span> <span class="comment"># Volume groups</span>
+<span class="cmd">lvs / lvextend -r</span> <span class="comment"># Logical volumes</span>
+<span class="cmd">vgchange -ay</span> <span class="comment"># Activate VGs</span>
+<span class="cmd">xfs_growfs /mnt</span> <span class="comment"># Grow XFS</span>
+<span class="cmd">resize2fs /dev/lv</span> <span class="comment"># Grow ext4</span>
+<span class="cmd">df -h / df -i</span> <span class="comment"># Space / inodes</span>
+<span class="cmd">multipath -ll</span> <span class="comment"># Multipath status</span>
+<span class="cmd">fsck -y / xfs_repair</span> <span class="comment"># Repair FS</span></div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+<div style="font-family:var(--mono);font-size:0.7rem;color:var(--accent5);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Security</div>
+<div class="code-block" style="margin:0">
+<span class="cmd">sestatus / getenforce</span> <span class="comment"># SELinux</span>
+<span class="cmd">ausearch -m avc</span> <span class="comment"># SELinux denials</span>
+<span class="cmd">audit2why / audit2allow</span>
+<span class="cmd">grep sudo /var/log/secure</span>
+<span class="cmd">faillock --user john</span> <span class="comment"># Failed logins</span>
+<span class="cmd">faillock --user j --reset</span>
+<span class="cmd">chage -l username</span> <span class="comment"># Password aging</span>
+<span class="cmd">visudo</span> <span class="comment"># Edit sudoers</span>
+<span class="cmd">sudo -l -U john</span> <span class="comment"># John's sudo rights</span></div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+<div style="font-family:var(--mono);font-size:0.7rem;color:var(--accent2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Networking</div>
+<div class="code-block" style="margin:0">
+<span class="cmd">ip addr / ip route</span> <span class="comment"># IP configuration</span>
+<span class="cmd">ss -tuln</span> <span class="comment"># Listening ports</span>
+<span class="cmd">netstat -s</span> <span class="comment"># Network stats</span>
+<span class="cmd">dig / nslookup / host</span> <span class="comment"># DNS</span>
+<span class="cmd">tcpdump -i eth0 port 80</span>
+<span class="cmd">firewall-cmd --list-all</span>
+<span class="cmd">nmcli con mod eth0 ...</span>
+<span class="cmd">cat /proc/net/bonding/bond0</span>
+<span class="cmd">ethtool eth0</span> <span class="comment"># NIC status</span></div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+<div style="font-family:var(--mono);font-size:0.7rem;color:var(--accent4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Boot / Kernel</div>
+<div class="code-block" style="margin:0">
+<span class="cmd">uname -r</span> <span class="comment"># Kernel version</span>
+<span class="cmd">grub2-install /dev/sda</span>
+<span class="cmd">grub2-mkconfig -o ...</span> <span class="comment"># Regenerate GRUB</span>
+<span class="cmd">dracut -f $(uname -r)</span> <span class="comment"># Rebuild initramfs</span>
+<span class="cmd">journalctl -b -1</span> <span class="comment"># Previous boot log</span>
+<span class="cmd">journalctl -p err -n 50</span>
+<span class="cmd">sysctl -a / sysctl -p</span>
+<span class="cmd">dmesg | tail -50</span>
+<span class="cmd">systemctl status kdump</span></div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+<div style="font-family:var(--mono);font-size:0.7rem;color:var(--accent6);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">User Admin</div>
+<div class="code-block" style="margin:0">
+<span class="cmd">useradd / usermod / userdel</span>
+<span class="cmd">groupadd / gpasswd</span>
+<span class="cmd">passwd / chage</span> <span class="comment"># Password mgmt</span>
+<span class="cmd">who / w / last</span> <span class="comment"># Logged-in users</span>
+<span class="cmd">id username</span> <span class="comment"># User info</span>
+<span class="cmd">cat /proc/&lt;PID&gt;/limits</span> <span class="comment"># Process limits</span>
+<span class="cmd">lsof -u username</span> <span class="comment"># User's open files</span>
+<span class="cmd">ulimit -a</span> <span class="comment"># Session limits</span></div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+<div style="font-family:var(--mono);font-size:0.7rem;color:var(--accent3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Solaris</div>
+<div class="code-block" style="margin:0">
+<span class="cmd">svcs -a / svcadm</span> <span class="comment"># SMF services</span>
+<span class="cmd">zoneadm list -cv</span> <span class="comment"># Zone status</span>
+<span class="cmd">zlogin / zonecfg</span>
+<span class="cmd">zfs list / zpool status</span>
+<span class="cmd">zfs snapshot ds@snap</span>
+<span class="cmd">zfs rollback ds@snap</span>
+<span class="cmd">prstat -Z</span> <span class="comment"># Per-zone stats</span>
+<span class="cmd">pkg update</span> <span class="comment"># S11 patching</span>
+<span class="cmd">patchadd</span> <span class="comment"># S10 patching</span></div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+<div style="font-family:var(--mono);font-size:0.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">AIX</div>
+<div class="code-block" style="margin:0">
+<span class="cmd">lsvg / lspv / lslv</span> <span class="comment"># LVM info</span>
+<span class="cmd">extendvg / mklv</span> <span class="comment"># Extend storage</span>
+<span class="cmd">chfs -a size=+1G /data</span>
+<span class="cmd">topas / nmon</span> <span class="comment"># Performance</span>
+<span class="cmd">errpt -a</span> <span class="comment"># Error report</span>
+<span class="cmd">oslevel -s</span> <span class="comment"># TL/SP level</span>
+<span class="cmd">smitty update_all</span> <span class="comment"># Apply updates</span>
+<span class="cmd">alt_disk_install</span> <span class="comment"># Zero-downtime patch</span>
+<span class="cmd">lsnim -l</span> <span class="comment"># NIM objects</span></div>
+</div>
+</div>
+</div>
+
+  </main>
+
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#tab-overview" class="toc-link">Overview</a><a href="#tab-patching" class="toc-link">Patching</a><a href="#tab-boot" class="toc-link">Boot</a><a href="#tab-lvm" class="toc-link">Lvm</a><a href="#tab-security" class="toc-link">Security</a><a href="#tab-performance" class="toc-link">Performance</a><a href="#tab-networking" class="toc-link">Networking</a><a href="#tab-scripting" class="toc-link">Scripting</a><a href="#tab-errors" class="toc-link">Errors</a><a href="#tab-vmware" class="toc-link">Vmware</a><a href="#tab-solaris" class="toc-link">Solaris</a><a href="#tab-aix" class="toc-link">Aix</a><a href="#tab-itsm" class="toc-link">Itsm</a><a href="#tab-quickref" class="toc-link">Quickref</a></nav>
+</div>
+
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer id="site-footer">
+  <span>StudyHub — Technical Reference Library</span>
+  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+</footer>
+
+<script>
+// Progress + back-to-top
+const pr = document.getElementById('prog');
+const bt = document.getElementById('btt');
+addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const m = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+  if (pr) pr.style.width = (m > 0 ? Math.min(s / m * 100, 100) : 0) + '%';
+  if (bt) bt.classList.toggle('vis', s > 280);
+}, {passive: true});
+
+// Nav toggle
+function toggleNav() {
+  const nav = document.getElementById('site-nav');
+  const ov = document.getElementById('mob-ov');
+  nav.classList.toggle('open');
+  ov.classList.toggle('on');
+}
+
+// Active ToC highlighting
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('.content-section[id]');
+function updateToc() {
+  const top = window.scrollY + 80;
+  let cur = null;
+  sections.forEach(s => { if (s.offsetTop <= top) cur = s.id; });
+  tocLinks.forEach(l => {
+    l.classList.toggle('active-toc', l.getAttribute('href') === '#' + cur);
+  });
+}
+if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCNA Study Notes — StudyHub</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* ── site-wide overrides ── */
+:root { --topbar-h:58px; --sidebar-w:240px; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* topbar */
+#site-topbar {
+  position:fixed; top:0; left:0; right:0; z-index:9000;
+  height:var(--topbar-h); background:var(--navy);
+  display:flex; align-items:center; padding:0 20px; gap:14px;
+  border-bottom:2px solid var(--blue);
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo span { color:var(--accent); }
+.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.topbar-spacer { flex:1; }
+#menu-btn { display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
+
+/* progress bar */
+#prog { position:fixed; top:var(--topbar-h); left:0; height:3px; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--sky)); z-index:8999;
+  transition:width .08s linear; pointer-events:none; }
+
+/* back-to-top */
+#btt { position:fixed; bottom:24px; right:20px; width:42px; height:42px;
+  background:var(--blue); color:#fff; border:none; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; z-index:8998; opacity:0; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(27,79,138,.45); transition:opacity .2s,transform .2s; }
+#btt.vis { opacity:1; pointer-events:auto; }
+#btt:hover { background:var(--mid); transform:translateY(-2px); }
+
+/* layout */
+.site-body { display:flex; margin-top:var(--topbar-h); flex:1; min-height:calc(100vh - var(--topbar-h)); }
+
+/* left sidebar (page nav) */
+#site-nav {
+  width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.nav-sec { padding:10px 16px 2px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); }
+.nav-link { display:flex; align-items:center; gap:8px; padding:9px 16px;
+  color:var(--text2); text-decoration:none; font-size:.84rem; border-left:3px solid transparent;
+  transition:all .12s; }
+.nav-link:hover { background:rgba(255,255,255,.05); color:var(--text); border-left-color:var(--border2); }
+.nav-link.active { background:rgba(240,165,0,.09); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
+
+/* right toc sidebar */
+#toc-nav {
+  width:220px; flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  padding:16px 0; display:flex; flex-direction:column;
+}
+.toc-head { padding:0 16px 8px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); border-bottom:1px solid var(--border); margin-bottom:4px; }
+.toc-link { display:block; padding:6px 16px; color:var(--text3); text-decoration:none;
+  font-size:.78rem; line-height:1.35; transition:color .12s;
+  border-left:2px solid transparent; }
+.toc-link:hover { color:var(--sky); border-left-color:var(--sky); }
+.toc-link.h3 { padding-left:26px; font-size:.72rem; }
+
+/* main content */
+#main-content {
+  flex:1; padding:32px 40px; overflow-x:hidden; min-width:0;
+}
+.page-hero {
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.page-hero h1 { margin-bottom:6px; }
+.page-hero p { color:var(--text2); font-size:.95rem; margin:0; }
+.hero-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; }
+.badge-blue { background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:var(--green); border:1px solid rgba(16,185,129,.25); }
+.badge-gold { background:rgba(240,165,0,.15); color:var(--accent); border:1px solid rgba(240,165,0,.25); }
+.badge-purple { background:rgba(139,92,246,.15); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+
+/* content sections */
+.content-section { margin-bottom:40px; scroll-margin-top:calc(var(--topbar-h) + 16px); }
+.section-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px; margin-bottom:20px;
+}
+.section-card h2 { margin-top:0; }
+
+/* code blocks */
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; margin:12px 0 16px; }
+code { font-family:var(--font-mono); font-size:.82rem; color:var(--code-fg); }
+pre code { color:var(--code-fg); }
+:not(pre) > code { background:rgba(121,192,255,.1); color:var(--code-fg);
+  padding:2px 6px; border-radius:4px; font-size:.8em; }
+
+/* tables */
+table { width:100%; border-collapse:collapse; margin:12px 0 16px; font-size:.875rem; }
+th { background:rgba(27,79,138,.35); color:var(--sky); padding:9px 12px;
+  text-align:left; font-weight:600; border-bottom:2px solid var(--border2); font-size:.78rem; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,.025); }
+.tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid var(--border); margin:12px 0 16px; }
+.tbl-wrap table { margin:0; border:none; }
+
+/* Q&A cards */
+.qa-card {
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:12px; overflow:hidden;
+}
+.qa-q { padding:12px 16px; background:rgba(27,79,138,.2);
+  color:var(--text); font-weight:600; font-size:.9rem;
+  display:flex; gap:10px; align-items:flex-start; }
+.qa-q::before { content:"Q"; font-family:var(--font-mono); color:var(--accent);
+  font-size:.7rem; font-weight:700; background:rgba(240,165,0,.1);
+  border-radius:4px; padding:2px 6px; flex-shrink:0; margin-top:1px; }
+.qa-a { padding:12px 16px 14px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.qa-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+  font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-family:var(--font-mono); margin-left:8px; }
+.qa-badge-concept { background:rgba(74,159,213,.15); color:var(--sky); }
+.qa-badge-cmd { background:rgba(16,185,129,.15); color:var(--green); }
+.qa-badge-crit { background:rgba(239,68,68,.15); color:var(--red); }
+.qa-badge-task { background:rgba(240,165,0,.15); color:var(--accent); }
+.qa-badge-scenario { background:rgba(139,92,246,.15); color:var(--purple); }
+
+/* callout boxes */
+.callout { border-left:4px solid; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0; }
+.callout-note { border-color:var(--sky); background:rgba(74,159,213,.08); }
+.callout-warn { border-color:var(--accent); background:rgba(240,165,0,.08); }
+.callout-danger { border-color:var(--red); background:rgba(239,68,68,.08); }
+.callout-tip { border-color:var(--green); background:rgba(16,185,129,.08); }
+.callout-title { font-weight:700; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:4px; }
+
+/* topic tag */
+.topic-tag { display:inline-flex; align-items:center; padding:3px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:600; margin-bottom:10px; }
+
+/* section divider */
+.section-divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* version badges in RHEL */
+.ver-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem;
+  font-weight:700; font-family:var(--font-mono); margin-right:4px;
+  background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.2); }
+
+/* footer */
+#site-footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:20px 40px; display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--text3);
+}
+#site-footer a { color:var(--sky); text-decoration:none; }
+
+/* mobile overlay */
+#mob-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8800; }
+#mob-ov.on { display:block; }
+
+@media (max-width:1100px) {
+  #toc-nav { display:none; }
+}
+@media (max-width:768px) {
+  #site-nav { position:fixed; left:0; top:var(--topbar-h);
+    bottom:0; transform:translateX(-100%); z-index:8900;
+    transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  #site-nav.open { transform:translateX(0); }
+  #menu-btn { display:block; }
+  #main-content { padding:20px 16px; }
+  #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="site-topbar">
+  <a href="index.html" class="logo">Study<span>Hub</span></a>
+  <span class="page-title-bar">CCNA Network Study Guide</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn" onclick="toggleNav()">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link ">🏠 Home</a>
+<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link active">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
+
+  </nav>
+
+  <main id="main-content">
+    
+<div class="page-hero">
+  <h1>🌐 CCNA Study Notes</h1>
+  <p>Comprehensive CCNA preparation — 31 topics across 7 categories</p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">31 Topics</span>
+    <span class="badge badge-green">7 Categories</span>
+    <span class="badge badge-gold">OSI · IPv4/IPv6 · VLANs · OSPF · BGP · QoS · Automation</span>
+  </div>
+</div>
+<div class="content-section section-card" id="cat-network-fundamentals">
+<h2>📑 Network Fundamentals</h2>
+<div id="topic-network-models" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">OSI & TCP/IP Models</h3>
+
+<h2>OSI & TCP/IP Models</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Network Fundamentals</span>
+
+<h3>OSI Model — 7 Layers</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Layer</th><th>#</th><th>PDU</th><th>Key Protocols / Devices</th></tr>
+<tr><td><strong>Application</strong></td><td>7</td><td>Data</td><td>HTTP, HTTPS, FTP, SMTP, DNS, DHCP, Telnet, SSH, SNMP</td></tr>
+<tr><td><strong>Presentation</strong></td><td>6</td><td>Data</td><td>SSL/TLS, JPEG, MPEG, ASCII, Encryption/Decryption</td></tr>
+<tr><td><strong>Session</strong></td><td>5</td><td>Data</td><td>NetBIOS, PPTP, RPC — establishes/maintains/terminates sessions</td></tr>
+<tr><td><strong>Transport</strong></td><td>4</td><td>Segment</td><td>TCP, UDP — ports, flow control, error recovery</td></tr>
+<tr><td><strong>Network</strong></td><td>3</td><td>Packet</td><td>IP, ICMP, ARP, OSPF — routing, logical addressing</td></tr>
+<tr><td><strong>Data Link</strong></td><td>2</td><td>Frame</td><td>Ethernet, Wi-Fi, PPP, STP — MAC addressing, switch</td></tr>
+<tr><td><strong>Physical</strong></td><td>1</td><td>Bit</td><td>Cables, hubs, repeaters, NIC — electrical/optical signals</td></tr>
+</table></div>
+<div class="note"><strong>Mnemonic (Top→Down):</strong> <em>All People Seem To Need Data Processing</em></div>
+
+<h3>TCP/IP Model (4 Layers)</h3>
+<div class="tbl-wrap"><table>
+<tr><th>TCP/IP Layer</th><th>Equivalent OSI</th><th>Protocols</th></tr>
+<tr><td>Application</td><td>Layers 5, 6, 7</td><td>HTTP, HTTPS, FTP, SMTP, DNS, DHCP, SSH, SNMP, NTP</td></tr>
+<tr><td>Transport</td><td>Layer 4</td><td>TCP, UDP</td></tr>
+<tr><td>Internet</td><td>Layer 3</td><td>IPv4, IPv6, ICMP, ARP, OSPF, EIGRP, BGP</td></tr>
+<tr><td>Network Access</td><td>Layers 1, 2</td><td>Ethernet, Wi-Fi, PPP, Frame Relay</td></tr>
+</table></div>
+
+<h3>TCP vs UDP</h3>
+<div class="card-grid">
+<div class="card">
+  <div class="card-title">TCP — Transmission Control Protocol</div>
+  <p>Connection-oriented (3-way handshake: SYN → SYN-ACK → ACK). Reliable, ordered, error-checked delivery. Flow control (sliding window). Used by: HTTP/HTTPS, FTP, SMTP, SSH, Telnet.</p>
+</div>
+<div class="card">
+  <div class="card-title">UDP — User Datagram Protocol</div>
+  <p>Connectionless. No guaranteed delivery, no ordering, no flow control. Low overhead, fast. Used by: DNS, DHCP, TFTP, VoIP, streaming video, SNMP.</p>
+</div>
+</div>
+
+<h3>Well-Known Port Numbers</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Port</th><th>Protocol</th><th>Transport</th></tr>
+<tr><td>20/21</td><td>FTP (Data/Control)</td><td>TCP</td></tr>
+<tr><td>22</td><td>SSH</td><td>TCP</td></tr>
+<tr><td>23</td><td>Telnet</td><td>TCP</td></tr>
+<tr><td>25</td><td>SMTP</td><td>TCP</td></tr>
+<tr><td>53</td><td>DNS</td><td>TCP/UDP</td></tr>
+<tr><td>67/68</td><td>DHCP (Server/Client)</td><td>UDP</td></tr>
+<tr><td>69</td><td>TFTP</td><td>UDP</td></tr>
+<tr><td>80</td><td>HTTP</td><td>TCP</td></tr>
+<tr><td>110</td><td>POP3</td><td>TCP</td></tr>
+<tr><td>143</td><td>IMAP</td><td>TCP</td></tr>
+<tr><td>161/162</td><td>SNMP</td><td>UDP</td></tr>
+<tr><td>443</td><td>HTTPS</td><td>TCP</td></tr>
+<tr><td>514</td><td>Syslog</td><td>UDP</td></tr>
+</table></div>
+
+<h3>Data Encapsulation</h3>
+<p>As data moves down the OSI stack, headers (and trailers at L2) are added at each layer — this is called <strong>encapsulation</strong>. Going up the stack, headers are removed — called <strong>de-encapsulation</strong>.</p>
+<pre>Application Data
+→ + TCP/UDP Header = Segment
+→ + IP Header      = Packet
+→ + L2 Header+Trailer = Frame
+→ + Physical encoding = Bits</pre>
+
+</div>
+<div id="topic-network-topologies" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Network Topologies & Media</h3>
+
+<h2>Network Topologies & Media</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Network Fundamentals</span>
+
+<h3>Network Topologies</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Bus</div><p>All devices share single cable. Cheap but a break affects all. Legacy (10BASE2/5).</p></div>
+<div class="card"><div class="card-title">Star</div><p>All devices connect to central switch/hub. Most common in LANs. Single point of failure at hub/switch.</p></div>
+<div class="card"><div class="card-title">Ring</div><p>Devices in a loop. Token Ring (legacy). Data travels in one direction. SONET/SDH uses dual ring.</p></div>
+<div class="card"><div class="card-title">Mesh</div><p>Full mesh: every device connected to every other. Partial mesh: selected connections. Used in WANs for redundancy.</p></div>
+<div class="card"><div class="card-title">Hybrid</div><p>Combination of topologies. Most enterprise networks are star-bus hybrids.</p></div>
+<div class="card"><div class="card-title">Spine-Leaf</div><p>Modern data center design. Every leaf connects to every spine. Predictable latency, high bandwidth, scalable.</p></div>
+</div>
+
+<h3>Ethernet Cable Types</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Category</th><th>Max Speed</th><th>Max Distance</th><th>Notes</th></tr>
+<tr><td>Cat 3</td><td>10 Mbps</td><td>100m</td><td>Legacy voice/10BASE-T</td></tr>
+<tr><td>Cat 5</td><td>100 Mbps</td><td>100m</td><td>Fast Ethernet</td></tr>
+<tr><td>Cat 5e</td><td>1 Gbps</td><td>100m</td><td>Most common legacy install</td></tr>
+<tr><td>Cat 6</td><td>1 Gbps / 10 Gbps</td><td>100m / 55m</td><td>Better crosstalk specs</td></tr>
+<tr><td>Cat 6a</td><td>10 Gbps</td><td>100m</td><td>Augmented Cat 6</td></tr>
+<tr><td>Cat 7</td><td>10 Gbps</td><td>100m</td><td>Shielded</td></tr>
+<tr><td>Cat 8</td><td>25/40 Gbps</td><td>30m</td><td>Data center use</td></tr>
+</table></div>
+
+<h3>Fiber Optic</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Single-Mode Fiber (SMF)</div><p>Narrow core (~9 µm). Laser light source. Long distances (up to 100km+). Used in WAN/carrier networks. More expensive.</p></div>
+<div class="card"><div class="card-title">Multi-Mode Fiber (MMF)</div><p>Wider core (50–62.5 µm). LED or VCSEL. Shorter distances (up to 2km). Used in campus/data centers. Cheaper.</p></div>
+</div>
+<div class="note"><strong>Fiber connectors:</strong> SC (square), LC (small square), ST (round bayonet), MT-RJ (duplex small). LC is most common in enterprise.</div>
+
+<h3>Cable Pinouts</h3>
+<ul>
+<li><strong>Straight-through:</strong> Connects different device types (PC → switch, router → switch). Both ends T568A/A or T568B/B.</li>
+<li><strong>Crossover:</strong> Connects same device types (switch → switch, PC → PC). One end T568A, other T568B.</li>
+<li><strong>Rollover (Console):</strong> PC COM port to router/switch console port. Completely reversed pinout.</li>
+</ul>
+<div class="note"><strong>Auto-MDIX:</strong> Modern switches auto-detect and correct for straight vs. crossover. Most cables will work either way.</div>
+
+<h3>Wireless Standards (IEEE 802.11)</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Standard</th><th>Wi-Fi Name</th><th>Frequency</th><th>Max Speed</th></tr>
+<tr><td>802.11a</td><td>Wi-Fi 2</td><td>5 GHz</td><td>54 Mbps</td></tr>
+<tr><td>802.11b</td><td>Wi-Fi 1</td><td>2.4 GHz</td><td>11 Mbps</td></tr>
+<tr><td>802.11g</td><td>Wi-Fi 3</td><td>2.4 GHz</td><td>54 Mbps</td></tr>
+<tr><td>802.11n</td><td>Wi-Fi 4</td><td>2.4/5 GHz</td><td>600 Mbps</td></tr>
+<tr><td>802.11ac</td><td>Wi-Fi 5</td><td>5 GHz</td><td>~7 Gbps</td></tr>
+<tr><td>802.11ax</td><td>Wi-Fi 6/6E</td><td>2.4/5/6 GHz</td><td>~9.6 Gbps</td></tr>
+</table></div>
+
+</div>
+<div id="topic-network-devices" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Network Devices</h3>
+
+<h2>Network Devices</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Network Fundamentals</span>
+
+<h3>Layer 1 — Physical Devices</h3>
+<ul>
+<li><strong>Hub:</strong> Repeats signal to all ports (broadcasts). Creates one collision domain. Legacy; no longer used.</li>
+<li><strong>Repeater:</strong> Regenerates signal to extend cable length.</li>
+<li><strong>Modem:</strong> Modulates/demodulates signal for transmission over telephone/cable lines.</li>
+</ul>
+
+<h3>Layer 2 — Data Link Devices</h3>
+<ul>
+<li><strong>Switch:</strong> Learns MAC addresses, forwards frames to correct port. Each port = separate collision domain. Creates one broadcast domain per VLAN.</li>
+<li><strong>Bridge:</strong> Connects two LAN segments at Layer 2. Software-based MAC learning. Predecessor to switch.</li>
+<li><strong>Wireless Access Point (AP):</strong> Connects wireless clients to wired network at Layer 2.</li>
+</ul>
+
+<h3>Layer 3 — Network Devices</h3>
+<ul>
+<li><strong>Router:</strong> Routes packets between networks using IP addressing. Separates broadcast domains. Uses routing tables.</li>
+<li><strong>Layer 3 Switch:</strong> Performs both switching and routing. Faster than routers for inter-VLAN routing in LAN.</li>
+<li><strong>Multilayer Switch:</strong> Switch with routing capabilities. Common in enterprise distribution/core layers.</li>
+</ul>
+
+<h3>Other Network Devices</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Firewall</div><p>Filters traffic based on rules (ACLs). Stateful inspection tracks connection state. Can be hardware or software. Next-gen firewalls add deep packet inspection, IPS, URL filtering.</p></div>
+<div class="card"><div class="card-title">IDS / IPS</div><p>IDS (Intrusion Detection) — monitors and alerts. IPS (Intrusion Prevention) — monitors and blocks inline. Signature-based or anomaly-based detection.</p></div>
+<div class="card"><div class="card-title">Load Balancer</div><p>Distributes traffic across multiple servers. Layer 4 (TCP/UDP) or Layer 7 (HTTP). Improves availability and performance.</p></div>
+<div class="card"><div class="card-title">Proxy Server</div><p>Intermediary between clients and servers. Forward proxy (client-side), Reverse proxy (server-side). Caching, content filtering, anonymization.</p></div>
+<div class="card"><div class="card-title">VPN Concentrator</div><p>Terminates VPN tunnels. Aggregates multiple VPN connections. Often integrated into firewall or router.</p></div>
+<div class="card"><div class="card-title">Wireless LAN Controller (WLC)</div><p>Centrally manages multiple APs. CAPWAP tunnel to APs. Handles roaming, RF management, security policies.</p></div>
+</div>
+
+<h3>Collision Domains vs Broadcast Domains</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Device</th><th>Collision Domains</th><th>Broadcast Domains</th></tr>
+<tr><td>Hub (4 ports)</td><td>1</td><td>1</td></tr>
+<tr><td>Switch (4 ports)</td><td>4 (1 per port)</td><td>1</td></tr>
+<tr><td>Router (4 ports)</td><td>4</td><td>4 (1 per interface)</td></tr>
+<tr><td>Switch + VLANs (4 VLANs)</td><td>Per port</td><td>4</td></tr>
+</table></div>
+
+</div>
+<div id="topic-cdp-lldp" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">CDP & LLDP</h3>
+
+<h2>CDP & LLDP</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Network Fundamentals</span>
+
+<h3>CDP — Cisco Discovery Protocol</h3>
+<p>Cisco-proprietary Layer 2 protocol. Discovers directly connected Cisco devices. Sends multicast every 60 seconds.</p>
+<pre>R1# show cdp neighbors             ! Brief neighbor summary
+R1# show cdp neighbors detail      ! Full info (IOS version, IP, etc.)
+R1# show cdp interface             ! CDP status per interface
+
+R1(config)# no cdp run             ! Disable globally (security)
+R1(config-if)# no cdp enable       ! Disable on interface</pre>
+
+<h3>LLDP — Link Layer Discovery Protocol</h3>
+<p>IEEE 802.1AB standard. Vendor-neutral replacement for CDP. Sends every 30 seconds.</p>
+<pre>R1(config)# lldp run               ! Enable LLDP globally
+R1(config-if)# lldp transmit       ! Enable TX on interface
+R1(config-if)# lldp receive        ! Enable RX on interface
+R1(config-if)# no lldp transmit    ! Disable TX
+
+R1# show lldp neighbors
+R1# show lldp neighbors detail</pre>
+
+<div class="note"><strong>Security note:</strong> CDP and LLDP reveal device information to anyone on the link. Disable on untrusted/external-facing ports.</div>
+
+</div>
+<div id="topic-troubleshooting" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Troubleshooting</h3>
+
+<h2>Network Troubleshooting</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Network Fundamentals</span>
+
+<h3>Troubleshooting Methodology</h3>
+<ol>
+<li><strong>Define the problem</strong> — gather symptoms, affected users/systems</li>
+<li><strong>Gather information</strong> — logs, show commands, topology</li>
+<li><strong>Analyze information</strong> — compare baseline vs. current state</li>
+<li><strong>Eliminate possible causes</strong> — rule out options systematically</li>
+<li><strong>Propose hypothesis</strong> — most likely cause</li>
+<li><strong>Test hypothesis</strong> — implement solution in test/change window</li>
+<li><strong>Solve the problem</strong> — implement fix</li>
+<li><strong>Document solution</strong> — update records</li>
+</ol>
+
+<h3>Troubleshooting Approaches</h3>
+<ul>
+<li><strong>Top-down:</strong> Start at Application layer, work down. Good for application-specific issues.</li>
+<li><strong>Bottom-up:</strong> Start at Physical layer, work up. Good for connectivity issues.</li>
+<li><strong>Divide and conquer:</strong> Start at middle (Network layer), work up or down based on results.</li>
+<li><strong>Follow the path:</strong> Trace packet route from source to destination.</li>
+<li><strong>Spot the differences:</strong> Compare working vs. non-working configurations.</li>
+</ul>
+
+<h3>Key Troubleshooting Commands</h3>
+<pre>! Connectivity
+ping 8.8.8.8                    ! Basic ping
+ping 8.8.8.8 repeat 100 size 1472  ! Extended ping
+traceroute 8.8.8.8               ! Path discovery
+traceroute 8.8.8.8 source gi0/0  ! Source-based traceroute
+
+! Routing
+show ip route
+show ip route 192.168.1.0
+show ip protocols
+show ip ospf neighbor
+show ip eigrp neighbors
+show ip bgp summary
+
+! Interfaces
+show interfaces
+show interfaces gi0/0
+show interfaces status           ! Switch
+show ip interface brief
+show ip interface gi0/0
+
+! Layer 2
+show mac address-table
+show spanning-tree
+show vlan brief
+show interfaces trunk
+show cdp neighbors detail
+
+! System
+show version
+show running-config
+show startup-config
+show processes cpu
+show memory</pre>
+
+<h3>Common Issues & Solutions</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Symptom</th><th>Possible Cause</th><th>Check</th></tr>
+<tr><td>Can't ping default gateway</td><td>Wrong IP/mask, interface down, ACL</td><td>show ip interface brief, show ip access-lists</td></tr>
+<tr><td>Can ping gateway, not remote</td><td>Routing issue, ACL</td><td>show ip route, traceroute</td></tr>
+<tr><td>Interface is down/down</td><td>Cable, wrong speed/duplex, shutdown</td><td>show interfaces, no shutdown</td></tr>
+<tr><td>Interface is up/down</td><td>Layer 2 issue, encapsulation mismatch</td><td>show interfaces, check encapsulation</td></tr>
+<tr><td>OSPF neighbors not forming</td><td>Area mismatch, hello/dead timers, network type</td><td>show ip ospf neighbor, debug ip ospf adj</td></tr>
+<tr><td>No DHCP address</td><td>No DHCP server, helper-address, pool empty</td><td>show ip dhcp pool, show ip dhcp binding</td></tr>
+<tr><td>Slow network</td><td>Duplex mismatch, high CPU, spanning tree</td><td>show interfaces (errors), show processes cpu</td></tr>
+</table></div>
+
+<h3>IOS Debugging</h3>
+<pre>debug ip packet                  ! Layer 3 packets (high overhead!)
+debug ip routing                 ! Routing table changes
+debug ip ospf events             ! OSPF events
+debug ip dhcp server events      ! DHCP events
+undebug all                      ! Stop all debugging
+terminal monitor                 ! See debug output in SSH session</pre>
+<div class="danger-box"><strong>Warning:</strong> Debug commands can overwhelm a router's CPU. Use with caution in production. Always <code>undebug all</code> when done.</div>
+
+</div>
+<div id="topic-wireless-arch" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Wireless Architecture</h3>
+
+<h2>Wireless LAN Architecture</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Network Fundamentals</span>
+
+<h3>Wireless Deployment Models</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Autonomous AP (Standalone)</div><p>Each AP configured and managed independently. No controller. Good for small deployments. SSH/GUI per device. Cisco 1600/2600 series.</p></div>
+<div class="card"><div class="card-title">Lightweight AP (CAPWAP)</div><p>Centrally managed by WLC. AP is "lightweight" — forwards traffic to controller. CAPWAP tunnel (UDP 5246/5247) for control and data.</p></div>
+<div class="card"><div class="card-title">Cloud-Managed (Meraki)</div><p>APs managed via cloud dashboard. No on-premise controller. Easy deployment, centralized visibility. Subscription-based.</p></div>
+</div>
+
+<h3>WLC — Wireless LAN Controller</h3>
+<ul>
+<li>Centrally manages lightweight APs</li>
+<li>RF management (power, channel selection)</li>
+<li>Roaming management (client seamlessly moves between APs)</li>
+<li>Security policy enforcement</li>
+<li>FlexConnect: AP can locally switch traffic when WLC is unreachable</li>
+</ul>
+
+<h3>CAPWAP</h3>
+<p>Control And Provisioning of Wireless Access Points. Replaces LWAPP.</p>
+<ul>
+<li>Control channel: UDP 5246 (DTLS encrypted)</li>
+<li>Data channel: UDP 5247</li>
+<li>Local mode: All traffic tunneled to WLC</li>
+<li>FlexConnect: Local switching when tunnel is down</li>
+</ul>
+
+<h3>Wireless Channels</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Band</th><th>Non-overlapping Channels (US)</th><th>Notes</th></tr>
+<tr><td>2.4 GHz</td><td>1, 6, 11</td><td>Better range, more interference, 3 channels</td></tr>
+<tr><td>5 GHz</td><td>36, 40, 44, 48, 52+ (many)</td><td>Less interference, shorter range, 24+ channels</td></tr>
+<tr><td>6 GHz (Wi-Fi 6E)</td><td>59 channels</td><td>Least interference, newest</td></tr>
+</table></div>
+<div class="note"><strong>2.4 GHz overlap:</strong> Only channels 1, 6, and 11 are non-overlapping. Using any other channels causes interference. Always use 1/6/11 for 2.4 GHz deployment.</div>
+
+<h3>Wireless Roaming</h3>
+<ul>
+<li><strong>Layer 2 Roaming:</strong> Client moves between APs in same subnet/WLC. IP address stays same.</li>
+<li><strong>Layer 3 Roaming:</strong> Client moves between different subnets. May get new IP or use mobility anchor to keep old IP.</li>
+<li><strong>Fast Roaming (802.11r):</strong> Pre-authenticates to target AP before disconnecting from current. Sub-50ms roaming for VoIP.</li>
+</ul>
+
+</div>
+<div id="topic-ios-basics" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">IOS CLI Basics</h3>
+
+<h2>Cisco IOS CLI Basics</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Network Fundamentals</span>
+
+<h3>IOS CLI Modes</h3>
+<pre>Router>                  User EXEC mode (view only)
+Router# enable           Privileged EXEC mode (show commands)
+Router(config)#          Global Configuration mode
+Router(config-if)#       Interface Configuration
+Router(config-router)#   Router Configuration
+Router(config-line)#     Line Configuration
+Router(config-vlan)#     VLAN Configuration
+
+! Navigate
+Router# configure terminal     (or conf t)
+Router(config)# end             (back to privileged)
+Router(config-if)# exit         (back one level)
+Router# disable                 (back to user EXEC)</pre>
+
+<h3>Essential CLI Shortcuts</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Shortcut</th><th>Action</th></tr>
+<tr><td>Tab</td><td>Complete command</td></tr>
+<tr><td>?</td><td>Context-sensitive help</td></tr>
+<tr><td>Ctrl+C</td><td>Interrupt / break out</td></tr>
+<tr><td>Ctrl+Z</td><td>End to privileged EXEC</td></tr>
+<tr><td>Ctrl+A</td><td>Move cursor to beginning of line</td></tr>
+<tr><td>Ctrl+E</td><td>Move cursor to end of line</td></tr>
+<tr><td>Up Arrow</td><td>Previous command (history)</td></tr>
+<tr><td>show history</td><td>View command history</td></tr>
+</table></div>
+
+<h3>Configuration Management</h3>
+<pre>! View configs
+show running-config          ! Current config (RAM)
+show startup-config          ! Saved config (NVRAM)
+show running-config | include ospf  ! Filter output
+
+! Save config
+copy running-config startup-config   (or write memory / wr)
+
+! Erase config
+erase startup-config
+reload
+
+! Backup to TFTP
+copy running-config tftp:
+copy running-config tftp://10.0.0.1/backup.cfg
+
+! Restore from TFTP
+copy tftp: running-config</pre>
+
+<h3>Password Recovery (Router)</h3>
+<pre>1. Power cycle router
+2. Break sequence (Ctrl+Break) during boot = ROMMON
+3. rommon> confreg 0x2142   (skip startup-config on boot)
+4. rommon> reset
+5. Router boots with no config
+6. Router> enable
+7. copy startup-config running-config
+8. config terminal → change passwords
+9. config-register 0x2102   (restore normal boot)
+10. copy running-config startup-config → reload</pre>
+
+<h3>IOS Licensing (Older IOS)</h3>
+<pre>show license feature          ! Available features
+show version                  ! Current image/license
+license boot module c1900 technology-package securityk9
+copy running-config startup-config
+reload</pre>
+
+<h3>Common Verification Commands</h3>
+<pre>show version
+show ip interface brief
+show interfaces
+show ip route
+show running-config
+show startup-config
+show flash:
+show inventory
+show processes cpu sorted
+show memory statistics</pre>
+
+</div>
+</div>
+<div class="content-section section-card" id="cat-ip-addressing">
+<h2>📑 IP Addressing</h2>
+<div id="topic-ipv4-addressing" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">IPv4 Addressing</h3>
+
+<h2>IPv4 Addressing</h2>
+<span class="topic-tag" style="background:rgba(123,97,255,0.15);color:#7b61ff">IP Addressing</span>
+
+<h3>IPv4 Address Structure</h3>
+<p>IPv4 address = 32 bits, written in dotted-decimal notation (4 octets × 8 bits).</p>
+<pre>192    .  168   .   1   .   100
+11000000.10101000.00000001.01100100</pre>
+
+<h3>Address Classes</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Class</th><th>Range</th><th>Default Mask</th><th>Networks</th><th>Hosts/Net</th><th>Use</th></tr>
+<tr><td>A</td><td>1–126</td><td>/8 (255.0.0.0)</td><td>126</td><td>16,777,214</td><td>Large orgs</td></tr>
+<tr><td>B</td><td>128–191</td><td>/16 (255.255.0.0)</td><td>16,382</td><td>65,534</td><td>Medium orgs</td></tr>
+<tr><td>C</td><td>192–223</td><td>/24 (255.255.255.0)</td><td>2,097,150</td><td>254</td><td>Small orgs</td></tr>
+<tr><td>D</td><td>224–239</td><td>N/A</td><td>N/A</td><td>N/A</td><td>Multicast</td></tr>
+<tr><td>E</td><td>240–255</td><td>N/A</td><td>N/A</td><td>N/A</td><td>Experimental</td></tr>
+</table></div>
+<div class="note"><strong>Note:</strong> 127.x.x.x is loopback (127.0.0.1). Not in Class A range for routing.</div>
+
+<h3>Private IP Ranges (RFC 1918)</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Class</th><th>Range</th><th>CIDR</th></tr>
+<tr><td>A</td><td>10.0.0.0 – 10.255.255.255</td><td>10.0.0.0/8</td></tr>
+<tr><td>B</td><td>172.16.0.0 – 172.31.255.255</td><td>172.16.0.0/12</td></tr>
+<tr><td>C</td><td>192.168.0.0 – 192.168.255.255</td><td>192.168.0.0/16</td></tr>
+</table></div>
+
+<h3>Special Addresses</h3>
+<ul>
+<li><strong>127.0.0.1:</strong> Loopback (localhost) — tests IP stack</li>
+<li><strong>0.0.0.0:</strong> Default route / "this host on this network"</li>
+<li><strong>255.255.255.255:</strong> Limited broadcast (all hosts on local subnet)</li>
+<li><strong>169.254.x.x:</strong> APIPA (Automatic Private IP Addressing) — no DHCP found</li>
+</ul>
+
+<h3>Subnetting — CIDR Notation</h3>
+<p>CIDR (Classless Inter-Domain Routing) uses prefix length to indicate network bits.</p>
+<div class="tbl-wrap"><table>
+<tr><th>CIDR</th><th>Subnet Mask</th><th>Hosts</th><th>Usable Hosts</th></tr>
+<tr><td>/8</td><td>255.0.0.0</td><td>16,777,216</td><td>16,777,214</td></tr>
+<tr><td>/16</td><td>255.255.0.0</td><td>65,536</td><td>65,534</td></tr>
+<tr><td>/24</td><td>255.255.255.0</td><td>256</td><td>254</td></tr>
+<tr><td>/25</td><td>255.255.255.128</td><td>128</td><td>126</td></tr>
+<tr><td>/26</td><td>255.255.255.192</td><td>64</td><td>62</td></tr>
+<tr><td>/27</td><td>255.255.255.224</td><td>32</td><td>30</td></tr>
+<tr><td>/28</td><td>255.255.255.240</td><td>16</td><td>14</td></tr>
+<tr><td>/29</td><td>255.255.255.248</td><td>8</td><td>6</td></tr>
+<tr><td>/30</td><td>255.255.255.252</td><td>4</td><td>2</td></tr>
+<tr><td>/31</td><td>255.255.255.254</td><td>2</td><td>2 (P2P)</td></tr>
+<tr><td>/32</td><td>255.255.255.255</td><td>1</td><td>1 (host route)</td></tr>
+</table></div>
+
+<h3>Subnetting Formula</h3>
+<pre>Number of subnets  = 2^(subnet bits)
+Hosts per subnet   = 2^(host bits) - 2
+Block size         = 256 - last non-255 octet of mask
+Usable hosts       = total hosts - 2 (network + broadcast)</pre>
+
+<h3>Subnetting Example</h3>
+<p><strong>Given:</strong> 192.168.10.0/26 — find all subnets</p>
+<pre>/26 → mask = 255.255.255.192
+Block size = 256 - 192 = 64
+
+Subnet 1: 192.168.10.0   – Network
+          192.168.10.1   – First Host
+          192.168.10.62  – Last Host
+          192.168.10.63  – Broadcast
+
+Subnet 2: 192.168.10.64  – Network
+          ...
+          192.168.10.127 – Broadcast
+
+Subnet 3: 192.168.10.128 – Network
+          ...
+          192.168.10.191 – Broadcast
+
+Subnet 4: 192.168.10.192 – Network
+          ...
+          192.168.10.255 – Broadcast</pre>
+
+</div>
+<div id="topic-ipv6" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">IPv6 Addressing</h3>
+
+<h2>IPv6 Addressing</h2>
+<span class="topic-tag" style="background:rgba(123,97,255,0.15);color:#7b61ff">IP Addressing</span>
+
+<h3>IPv6 Overview</h3>
+<p>IPv6 uses 128-bit addresses (vs IPv4's 32-bit), providing 3.4 × 10³⁸ addresses. Written as 8 groups of 4 hex digits separated by colons.</p>
+<pre>2001:0db8:85a3:0000:0000:8a2e:0370:7334</pre>
+
+<h3>IPv6 Compression Rules</h3>
+<ul>
+<li><strong>Rule 1:</strong> Remove leading zeros in each group: <code>0042 → 42</code></li>
+<li><strong>Rule 2:</strong> Replace one or more consecutive all-zero groups with <code>::</code> (can only be used once)</li>
+</ul>
+<pre>2001:0db8:0000:0000:0000:0000:0000:0001
+→ 2001:db8::1</pre>
+
+<h3>IPv6 Address Types</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Global Unicast (GUA)</div><p>Starts with 2000::/3 (2xxx or 3xxx). Publicly routable, assigned by ISP. Equivalent to IPv4 public addresses.</p></div>
+<div class="card"><div class="card-title">Link-Local</div><p>FE80::/10. Automatically assigned on every IPv6 interface. Not routable beyond local link. Required for NDP.</p></div>
+<div class="card"><div class="card-title">Unique Local</div><p>FC00::/7 (FD00::/8 in practice). Private addressing, not routable on internet. Similar to RFC 1918.</p></div>
+<div class="card"><div class="card-title">Loopback</div><p>::1/128. Equivalent to 127.0.0.1 in IPv4.</p></div>
+<div class="card"><div class="card-title">Multicast</div><p>FF00::/8. No broadcast in IPv6; multicast replaces it. FF02::1 = all nodes, FF02::2 = all routers.</p></div>
+<div class="card"><div class="card-title">Anycast</div><p>Same address assigned to multiple interfaces. Packet delivered to nearest interface. Used for load balancing.</p></div>
+</div>
+
+<h3>EUI-64 Interface ID</h3>
+<p>IPv6 can auto-generate the 64-bit interface ID from the MAC address:</p>
+<pre>MAC: AA:BB:CC:DD:EE:FF
+1. Split in half: AA:BB:CC | DD:EE:FF
+2. Insert FF:FE: AA:BB:CC:FF:FE:DD:EE:FF
+3. Flip 7th bit of first byte (U/L bit): AA → A8
+EUI-64 ID: A8BB:CCFF:FEDD:EEFF</pre>
+
+<h3>IPv6 Address Configuration</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Method</th><th>Description</th></tr>
+<tr><td>Static</td><td>Manually configured. <code>ipv6 address 2001:db8::1/64</code></td></tr>
+<tr><td>SLAAC</td><td>Stateless Address Autoconfiguration. Host gets prefix from RA, creates Interface ID via EUI-64 or random.</td></tr>
+<tr><td>DHCPv6 Stateless</td><td>RA provides prefix; DHCPv6 provides DNS/options only.</td></tr>
+<tr><td>DHCPv6 Stateful</td><td>DHCPv6 server assigns full address. Similar to DHCPv4.</td></tr>
+</table></div>
+
+<h3>NDP — Neighbor Discovery Protocol</h3>
+<p>IPv6 replacement for ARP. Uses ICMPv6 messages:</p>
+<ul>
+<li><strong>RS (Router Solicitation):</strong> Host requests router info</li>
+<li><strong>RA (Router Advertisement):</strong> Router sends prefix, gateway, flags</li>
+<li><strong>NS (Neighbor Solicitation):</strong> Like ARP Request — find MAC for IP</li>
+<li><strong>NA (Neighbor Advertisement):</strong> Like ARP Reply — sends MAC</li>
+<li><strong>Redirect:</strong> Router tells host of better path</li>
+</ul>
+
+<h3>IPv6 Migration Techniques</h3>
+<ul>
+<li><strong>Dual Stack:</strong> Run both IPv4 and IPv6 simultaneously on same device</li>
+<li><strong>Tunneling:</strong> Encapsulate IPv6 in IPv4 packets (6to4, ISATAP, Teredo)</li>
+<li><strong>NAT64/DNS64:</strong> Translates between IPv6 and IPv4</li>
+</ul>
+
+</div>
+<div id="topic-vlsm-nat" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">VLSM & NAT</h3>
+
+<h2>VLSM & NAT</h2>
+<span class="topic-tag" style="background:rgba(123,97,255,0.15);color:#7b61ff">IP Addressing</span>
+
+<h3>VLSM — Variable Length Subnet Masking</h3>
+<p>VLSM allows subnets of different sizes within the same address space. Used to efficiently allocate IP addresses.</p>
+<div class="note"><strong>Approach:</strong> Always subnet the largest network first, then work down to smallest.</div>
+
+<h4>VLSM Example</h4>
+<pre>Given: 192.168.1.0/24
+Requirements:
+  - Sales:    60 hosts  → needs /26 (62 hosts)
+  - IT:       25 hosts  → needs /27 (30 hosts)
+  - HR:       10 hosts  → needs /28 (14 hosts)
+  - Mgmt:      5 hosts  → needs /29 (6 hosts)
+  - Links:     2 hosts  → needs /30 (2 hosts)
+
+Allocation:
+  Sales: 192.168.1.0/26   (0–63)
+  IT:    192.168.1.64/27  (64–95)
+  HR:    192.168.1.96/28  (96–111)
+  Mgmt:  192.168.1.112/29 (112–119)
+  Link:  192.168.1.120/30 (120–123)</pre>
+
+<h3>NAT — Network Address Translation</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Type</th><th>Description</th><th>Use Case</th></tr>
+<tr><td>Static NAT</td><td>One-to-one mapping between private and public IP</td><td>Servers needing fixed public IP</td></tr>
+<tr><td>Dynamic NAT</td><td>Maps private IPs to a pool of public IPs (first-come basis)</td><td>Pool of public IPs available</td></tr>
+<tr><td>PAT / NAT Overload</td><td>Many private IPs map to one public IP using different ports</td><td>Home/small office (most common)</td></tr>
+</table></div>
+
+<h4>NAT Terminology</h4>
+<ul>
+<li><strong>Inside Local:</strong> Private IP of inside host (as seen inside)</li>
+<li><strong>Inside Global:</strong> Public IP representing inside host (as seen outside)</li>
+<li><strong>Outside Local:</strong> IP of outside host as seen from inside</li>
+<li><strong>Outside Global:</strong> Real IP of outside host</li>
+</ul>
+
+<h4>NAT Configuration (IOS)</h4>
+<pre>! Static NAT
+ip nat inside source static 192.168.1.10 203.0.113.10
+
+! Dynamic NAT with Pool
+ip nat pool MYPOOL 203.0.113.1 203.0.113.5 netmask 255.255.255.248
+access-list 1 permit 192.168.1.0 0.0.0.255
+ip nat inside source list 1 pool MYPOOL
+
+! PAT (Overload)
+ip nat inside source list 1 interface GigabitEthernet0/0 overload
+
+! Interface designations
+interface GigabitEthernet0/0
+ ip nat outside
+interface GigabitEthernet0/1
+ ip nat inside</pre>
+<pre>! Verify
+show ip nat translations
+show ip nat statistics</pre>
+
+</div>
+</div>
+<div class="content-section section-card" id="cat-switching">
+<h2>📑 Switching</h2>
+<div id="topic-ethernet-switching" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Ethernet & Switching</h3>
+
+<h2>Ethernet & Switching</h2>
+<span class="topic-tag" style="background:rgba(0,229,160,0.15);color:#00e5a0">Switching</span>
+
+<h3>Ethernet Frame Structure</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Field</th><th>Size</th><th>Description</th></tr>
+<tr><td>Preamble</td><td>7 bytes</td><td>Synchronization pattern (101010…)</td></tr>
+<tr><td>SFD</td><td>1 byte</td><td>Start Frame Delimiter (10101011)</td></tr>
+<tr><td>Destination MAC</td><td>6 bytes</td><td>Target MAC address</td></tr>
+<tr><td>Source MAC</td><td>6 bytes</td><td>Sender MAC address</td></tr>
+<tr><td>Type/Length</td><td>2 bytes</td><td>&gt;1500 = EtherType, ≤1500 = length</td></tr>
+<tr><td>Data/Payload</td><td>46–1500 bytes</td><td>Upper layer data (+ padding if needed)</td></tr>
+<tr><td>FCS</td><td>4 bytes</td><td>Frame Check Sequence (CRC error detection)</td></tr>
+</table></div>
+
+<h3>MAC Address</h3>
+<p>48-bit (6-byte) address burned into NIC. Written as hex: <code>AA:BB:CC:DD:EE:FF</code></p>
+<ul>
+<li>First 24 bits = OUI (Organizationally Unique Identifier) — identifies manufacturer</li>
+<li>Last 24 bits = Device-specific serial number</li>
+<li>Bit 1 of first byte: 0=unicast, 1=multicast</li>
+<li>Bit 2 of first byte: 0=globally unique (burned-in), 1=locally administered</li>
+</ul>
+
+<h3>Switch Operation</h3>
+<p>Switches use the <strong>MAC address table</strong> (CAM table) to make forwarding decisions:</p>
+<ol>
+<li><strong>Learning:</strong> When a frame arrives, the switch records the source MAC → port mapping</li>
+<li><strong>Forwarding:</strong> If destination MAC is known, forward to that port only (unicast)</li>
+<li><strong>Flooding:</strong> If destination unknown, send out all ports except source (unknown unicast flood)</li>
+<li><strong>Filtering:</strong> Don't send frame back out the same port it came from</li>
+</ol>
+
+<h3>Switch Frame Processing Modes</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Store-and-Forward</div><p>Receives entire frame, checks FCS for errors, then forwards. Higher latency, error-free forwarding. Default on most Cisco switches.</p></div>
+<div class="card"><div class="card-title">Cut-Through</div><p>Begins forwarding after reading destination MAC (first 6 bytes). Lower latency but can forward corrupt frames.</p></div>
+<div class="card"><div class="card-title">Fragment-Free</div><p>Waits for first 64 bytes (min Ethernet frame size to avoid collision fragments) then forwards. Compromise between the two.</p></div>
+</div>
+
+<h3>Switch IOS — Basic Configuration</h3>
+<pre>! Initial setup
+Switch> enable
+Switch# configure terminal
+Switch(config)# hostname SW1
+SW1(config)# enable secret cisco123
+SW1(config)# service password-encryption
+SW1(config)# banner motd # Authorized Access Only #
+
+! Management VLAN interface
+SW1(config)# interface vlan 1
+SW1(config-if)# ip address 192.168.1.2 255.255.255.0
+SW1(config-if)# no shutdown
+
+! Default gateway
+SW1(config)# ip default-gateway 192.168.1.1
+
+! Console & VTY lines
+SW1(config)# line console 0
+SW1(config-line)# password cisco
+SW1(config-line)# login
+SW1(config)# line vty 0 15
+SW1(config-line)# password cisco
+SW1(config-line)# login
+SW1(config-line)# transport input ssh
+
+! Save
+SW1# copy running-config startup-config</pre>
+
+<h3>Useful Show Commands</h3>
+<pre>show mac address-table        ! MAC table
+show mac address-table dynamic ! Dynamic entries only
+show interfaces status         ! Port status
+show interfaces gi0/1          ! Detailed interface info
+show running-config
+show version</pre>
+
+</div>
+<div id="topic-vlans" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">VLANs & Trunking</h3>
+
+<h2>VLANs & Trunking</h2>
+<span class="topic-tag" style="background:rgba(0,229,160,0.15);color:#00e5a0">Switching</span>
+
+<h3>VLAN Concepts</h3>
+<p>VLANs (Virtual LANs) segment a physical network into multiple logical broadcast domains at Layer 2.</p>
+<ul>
+<li>Each VLAN is a separate broadcast domain</li>
+<li>Traffic between VLANs requires Layer 3 routing</li>
+<li>VLANs 1–4094 are valid (1 is default, 1002–1005 reserved for legacy)</li>
+<li>Normal range: 1–1005 | Extended range: 1006–4094</li>
+</ul>
+
+<h3>VLAN Configuration</h3>
+<pre>! Create VLANs
+SW1(config)# vlan 10
+SW1(config-vlan)# name SALES
+SW1(config)# vlan 20
+SW1(config-vlan)# name IT
+SW1(config)# vlan 30
+SW1(config-vlan)# name MGMT
+
+! Access port (end device)
+SW1(config)# interface gi0/1
+SW1(config-if)# switchport mode access
+SW1(config-if)# switchport access vlan 10
+
+! Voice VLAN on access port
+SW1(config-if)# switchport voice vlan 99
+
+! Verify
+SW1# show vlan brief
+SW1# show interfaces gi0/1 switchport</pre>
+
+<h3>Trunk Ports & 802.1Q</h3>
+<p>Trunk links carry traffic for multiple VLANs between switches (or switch to router). <strong>IEEE 802.1Q</strong> adds a 4-byte tag to Ethernet frames:</p>
+<pre>802.1Q Tag (4 bytes):
+  - TPID: 0x8100 (2 bytes) — identifies as 802.1Q
+  - PCP:  3 bits  — priority (CoS)
+  - DEI:  1 bit   — drop eligible
+  - VID:  12 bits — VLAN ID (0–4095)</pre>
+
+<pre>! Trunk port configuration
+SW1(config)# interface gi0/24
+SW1(config-if)# switchport mode trunk
+SW1(config-if)# switchport trunk encapsulation dot1q  ! Required on some switches
+SW1(config-if)# switchport trunk allowed vlan 10,20,30
+SW1(config-if)# switchport trunk native vlan 99      ! Native VLAN (untagged)
+
+! Verify
+SW1# show interfaces trunk
+SW1# show interfaces gi0/24 switchport</pre>
+
+<div class="warn"><strong>Native VLAN:</strong> Traffic on the native VLAN is sent untagged over a trunk. Both ends must agree on native VLAN. VLAN hopping attack can exploit native VLAN mismatches. Best practice: set native VLAN to unused VLAN.</div>
+
+<h3>DTP — Dynamic Trunking Protocol</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Mode</th><th>Description</th></tr>
+<tr><td>dynamic auto</td><td>Becomes trunk if other side initiates. Does NOT initiate.</td></tr>
+<tr><td>dynamic desirable</td><td>Actively tries to become trunk. Initiates negotiation.</td></tr>
+<tr><td>trunk</td><td>Always trunk, sends DTP.</td></tr>
+<tr><td>access</td><td>Always access, sends DTP to disable trunk.</td></tr>
+<tr><td>nonegotiate</td><td>Static trunk/access, no DTP sent.</td></tr>
+</table></div>
+<pre>SW1(config-if)# switchport nonegotiate  ! Disable DTP (security best practice)</pre>
+
+<h3>VTP — VLAN Trunking Protocol</h3>
+<p>Cisco proprietary. Propagates VLAN database changes across trunk links.</p>
+<div class="tbl-wrap"><table>
+<tr><th>Mode</th><th>Create VLANs</th><th>Sync</th><th>Forward</th></tr>
+<tr><td>Server</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+<tr><td>Client</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+<tr><td>Transparent</td><td>Yes (local only)</td><td>No</td><td>Yes</td></tr>
+<tr><td>Off (VTPv3)</td><td>Yes (local)</td><td>No</td><td>No</td></tr>
+</table></div>
+<div class="danger-box"><strong>VTP Danger:</strong> A switch with higher revision number connecting to your network can wipe all VLANs! Always reset revision number before adding a switch (change domain name twice).</div>
+<pre>SW1# show vtp status
+SW1(config)# vtp mode transparent
+SW1(config)# vtp domain COMPANY
+SW1(config)# vtp password cisco123</pre>
+
+<h3>Inter-VLAN Routing</h3>
+<h4>Method 1: Router-on-a-Stick</h4>
+<pre>! Router subinterfaces
+R1(config)# interface gi0/0.10
+R1(config-subif)# encapsulation dot1q 10
+R1(config-subif)# ip address 192.168.10.1 255.255.255.0
+R1(config)# interface gi0/0.20
+R1(config-subif)# encapsulation dot1q 20
+R1(config-subif)# ip address 192.168.20.1 255.255.255.0
+R1(config)# interface gi0/0
+R1(config-if)# no shutdown</pre>
+
+<h4>Method 2: Layer 3 Switch (SVIs)</h4>
+<pre>! Switch Virtual Interfaces
+SW1(config)# ip routing              ! Enable L3 routing
+SW1(config)# interface vlan 10
+SW1(config-if)# ip address 192.168.10.1 255.255.255.0
+SW1(config-if)# no shutdown
+SW1(config)# interface vlan 20
+SW1(config-if)# ip address 192.168.20.1 255.255.255.0
+SW1(config-if)# no shutdown</pre>
+
+</div>
+<div id="topic-stp" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Spanning Tree Protocol</h3>
+
+<h2>Spanning Tree Protocol (STP)</h2>
+<span class="topic-tag" style="background:rgba(0,229,160,0.15);color:#00e5a0">Switching</span>
+
+<h3>Why STP?</h3>
+<p>Without STP, redundant switch links cause <strong>broadcast storms</strong> (frames loop forever), <strong>MAC table instability</strong>, and <strong>duplicate frame delivery</strong>. STP prevents loops by blocking redundant paths.</p>
+
+<h3>STP Election Process</h3>
+<ol>
+<li><strong>Elect Root Bridge:</strong> Switch with lowest Bridge ID = Root Bridge. BID = Priority (16-bit, default 32768) + MAC address. All ports on root bridge are Designated Ports (forwarding).</li>
+<li><strong>Elect Root Ports:</strong> Each non-root switch selects one Root Port — the port with lowest cost path to root bridge.</li>
+<li><strong>Elect Designated Ports:</strong> Each segment has one Designated Port — the port closest to root on that segment.</li>
+<li><strong>Block remaining:</strong> All other ports become Alternate/Backup (blocking).</li>
+</ol>
+
+<h3>STP Port Costs</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Speed</th><th>STP Cost (802.1D)</th><th>RSTP Cost (802.1w)</th></tr>
+<tr><td>10 Mbps</td><td>100</td><td>2,000,000</td></tr>
+<tr><td>100 Mbps</td><td>19</td><td>200,000</td></tr>
+<tr><td>1 Gbps</td><td>4</td><td>20,000</td></tr>
+<tr><td>10 Gbps</td><td>2</td><td>2,000</td></tr>
+</table></div>
+
+<h3>STP Port States</h3>
+<div class="tbl-wrap"><table>
+<tr><th>State</th><th>Forward Frames</th><th>Learn MACs</th><th>Duration</th></tr>
+<tr><td>Blocking</td><td>No</td><td>No</td><td>Max Age: 20s</td></tr>
+<tr><td>Listening</td><td>No</td><td>No</td><td>Forward Delay: 15s</td></tr>
+<tr><td>Learning</td><td>No</td><td>Yes</td><td>Forward Delay: 15s</td></tr>
+<tr><td>Forwarding</td><td>Yes</td><td>Yes</td><td>Normal operation</td></tr>
+<tr><td>Disabled</td><td>No</td><td>No</td><td>Admin disabled</td></tr>
+</table></div>
+<p>Total convergence time for classic 802.1D STP: up to <strong>50 seconds</strong>.</p>
+
+<h3>STP Variants</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Protocol</th><th>Standard</th><th>Convergence</th><th>VLAN Support</th></tr>
+<tr><td>STP</td><td>802.1D</td><td>~50 sec</td><td>Common tree (all VLANs)</td></tr>
+<tr><td>PVST+</td><td>Cisco</td><td>~50 sec</td><td>Per-VLAN tree</td></tr>
+<tr><td>RSTP</td><td>802.1w</td><td>~1-2 sec</td><td>Common tree</td></tr>
+<tr><td>Rapid PVST+</td><td>Cisco</td><td>~1-2 sec</td><td>Per-VLAN tree</td></tr>
+<tr><td>MST/MSTP</td><td>802.1s</td><td>~1-2 sec</td><td>Multiple VLANs per instance</td></tr>
+</table></div>
+
+<h3>STP Configuration</h3>
+<pre>! Set switch as root bridge
+SW1(config)# spanning-tree vlan 10 priority 4096  ! Lower = preferred root
+SW1(config)# spanning-tree vlan 10 root primary   ! Shortcut — sets to 24576
+
+! Enable Rapid PVST+
+SW1(config)# spanning-tree mode rapid-pvst
+
+! PortFast — skip listening/learning for access ports
+SW1(config-if)# spanning-tree portfast
+
+! BPDU Guard — disable port if BPDU received (protect PortFast ports)
+SW1(config-if)# spanning-tree bpduguard enable
+SW1(config)# spanning-tree portfast bpduguard default  ! Enable globally
+
+! Root Guard — prevent port from becoming root port
+SW1(config-if)# spanning-tree guard root
+
+! Verify
+SW1# show spanning-tree
+SW1# show spanning-tree vlan 10
+SW1# show spanning-tree summary</pre>
+
+<h3>STP Protection Features</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">PortFast</div><p>Immediately moves access port to forwarding state. Use ONLY on access ports connected to end devices (not switches). Prevents 30-second delay on PC startup.</p></div>
+<div class="card"><div class="card-title">BPDU Guard</div><p>If a PortFast port receives a BPDU, the port is put into err-disabled state. Protects against unauthorized switch connections.</p></div>
+<div class="card"><div class="card-title">Root Guard</div><p>Prevents designated port from becoming root port. Placed on ports facing access switches. Enforces root bridge placement.</p></div>
+<div class="card"><div class="card-title">Loop Guard</div><p>Prevents alternate/backup ports from becoming designated if BPDUs stop. Protects against unidirectional link failures.</p></div>
+</div>
+
+</div>
+<div id="topic-etherchannel" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">EtherChannel</h3>
+
+<h2>EtherChannel</h2>
+<span class="topic-tag" style="background:rgba(0,229,160,0.15);color:#00e5a0">Switching</span>
+
+<h3>EtherChannel Overview</h3>
+<p>EtherChannel bundles multiple physical links into one logical link, providing increased bandwidth and redundancy without STP blocking.</p>
+<ul>
+<li>Up to 8 active links (16 in 802.3ad — 8 active, 8 standby)</li>
+<li>STP sees it as one link — no blocking!</li>
+<li>Load balancing across member links</li>
+<li>If one link fails, traffic continues on remaining links</li>
+</ul>
+
+<h3>EtherChannel Protocols</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">PAgP — Port Aggregation Protocol</div><p>Cisco proprietary. Modes: <strong>Desirable</strong> (actively negotiates), <strong>Auto</strong> (responds to negotiation, doesn't initiate). Auto + Auto = No EtherChannel!</p></div>
+<div class="card"><div class="card-title">LACP — Link Aggregation Control Protocol</div><p>IEEE 802.3ad standard. Modes: <strong>Active</strong> (actively negotiates), <strong>Passive</strong> (responds, doesn't initiate). Passive + Passive = No EtherChannel!</p></div>
+<div class="card"><div class="card-title">Static (On)</div><p>No negotiation protocol. Both sides set to "on". No PAgP or LACP packets sent. Simple but no error checking.</p></div>
+</div>
+
+<h3>EtherChannel Requirements</h3>
+<ul>
+<li>Same speed and duplex on all member ports</li>
+<li>Same access VLAN or trunk configuration</li>
+<li>Same native VLAN and allowed VLANs (trunk)</li>
+<li>Same STP configuration</li>
+</ul>
+
+<h3>EtherChannel Configuration</h3>
+<pre>! LACP EtherChannel
+SW1(config)# interface range gi0/1-4
+SW1(config-if-range)# channel-group 1 mode active
+SW1(config)# interface port-channel 1
+SW1(config-if)# switchport mode trunk    ! Configure the port-channel
+
+! PAgP EtherChannel
+SW1(config)# interface range gi0/1-4
+SW1(config-if-range)# channel-group 1 mode desirable
+
+! Static EtherChannel
+SW1(config)# interface range gi0/1-4
+SW1(config-if-range)# channel-group 1 mode on
+
+! Verify
+SW1# show etherchannel summary
+SW1# show etherchannel port-channel
+SW1# show interfaces port-channel 1</pre>
+
+<h3>Load Balancing Methods</h3>
+<pre>SW1(config)# port-channel load-balance ?
+  dst-ip      Dst IP Addr
+  dst-mac     Dst Mac Addr
+  src-dst-ip  Src XOR Dst IP Addr
+  src-dst-mac Src XOR Dst Mac Addr
+  src-ip      Src IP Addr
+  src-mac     Src Mac Addr
+
+SW1# show etherchannel load-balance</pre>
+
+</div>
+</div>
+<div class="content-section section-card" id="cat-routing">
+<h2>📑 Routing</h2>
+<div id="topic-routing-fundamentals" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Routing Fundamentals</h3>
+
+<h2>Routing Fundamentals</h2>
+<span class="topic-tag" style="background:rgba(255,159,64,0.15);color:#ff9f40">Routing</span>
+
+<h3>Routing Process</h3>
+<p>A router examines the destination IP address of an incoming packet, consults its routing table, and forwards the packet out the appropriate interface.</p>
+
+<h3>Routing Table</h3>
+<pre>R1# show ip route
+Codes: C - connected, S - static, R - RIP, O - OSPF, D - EIGRP, 
+       B - BGP, i - IS-IS, * - candidate default
+
+Gateway of last resort is 10.0.0.1 to network 0.0.0.0
+
+C    192.168.1.0/24 is directly connected, GigabitEthernet0/0
+L    192.168.1.1/32 is directly connected, GigabitEthernet0/0
+O    10.0.0.0/8 [110/2] via 192.168.1.2, 00:01:23, GigabitEthernet0/0
+S    0.0.0.0/0 [1/0] via 10.0.0.1</pre>
+<p>Format: <code>[Administrative Distance/Metric]</code></p>
+
+<h3>Administrative Distance (AD)</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Routing Source</th><th>AD</th></tr>
+<tr><td>Connected</td><td>0</td></tr>
+<tr><td>Static</td><td>1</td></tr>
+<tr><td>EIGRP Summary</td><td>5</td></tr>
+<tr><td>External BGP</td><td>20</td></tr>
+<tr><td>Internal EIGRP</td><td>90</td></tr>
+<tr><td>IGRP</td><td>100</td></tr>
+<tr><td>OSPF</td><td>110</td></tr>
+<tr><td>IS-IS</td><td>115</td></tr>
+<tr><td>RIP</td><td>120</td></tr>
+<tr><td>External EIGRP</td><td>170</td></tr>
+<tr><td>Internal BGP</td><td>200</td></tr>
+<tr><td>Unknown / Unreachable</td><td>255</td></tr>
+</table></div>
+<div class="note"><strong>Lower AD = more trusted.</strong> If two routing protocols have routes to same destination, lowest AD wins.</div>
+
+<h3>Router IOS — Basic Configuration</h3>
+<pre>R1(config)# interface gi0/0
+R1(config-if)# ip address 192.168.1.1 255.255.255.0
+R1(config-if)# description Link to SW1
+R1(config-if)# no shutdown
+
+! Serial interface
+R1(config)# interface serial0/0/0
+R1(config-if)# ip address 10.0.0.1 255.255.255.252
+R1(config-if)# clock rate 64000    ! DCE end only
+R1(config-if)# no shutdown
+
+! Loopback interface
+R1(config)# interface loopback 0
+R1(config-if)# ip address 1.1.1.1 255.255.255.255</pre>
+
+<h3>Static Routing</h3>
+<pre>! Standard static route
+R1(config)# ip route 192.168.2.0 255.255.255.0 10.0.0.2
+R1(config)# ip route 192.168.2.0 255.255.255.0 gi0/1  ! Exit interface
+
+! Default route
+R1(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.1        ! Next-hop
+R1(config)# ip route 0.0.0.0 0.0.0.0 gi0/0 10.0.0.1  ! Fully specified (best)
+
+! Floating static (backup route — higher AD than dynamic)
+R1(config)# ip route 192.168.2.0 255.255.255.0 10.0.1.2 200
+
+! Summary static route
+R1(config)# ip route 172.16.0.0 255.255.0.0 10.0.0.2
+
+! IPv6 static
+R1(config)# ipv6 route 2001:db8:2::/64 2001:db8:1::2</pre>
+
+</div>
+<div id="topic-ospf" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">OSPF</h3>
+
+<h2>OSPF — Open Shortest Path First</h2>
+<span class="topic-tag" style="background:rgba(255,159,64,0.15);color:#ff9f40">Routing</span>
+
+<h3>OSPF Key Concepts</h3>
+<ul>
+<li><strong>Link-State:</strong> Builds a complete topology map of the network using LSAs</li>
+<li><strong>Algorithm:</strong> Dijkstra's Shortest Path First (SPF)</li>
+<li><strong>Metric:</strong> Cost = 100 Mbps ÷ interface bandwidth</li>
+<li><strong>AD:</strong> 110</li>
+<li><strong>Multicast:</strong> 224.0.0.5 (all OSPF routers), 224.0.0.6 (DR/BDR)</li>
+<li><strong>Protocol:</strong> IP Protocol 89</li>
+<li><strong>Standard:</strong> OSPFv2 (IPv4), OSPFv3 (IPv6)</li>
+</ul>
+
+<h3>OSPF Neighbor States</h3>
+<p>OSPF forms adjacencies through a state machine:</p>
+<pre>Down → Init → 2-Way → ExStart → Exchange → Loading → Full</pre>
+<ul>
+<li><strong>2-Way:</strong> Bidirectional communication. DR/BDR election happens here.</li>
+<li><strong>Full:</strong> Complete adjacency. LSDBs are synchronized.</li>
+</ul>
+
+<h3>DR/BDR Election (Multi-Access Networks)</h3>
+<p>On broadcast networks (Ethernet), OSPF elects a Designated Router (DR) and Backup DR (BDR) to reduce OSPF traffic.</p>
+<ul>
+<li>Highest OSPF priority wins (default: 1). Priority 0 = never elected.</li>
+<li>Tie: Highest Router ID wins</li>
+<li>Router ID = Highest loopback IP, then highest active interface IP, or manually configured</li>
+<li>DR/BDR election is <strong>non-preemptive</strong> once formed</li>
+</ul>
+
+<h3>OSPF Areas</h3>
+<ul>
+<li><strong>Backbone Area (Area 0):</strong> All other areas must connect to Area 0</li>
+<li><strong>ABR (Area Border Router):</strong> Connects non-backbone area to Area 0</li>
+<li><strong>ASBR (Autonomous System Boundary Router):</strong> Connects OSPF to external routing domain</li>
+<li><strong>Stub Area:</strong> No external LSAs. Default route used instead.</li>
+<li><strong>Totally Stubby:</strong> No external or inter-area LSAs. Only default route. (Cisco)</li>
+<li><strong>NSSA:</strong> Not-So-Stubby. Allows limited external routes (Type 7 LSA).</li>
+</ul>
+
+<h3>OSPF Configuration (Single Area)</h3>
+<pre>! OSPFv2
+R1(config)# router ospf 1
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# network 192.168.1.0 0.0.0.255 area 0
+R1(config-router)# network 10.0.0.0 0.0.0.3 area 0
+R1(config-router)# passive-interface gi0/1  ! No OSPF hellos on this interface
+R1(config-router)# default-information originate  ! Advertise default route
+
+! Interface cost
+R1(config-if)# ip ospf cost 10
+
+! Priority for DR election
+R1(config-if)# ip ospf priority 100  ! 0 = won't be elected
+
+! Hello/Dead timers
+R1(config-if)# ip ospf hello-interval 10
+R1(config-if)# ip ospf dead-interval 40</pre>
+
+<h3>OSPF Verification</h3>
+<pre>show ip ospf neighbor            ! Adjacency table
+show ip ospf neighbor detail     ! Detailed neighbor info
+show ip ospf database            ! LSDB
+show ip ospf interface           ! OSPF interface info
+show ip route ospf               ! OSPF routes in routing table
+debug ip ospf events
+debug ip ospf adj</pre>
+
+<h3>OSPFv3 (IPv6)</h3>
+<pre>R1(config)# ipv6 router ospf 1
+R1(config-rtr)# router-id 1.1.1.1
+R1(config)# interface gi0/0
+R1(config-if)# ipv6 ospf 1 area 0</pre>
+
+<h3>OSPF Cost Calculation</h3>
+<pre>Cost = Reference Bandwidth / Interface Bandwidth
+Default reference = 100 Mbps
+
+FastEthernet (100M): 100/100 = 1
+GigabitEthernet (1G): 100/1000 = 0.1 → rounds to 1 (same as FE!)
+
+! Fix: increase reference bandwidth
+R1(config-router)# auto-cost reference-bandwidth 1000  ! = 1 Gbps
+R1(config-router)# auto-cost reference-bandwidth 10000 ! = 10 Gbps</pre>
+
+</div>
+<div id="topic-eigrp" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">EIGRP</h3>
+
+<h2>EIGRP — Enhanced Interior Gateway Routing Protocol</h2>
+<span class="topic-tag" style="background:rgba(255,159,64,0.15);color:#ff9f40">Routing</span>
+
+<h3>EIGRP Characteristics</h3>
+<ul>
+<li><strong>Type:</strong> Advanced Distance Vector / Hybrid (uses Diffusing Update Algorithm — DUAL)</li>
+<li><strong>Cisco proprietary</strong> (now has RFC 7868 open standard)</li>
+<li><strong>AD:</strong> Internal 90, External 170, Summary 5</li>
+<li><strong>Metric:</strong> Composite — Bandwidth + Delay (+ Reliability + Load + MTU optionally)</li>
+<li><strong>Multicast:</strong> 224.0.0.10</li>
+<li><strong>Protocol:</strong> IP Protocol 88</li>
+<li><strong>100% loop-free</strong> due to DUAL algorithm</li>
+</ul>
+
+<h3>EIGRP DUAL Terminology</h3>
+<ul>
+<li><strong>Feasible Distance (FD):</strong> Best metric to reach destination (from this router)</li>
+<li><strong>Reported Distance (RD) / Advertised Distance:</strong> Neighbor's metric to destination</li>
+<li><strong>Successor:</strong> Best path to destination. Installed in routing table.</li>
+<li><strong>Feasible Successor (FS):</strong> Backup path. RD &lt; Successor's FD. Immediately usable if successor fails.</li>
+<li><strong>Feasibility Condition:</strong> RD of neighbor must be less than FD of current successor</li>
+</ul>
+
+<h3>EIGRP Configuration</h3>
+<pre>! Classic mode
+R1(config)# router eigrp 100         ! AS number must match
+R1(config-router)# eigrp router-id 1.1.1.1
+R1(config-router)# network 192.168.1.0
+R1(config-router)# network 10.0.0.0 0.0.0.3  ! With wildcard mask
+R1(config-router)# passive-interface gi0/1
+R1(config-router)# no auto-summary   ! Disable automatic summarization
+
+! Named mode (preferred — supports IPv4 and IPv6)
+R1(config)# router eigrp CORP
+R1(config-router)# address-family ipv4 unicast autonomous-system 100
+R1(config-router-af)# eigrp router-id 1.1.1.1
+R1(config-router-af)# network 192.168.1.0
+R1(config-router-af)# af-interface gi0/0
+R1(config-router-af-interface)# passive-interface</pre>
+
+<h3>EIGRP Verification</h3>
+<pre>show ip eigrp neighbors          ! Neighbor table
+show ip eigrp topology           ! Topology table (successors + FS)
+show ip eigrp topology all-links ! All paths
+show ip route eigrp              ! EIGRP routes
+show ip eigrp interfaces         ! Interfaces running EIGRP
+show ip eigrp traffic            ! Packet statistics</pre>
+
+<h3>EIGRP Metric Calculation</h3>
+<pre>Metric = 256 × [(K1 × BW) + (K3 × Delay)]
+  Default K values: K1=1, K2=0, K3=1, K4=0, K5=0
+
+BW    = 10^7 / slowest link bandwidth (in kbps)
+Delay = sum of delays along path (in 10 microsecond units)
+
+Example: 100 Mbps link, delay 1000 μs:
+  BW    = 10^7 / 100000 = 100
+  Delay = 1000/10 = 100
+  Metric = 256 × (100 + 100) = 51200</pre>
+
+</div>
+<div id="topic-rip" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">RIP</h3>
+
+<h2>RIP — Routing Information Protocol</h2>
+<span class="topic-tag" style="background:rgba(255,159,64,0.15);color:#ff9f40">Routing</span>
+
+<h3>RIP Characteristics</h3>
+<ul>
+<li><strong>Type:</strong> Distance Vector</li>
+<li><strong>Metric:</strong> Hop count (max 15; 16 = infinite = unreachable)</li>
+<li><strong>AD:</strong> 120</li>
+<li><strong>Updates:</strong> Full routing table broadcast/multicast every 30 seconds</li>
+<li><strong>RIPv1:</strong> Classful, broadcast (255.255.255.255), no VLSM</li>
+<li><strong>RIPv2:</strong> Classless, multicast (224.0.0.9), supports VLSM, authentication</li>
+<li><strong>RIPng:</strong> RIPv2 for IPv6</li>
+</ul>
+
+<h3>RIP Loop Prevention</h3>
+<ul>
+<li><strong>Maximum hop count (15):</strong> Limits network size</li>
+<li><strong>Split horizon:</strong> Don't advertise routes back to source interface</li>
+<li><strong>Route poisoning:</strong> Advertise dead route with metric 16</li>
+<li><strong>Poison reverse:</strong> Send poisoned route back to source</li>
+<li><strong>Holddown timers:</strong> Ignore updates about dead route for 180 sec</li>
+</ul>
+
+<h3>RIP Configuration</h3>
+<pre>R1(config)# router rip
+R1(config-router)# version 2
+R1(config-router)# no auto-summary    ! Required for VLSM support
+R1(config-router)# network 192.168.1.0
+R1(config-router)# network 10.0.0.0
+R1(config-router)# passive-interface gi0/1
+R1(config-router)# default-information originate
+
+! Verify
+R1# show ip rip database
+R1# show ip protocols
+R1# debug ip rip</pre>
+
+</div>
+<div id="topic-bgp-basics" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">BGP Basics</h3>
+
+<h2>BGP — Border Gateway Protocol</h2>
+<span class="topic-tag" style="background:rgba(255,159,64,0.15);color:#ff9f40">Routing</span>
+
+<h3>BGP Overview</h3>
+<p>BGP is the routing protocol of the internet — an Exterior Gateway Protocol (EGP) used between Autonomous Systems (AS).</p>
+<ul>
+<li><strong>Type:</strong> Path Vector (uses AS-PATH attribute for loop prevention)</li>
+<li><strong>Transport:</strong> TCP port 179</li>
+<li><strong>AD:</strong> eBGP = 20, iBGP = 200</li>
+<li><strong>iBGP:</strong> BGP between routers in same AS</li>
+<li><strong>eBGP:</strong> BGP between routers in different AS</li>
+</ul>
+
+<h3>BGP Attributes (Path Selection)</h3>
+<div class="note">BGP selects best path using attributes in order — remember: <strong>We Love Oranges AS Oranges Mean Pure Refreshment</strong></div>
+<ol>
+<li><strong>Weight</strong> (Cisco-specific, local to router) — higher preferred</li>
+<li><strong>Local Preference</strong> (local to AS) — higher preferred</li>
+<li><strong>Originate</strong> (locally originated) — prefer</li>
+<li><strong>AS-PATH length</strong> — shorter preferred</li>
+<li><strong>Origin</strong> (IGP &gt; EGP &gt; Incomplete)</li>
+<li><strong>MED</strong> (Multi-Exit Discriminator) — lower preferred</li>
+<li><strong>Paths</strong> (eBGP over iBGP)</li>
+<li><strong>IGP metric</strong> — lower preferred</li>
+</ol>
+
+<h3>Basic BGP Configuration</h3>
+<pre>! eBGP
+R1(config)# router bgp 65001
+R1(config-router)# bgp router-id 1.1.1.1
+R1(config-router)# neighbor 203.0.113.2 remote-as 65002  ! eBGP neighbor
+R1(config-router)# network 192.168.1.0 mask 255.255.255.0
+
+! iBGP
+R1(config-router)# neighbor 10.0.0.2 remote-as 65001
+R1(config-router)# neighbor 10.0.0.2 update-source Loopback0
+R1(config-router)# neighbor 10.0.0.2 next-hop-self
+
+! Verify
+R1# show bgp summary
+R1# show ip bgp
+R1# show bgp neighbors</pre>
+
+</div>
+<div id="topic-hsrp-fhrp" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">HSRP & FHRP</h3>
+
+<h2>HSRP & First Hop Redundancy Protocols</h2>
+<span class="topic-tag" style="background:rgba(255,159,64,0.15);color:#ff9f40">Routing</span>
+
+<h3>FHRP Overview</h3>
+<p>First Hop Redundancy Protocols provide a virtual gateway IP/MAC so hosts can continue communicating if the primary router fails.</p>
+
+<h3>HSRP — Hot Standby Router Protocol</h3>
+<ul>
+<li>Cisco-proprietary</li>
+<li>One Active router, one Standby, others in Listen state</li>
+<li>Virtual IP + virtual MAC (0000.0C07.ACxx for HSRPv1)</li>
+<li>Hellos: every 3 seconds. Hold time: 10 seconds.</li>
+<li>Priority: default 100. Highest priority = Active.</li>
+<li>Preemption disabled by default</li>
+</ul>
+<pre>R1(config)# interface gi0/0
+R1(config-if)# standby 1 ip 192.168.1.254       ! Virtual IP
+R1(config-if)# standby 1 priority 110           ! Higher = preferred active
+R1(config-if)# standby 1 preempt               ! Take over if higher priority
+R1(config-if)# standby 1 track gi0/1 decrement 20  ! Reduce priority if WAN fails
+
+R1# show standby
+R1# show standby brief</pre>
+
+<h3>HSRP vs VRRP vs GLBP</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Protocol</th><th>Standard</th><th>Active</th><th>Load Balance</th><th>Virtual MAC</th></tr>
+<tr><td>HSRP v1</td><td>Cisco</td><td>1 active, 1 standby</td><td>No (per-group)</td><td>0000.0C07.ACxx</td></tr>
+<tr><td>HSRP v2</td><td>Cisco</td><td>1 active, 1 standby</td><td>No (per-group)</td><td>0000.0C9F.Fxxx</td></tr>
+<tr><td>VRRP</td><td>IEEE (RFC 5798)</td><td>1 master, backups</td><td>No (per-group)</td><td>0000.5E00.01xx</td></tr>
+<tr><td>GLBP</td><td>Cisco</td><td>1 AVG + multiple AVF</td><td>Yes (per-host)</td><td>0007.B400.xxyy</td></tr>
+</table></div>
+
+</div>
+<div id="topic-ipv4-layer3" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Layer 3 Forwarding</h3>
+
+<h2>Layer 3 Forwarding & ARP</h2>
+<span class="topic-tag" style="background:rgba(255,159,64,0.15);color:#ff9f40">Routing</span>
+
+<h3>ARP — Address Resolution Protocol</h3>
+<p>Maps Layer 3 IP addresses to Layer 2 MAC addresses.</p>
+<pre>Process:
+1. Host A wants to send to 192.168.1.2
+2. Checks ARP cache — not found
+3. Sends ARP Request (broadcast): "Who has 192.168.1.2? Tell 192.168.1.1"
+4. Host B receives request, replies (unicast): "192.168.1.2 is at AA:BB:CC:DD:EE:FF"
+5. Host A caches mapping, sends frame</pre>
+<pre>show arp                         ! View ARP table
+arp -a                           ! Windows
+ip neigh show                    ! Linux</pre>
+
+<h3>Proxy ARP</h3>
+<p>Router responds to ARP requests on behalf of a host in another subnet. Allows hosts with incorrect subnet masks to still communicate. Usually enabled by default; disable if not needed:</p>
+<pre>R1(config-if)# no ip proxy-arp</pre>
+
+<h3>Packet Forwarding Process</h3>
+<pre>1. Receive frame, check destination MAC
+2. If MAC matches, strip L2 header → inspect IP packet
+3. Check TTL — decrement by 1. If TTL=0, discard + ICMP TTL exceeded
+4. Look up destination IP in routing table (longest prefix match)
+5. Determine exit interface and next-hop IP
+6. ARP for next-hop MAC (if Ethernet)
+7. Build new L2 frame with next-hop MAC, forward</pre>
+
+<h3>ICMP — Internet Control Message Protocol</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Type</th><th>Name</th><th>Common Use</th></tr>
+<tr><td>0</td><td>Echo Reply</td><td>Ping response</td></tr>
+<tr><td>3</td><td>Destination Unreachable</td><td>Can't reach host/port/network</td></tr>
+<tr><td>5</td><td>Redirect</td><td>Better route available</td></tr>
+<tr><td>8</td><td>Echo Request</td><td>Ping</td></tr>
+<tr><td>11</td><td>Time Exceeded</td><td>TTL expired (traceroute uses this)</td></tr>
+</table></div>
+
+</div>
+</div>
+<div class="content-section section-card" id="cat-wan-services">
+<h2>📑 WAN & Services</h2>
+<div id="topic-wan-technologies" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">WAN Technologies</h3>
+
+<h2>WAN Technologies</h2>
+<span class="topic-tag" style="background:rgba(255,79,109,0.15);color:#ff4f6d">WAN & Services</span>
+
+<h3>WAN Connection Types</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Leased Lines (Point-to-Point)</div><p>Dedicated serial connection between two sites. T1 (1.544 Mbps), T3 (44.7 Mbps), E1 (2.048 Mbps). Always-on. PPP or HDLC encapsulation. Expensive.</p></div>
+<div class="card"><div class="card-title">Frame Relay (Legacy)</div><p>Packet-switched. Virtual circuits (PVC/SVC). DLCI numbers identify VCs. Uses Local Management Interface (LMI). Being replaced by MPLS.</p></div>
+<div class="card"><div class="card-title">MPLS</div><p>Multi-Protocol Label Switching. Labels instead of IPs for fast forwarding. Provider-managed. MPLS VPN = private WAN. Most common enterprise WAN today.</p></div>
+<div class="card"><div class="card-title">Metro Ethernet</div><p>Ethernet-based WAN. Uses Ethernet standards across MAN/WAN. E-Line (P2P), E-LAN (multipoint), E-Tree (hub-and-spoke). Cost-effective.</p></div>
+<div class="card"><div class="card-title">DSL</div><p>Digital Subscriber Line over telephone lines. ADSL (asymmetric), VDSL (faster). PPPoE encapsulation. Distance-limited.</p></div>
+<div class="card"><div class="card-title">Cable</div><p>HFC (Hybrid Fiber-Coax). DOCSIS standard. Shared bandwidth. High speeds, asymmetric.</p></div>
+</div>
+
+<h3>WAN Serial Encapsulations</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Protocol</th><th>Description</th><th>Notes</th></tr>
+<tr><td>HDLC</td><td>High-Level Data Link Control</td><td>Cisco default for serial. Cisco-proprietary version. Point-to-point only.</td></tr>
+<tr><td>PPP</td><td>Point-to-Point Protocol</td><td>Open standard. Authentication (PAP, CHAP). Multilink support. More features than HDLC.</td></tr>
+<tr><td>PPPoE</td><td>PPP over Ethernet</td><td>Used for DSL connections. Authentication + IP assignment via PPP over Ethernet.</td></tr>
+</table></div>
+
+<h3>PPP Configuration</h3>
+<pre>! PPP with CHAP authentication
+R1(config)# interface serial0/0/0
+R1(config-if)# encapsulation ppp
+R1(config-if)# ppp authentication chap
+
+R1(config)# username R2 password cisco123  ! Remote router's hostname
+
+! Verify
+R1# show interfaces serial0/0/0
+R1# debug ppp authentication</pre>
+
+<h3>VPN Types</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Site-to-Site VPN</div><p>Permanent encrypted tunnel between two networks. Uses IPsec. Gateway-to-gateway. Replaces leased lines. Employees don't notice VPN.</p></div>
+<div class="card"><div class="card-title">Remote Access VPN</div><p>Individual users connect to corporate network. SSL/TLS or IPsec. AnyConnect, OpenVPN, WireGuard. Users install VPN client.</p></div>
+<div class="card"><div class="card-title">GRE Tunnel</div><p>Generic Routing Encapsulation. Encapsulates any protocol. Not encrypted by default. Often combined with IPsec for security. Multipoint GRE (mGRE) for hub-and-spoke.</p></div>
+<div class="card"><div class="card-title">DMVPN</div><p>Dynamic Multipoint VPN. Hub-and-spoke + dynamic spoke-to-spoke tunnels. NHRP + mGRE. Scalable enterprise WAN.</p></div>
+</div>
+
+<h3>SD-WAN</h3>
+<p>Software-Defined WAN abstracts the WAN transport layer from the application layer. Benefits:</p>
+<ul>
+<li>Centralized management and visibility</li>
+<li>Multiple transport links (MPLS + broadband + LTE) simultaneously</li>
+<li>Application-aware routing</li>
+<li>Zero-touch provisioning</li>
+<li>Vendors: Cisco Viptela, VMware SD-WAN (VeloCloud), Silver Peak</li>
+</ul>
+
+</div>
+<div id="topic-dhcp-dns" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">DHCP & DNS</h3>
+
+<h2>DHCP & DNS</h2>
+<span class="topic-tag" style="background:rgba(255,79,109,0.15);color:#ff4f6d">WAN & Services</span>
+
+<h3>DHCP — Dynamic Host Configuration Protocol</h3>
+<p>Automatically assigns IP addresses and configuration to network devices.</p>
+
+<h4>DHCP DORA Process</h4>
+<pre>1. DISCOVER  — Client broadcasts (255.255.255.255) looking for DHCP server
+2. OFFER     — Server unicasts/broadcasts offer with IP, mask, gateway, DNS
+3. REQUEST   — Client broadcasts acceptance of offer
+4. ACK       — Server confirms assignment
+(NACK = rejected)</pre>
+
+<h4>DHCP Server Configuration (IOS)</h4>
+<pre>R1(config)# ip dhcp excluded-address 192.168.1.1 192.168.1.10
+R1(config)# ip dhcp pool LAN_POOL
+R1(dhcp-config)# network 192.168.1.0 255.255.255.0
+R1(dhcp-config)# default-router 192.168.1.1
+R1(dhcp-config)# dns-server 8.8.8.8 8.8.4.4
+R1(dhcp-config)# domain-name company.local
+R1(dhcp-config)# lease 7              ! Days
+
+! Verify
+R1# show ip dhcp binding
+R1# show ip dhcp pool
+R1# show ip dhcp conflict</pre>
+
+<h4>DHCP Relay (IP Helper)</h4>
+<pre>! When DHCP server is on different subnet
+R1(config)# interface gi0/1             ! Interface facing clients
+R1(config-if)# ip helper-address 10.0.0.100  ! DHCP server IP</pre>
+
+<h3>DHCPv6</h3>
+<pre>! Stateless DHCPv6 (SLAAC + options)
+R1(config)# ipv6 dhcp pool IPV6_POOL
+R1(config-dhcpv6)# dns-server 2001:4860:4860::8888
+R1(config)# interface gi0/0
+R1(config-if)# ipv6 dhcp server IPV6_POOL
+R1(config-if)# ipv6 nd other-config-flag  ! Set O flag in RA
+
+! Stateful DHCPv6
+R1(config-if)# ipv6 nd managed-config-flag  ! Set M flag in RA</pre>
+
+<h3>DNS — Domain Name System</h3>
+<p>Resolves hostnames to IP addresses. Hierarchical distributed database.</p>
+<div class="tbl-wrap"><table>
+<tr><th>Record Type</th><th>Purpose</th></tr>
+<tr><td>A</td><td>IPv4 address record</td></tr>
+<tr><td>AAAA</td><td>IPv6 address record</td></tr>
+<tr><td>CNAME</td><td>Alias/canonical name</td></tr>
+<tr><td>MX</td><td>Mail exchanger</td></tr>
+<tr><td>NS</td><td>Name server</td></tr>
+<tr><td>PTR</td><td>Reverse lookup (IP → hostname)</td></tr>
+<tr><td>SOA</td><td>Start of authority</td></tr>
+<tr><td>TXT</td><td>Text records (SPF, DKIM, verification)</td></tr>
+</table></div>
+
+<h4>DNS Resolution Order (Windows)</h4>
+<pre>1. Local cache
+2. hosts file (C:\Windows\System32\drivers\etc\hosts)
+3. DNS server query (recursive → iterative)</pre>
+
+</div>
+<div id="topic-ntp-snmp-syslog" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">NTP, SNMP & Syslog</h3>
+
+<h2>NTP, SNMP & Syslog</h2>
+<span class="topic-tag" style="background:rgba(255,79,109,0.15);color:#ff4f6d">WAN & Services</span>
+
+<h3>NTP — Network Time Protocol</h3>
+<p>Synchronizes clocks across network devices. Uses UDP port 123. Stratum levels indicate accuracy.</p>
+<ul>
+<li><strong>Stratum 0:</strong> Atomic clock / GPS (reference clock)</li>
+<li><strong>Stratum 1:</strong> Directly synced to Stratum 0 (NTP servers)</li>
+<li><strong>Stratum 2:</strong> Synced to Stratum 1 servers</li>
+<li>…up to Stratum 15. Stratum 16 = unsynchronized.</li>
+</ul>
+<pre>R1(config)# ntp server 216.239.35.0      ! Google NTP
+R1(config)# ntp server 10.0.0.1 prefer
+R1(config)# ntp master 2                 ! Make this router NTP master (stratum 2)
+R1(config)# ntp update-calendar
+R1(config)# clock timezone EST -5
+
+R1# show ntp status
+R1# show ntp associations</pre>
+
+<h3>SNMP — Simple Network Management Protocol</h3>
+<p>Used for network monitoring and management. UDP ports 161 (queries) and 162 (traps).</p>
+<div class="tbl-wrap"><table>
+<tr><th>Version</th><th>Security</th><th>Notes</th></tr>
+<tr><td>SNMPv1</td><td>Community string (cleartext)</td><td>Legacy. Read-only and read-write communities.</td></tr>
+<tr><td>SNMPv2c</td><td>Community string (cleartext)</td><td>Better performance, bulk operations. Still insecure.</td></tr>
+<tr><td>SNMPv3</td><td>Authentication + Encryption</td><td>Recommended. Auth: MD5/SHA. Encrypt: DES/AES.</td></tr>
+</table></div>
+
+<h4>SNMP Components</h4>
+<ul>
+<li><strong>MIB:</strong> Management Information Base — database of manageable objects</li>
+<li><strong>OID:</strong> Object Identifier — unique address of MIB object</li>
+<li><strong>Manager (NMS):</strong> Sends queries (GET, SET), receives traps</li>
+<li><strong>Agent:</strong> Runs on managed device, responds to queries, sends traps/informs</li>
+</ul>
+
+<pre>! SNMPv2c
+R1(config)# snmp-server community PUBLIC ro
+R1(config)# snmp-server community PRIVATE rw
+R1(config)# snmp-server host 10.0.0.10 version 2c PUBLIC
+R1(config)# snmp-server enable traps
+
+! SNMPv3
+R1(config)# snmp-server group ADMIN v3 priv
+R1(config)# snmp-server user NETADMIN ADMIN v3 auth sha Auth@123 priv aes 128 Priv@123</pre>
+
+<h3>Syslog</h3>
+<p>Standard for message logging. UDP port 514. Severity levels (0 = most critical):</p>
+<div class="tbl-wrap"><table>
+<tr><th>Level</th><th>Name</th><th>Description</th></tr>
+<tr><td>0</td><td>Emergency</td><td>System unusable</td></tr>
+<tr><td>1</td><td>Alert</td><td>Immediate action needed</td></tr>
+<tr><td>2</td><td>Critical</td><td>Critical conditions</td></tr>
+<tr><td>3</td><td>Error</td><td>Error conditions</td></tr>
+<tr><td>4</td><td>Warning</td><td>Warning conditions</td></tr>
+<tr><td>5</td><td>Notice</td><td>Normal but significant</td></tr>
+<tr><td>6</td><td>Informational</td><td>Informational messages</td></tr>
+<tr><td>7</td><td>Debug</td><td>Debug-level messages</td></tr>
+</table></div>
+<div class="note"><strong>Mnemonic:</strong> Every Awful Clown Eats Worms Never Inviting Dogs</div>
+<pre>R1(config)# logging 10.0.0.20              ! Syslog server IP
+R1(config)# logging trap warnings          ! Send level 4 and below
+R1(config)# logging on
+R1(config)# logging buffered 16384 debugging  ! Local buffer
+
+R1# show logging</pre>
+
+</div>
+<div id="topic-qos" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">QoS</h3>
+
+<h2>QoS — Quality of Service</h2>
+<span class="topic-tag" style="background:rgba(255,79,109,0.15);color:#ff4f6d">WAN & Services</span>
+
+<h3>Why QoS?</h3>
+<p>Networks have limited bandwidth. QoS prioritizes traffic to ensure latency-sensitive applications (voice, video) get preferential treatment over less time-sensitive traffic (file transfers, email).</p>
+
+<h3>QoS Characteristics</h3>
+<ul>
+<li><strong>Bandwidth:</strong> Available capacity in bits per second</li>
+<li><strong>Delay (Latency):</strong> Time for packet to travel from source to destination</li>
+<li><strong>Jitter:</strong> Variation in delay between packets</li>
+<li><strong>Loss:</strong> Percentage of packets dropped</li>
+</ul>
+
+<h4>Recommended QoS Values</h4>
+<div class="tbl-wrap"><table>
+<tr><th>Application</th><th>Max Delay (one-way)</th><th>Max Jitter</th><th>Max Loss</th></tr>
+<tr><td>VoIP</td><td>150 ms</td><td>30 ms</td><td>1%</td></tr>
+<tr><td>Video</td><td>200 ms</td><td>50 ms</td><td>0.1%</td></tr>
+<tr><td>Data</td><td>N/A</td><td>N/A</td><td>Variable</td></tr>
+</table></div>
+
+<h3>QoS Models</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Best Effort</div><p>No QoS. All packets treated equally. Default in most networks.</p></div>
+<div class="card"><div class="card-title">IntServ (RSVP)</div><p>Integrated Services. Per-flow resource reservation using RSVP. Guarantees but doesn't scale well.</p></div>
+<div class="card"><div class="card-title">DiffServ</div><p>Differentiated Services. Marks packets with DSCP/IP Precedence. Scalable. Most common in enterprise.</p></div>
+</div>
+
+<h3>QoS Marking</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Field</th><th>Bits</th><th>Location</th><th>Values</th></tr>
+<tr><td>IP Precedence</td><td>3</td><td>IPv4 TOS byte</td><td>0–7</td></tr>
+<tr><td>DSCP</td><td>6</td><td>IPv4 TOS / IPv6 Traffic Class</td><td>0–63 (EF=46, AF=10-43, CS=0-56)</td></tr>
+<tr><td>CoS (802.1p)</td><td>3</td><td>802.1Q frame tag</td><td>0–7</td></tr>
+</table></div>
+
+<h3>QoS Queuing Methods</h3>
+<ul>
+<li><strong>FIFO:</strong> First-In, First-Out. No prioritization. Default.</li>
+<li><strong>WFQ:</strong> Weighted Fair Queuing. Automatic classification.</li>
+<li><strong>CBWFQ:</strong> Class-Based WFQ. Traffic classes with bandwidth guarantees.</li>
+<li><strong>LLQ:</strong> Low Latency Queuing. CBWFQ + priority queue for voice. Recommended for VoIP.</li>
+<li><strong>PQ:</strong> Priority Queuing. 4 queues (high/medium/normal/low). Can starve lower queues.</li>
+</ul>
+
+<h3>QoS Configuration (MQC)</h3>
+<pre>! Step 1: Classification
+class-map match-any VOICE
+ match dscp ef
+ match ip dscp 46
+
+class-map match-all VIDEO
+ match dscp af41
+
+! Step 2: Policy
+policy-map WAN_POLICY
+ class VOICE
+  priority 256           ! LLQ strict priority
+ class VIDEO
+  bandwidth 512          ! Guarantee 512 kbps
+ class class-default
+  fair-queue
+
+! Step 3: Apply to interface
+interface serial0/0/0
+ service-policy output WAN_POLICY</pre>
+
+</div>
+</div>
+<div class="content-section section-card" id="cat-security">
+<h2>📑 Security</h2>
+<div id="topic-acl" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Access Control Lists</h3>
+
+<h2>Access Control Lists (ACLs)</h2>
+<span class="topic-tag" style="background:rgba(123,97,255,0.15);color:#7b61ff">Security</span>
+
+<h3>ACL Overview</h3>
+<p>ACLs are ordered lists of permit/deny statements used to filter traffic. Processed top-to-bottom; first match wins. Implicit deny all at end.</p>
+
+<h3>ACL Types</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Standard ACL (1–99, 1300–1999)</div><p>Filters by source IP address only. Place close to destination. Simple but limited.</p></div>
+<div class="card"><div class="card-title">Extended ACL (100–199, 2000–2699)</div><p>Filters by source IP, destination IP, protocol, ports. Place close to source. More precise.</p></div>
+<div class="card"><div class="card-title">Named ACL</div><p>Uses names instead of numbers. Both standard and extended. Easier to manage, edit, delete individual entries.</p></div>
+</div>
+
+<h3>Wildcard Masks</h3>
+<p>Wildcard masks are the inverse of subnet masks. 0 = must match, 1 = don't care.</p>
+<pre>255.255.255.0 subnet mask → 0.0.0.255 wildcard
+255.255.255.252 → 0.0.0.3
+
+Special:
+  host  = 0.0.0.0    (matches exact IP)
+  any   = 255.255.255.255 (matches all)</pre>
+
+<h3>Standard ACL Configuration</h3>
+<pre>! Numbered
+R1(config)# access-list 10 permit 192.168.1.0 0.0.0.255
+R1(config)# access-list 10 deny any
+
+! Named
+R1(config)# ip access-list standard ALLOW_LAN
+R1(config-std-nacl)# permit 192.168.1.0 0.0.0.255
+R1(config-std-nacl)# deny any log
+
+! Apply to interface
+R1(config)# interface gi0/0
+R1(config-if)# ip access-group 10 in      ! inbound
+R1(config-if)# ip access-group ALLOW_LAN out  ! outbound
+
+! Apply to VTY lines
+R1(config)# line vty 0 15
+R1(config-line)# access-class 10 in</pre>
+
+<h3>Extended ACL Configuration</h3>
+<pre>R1(config)# ip access-list extended CORP_POLICY
+! Permit HTTP/HTTPS from sales to server
+R1(config-ext-nacl)# permit tcp 192.168.10.0 0.0.0.255 host 10.0.0.5 eq 80
+R1(config-ext-nacl)# permit tcp 192.168.10.0 0.0.0.255 host 10.0.0.5 eq 443
+! Permit ICMP for troubleshooting
+R1(config-ext-nacl)# permit icmp 192.168.10.0 0.0.0.255 any
+! Block Telnet everywhere
+R1(config-ext-nacl)# deny tcp any any eq 23
+! Permit everything else
+R1(config-ext-nacl)# permit ip any any
+
+R1(config)# interface gi0/0
+R1(config-if)# ip access-group CORP_POLICY in</pre>
+
+<h3>ACL Verification</h3>
+<pre>show ip access-lists           ! All ACLs with match counts
+show ip access-lists 10        ! Specific ACL
+show ip interface gi0/0        ! Check which ACLs applied to interface
+show running-config | include access</pre>
+
+<h3>ACL Best Practices</h3>
+<ul>
+<li>Standard ACLs: place near destination</li>
+<li>Extended ACLs: place near source</li>
+<li>Most specific entries first</li>
+<li>Remember implicit deny — add explicit permit if needed</li>
+<li>Use <code>log</code> keyword to log matches</li>
+<li>Use named ACLs for easier editing</li>
+<li>Always verify with <code>show ip access-lists</code> (check counters)</li>
+</ul>
+
+</div>
+<div id="topic-network-security" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Network Security</h3>
+
+<h2>Network Security</h2>
+<span class="topic-tag" style="background:rgba(123,97,255,0.15);color:#7b61ff">Security</span>
+
+<h3>AAA — Authentication, Authorization, Accounting</h3>
+<ul>
+<li><strong>Authentication:</strong> Who are you? (username/password, certificates, MFA)</li>
+<li><strong>Authorization:</strong> What can you do? (privilege levels, command sets)</li>
+<li><strong>Accounting:</strong> What did you do? (logging, billing, audit)</li>
+</ul>
+<div class="tbl-wrap"><table>
+<tr><th>Protocol</th><th>Transport</th><th>Port</th><th>Encryption</th><th>Cisco</th></tr>
+<tr><td>RADIUS</td><td>UDP</td><td>1812/1813</td><td>Password only</td><td>Standard, used for network access</td></tr>
+<tr><td>TACACS+</td><td>TCP</td><td>49</td><td>Full payload</td><td>Cisco-proprietary, used for device management</td></tr>
+</table></div>
+
+<h3>Layer 2 Security Threats & Mitigations</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Attack</th><th>Description</th><th>Mitigation</th></tr>
+<tr><td>MAC Flooding</td><td>Fill CAM table → switch acts like hub</td><td>Port Security</td></tr>
+<tr><td>VLAN Hopping</td><td>Double-tagging or DTP to access other VLANs</td><td>Disable DTP, change native VLAN, use unused VLAN</td></tr>
+<tr><td>DHCP Starvation</td><td>Flood DISCOVER packets to exhaust DHCP pool</td><td>DHCP Snooping</td></tr>
+<tr><td>DHCP Spoofing</td><td>Rogue DHCP server assigns wrong gateway</td><td>DHCP Snooping (trusted ports)</td></tr>
+<tr><td>ARP Spoofing/Poisoning</td><td>Fake ARP replies to redirect traffic (MITM)</td><td>Dynamic ARP Inspection (DAI)</td></tr>
+<tr><td>IP Spoofing</td><td>Fake source IP address</td><td>IP Source Guard</td></tr>
+<tr><td>STP Attack</td><td>Send superior BPDUs to become root bridge</td><td>BPDU Guard, Root Guard</td></tr>
+</table></div>
+
+<h3>Port Security</h3>
+<pre>SW1(config)# interface gi0/1
+SW1(config-if)# switchport mode access
+SW1(config-if)# switchport port-security
+SW1(config-if)# switchport port-security maximum 2
+SW1(config-if)# switchport port-security mac-address sticky    ! Learn dynamically
+SW1(config-if)# switchport port-security violation restrict    ! or shutdown/protect
+
+! Violation modes:
+!   shutdown  — err-disables port (default)
+!   restrict  — drop + log
+!   protect   — drop silently
+
+SW1# show port-security interface gi0/1
+SW1# show port-security address
+
+! Re-enable err-disabled port:
+SW1(config-if)# shutdown
+SW1(config-if)# no shutdown</pre>
+
+<h3>DHCP Snooping</h3>
+<pre>SW1(config)# ip dhcp snooping
+SW1(config)# ip dhcp snooping vlan 10,20
+SW1(config)# no ip dhcp snooping information option  ! Disable option 82 if issues
+
+! Trusted port = uplink to DHCP server or trusted switch
+SW1(config)# interface gi0/24
+SW1(config-if)# ip dhcp snooping trust
+
+! Untrusted ports (default) rate-limit DHCP
+SW1(config)# interface gi0/1
+SW1(config-if)# ip dhcp snooping limit rate 10
+
+SW1# show ip dhcp snooping binding</pre>
+
+<h3>Dynamic ARP Inspection (DAI)</h3>
+<pre>SW1(config)# ip arp inspection vlan 10,20  ! Requires DHCP snooping binding table
+SW1(config)# interface gi0/24
+SW1(config-if)# ip arp inspection trust   ! Trusted uplink
+
+SW1# show ip arp inspection vlan 10</pre>
+
+<h3>Cisco Device Hardening</h3>
+<pre>! Secure management access
+R1(config)# service password-encryption
+R1(config)# security passwords min-length 10
+R1(config)# login block-for 120 attempts 3 within 60  ! Login lockout
+R1(config)# ip ssh version 2                           ! Use SSHv2 only
+R1(config)# ip domain-name company.com
+R1(config)# crypto key generate rsa modulus 2048
+
+! Disable unused services
+R1(config)# no service finger
+R1(config)# no service udp-small-servers
+R1(config)# no service tcp-small-servers
+R1(config)# no ip http server                          ! Disable HTTP
+R1(config)# ip http secure-server                     ! Enable HTTPS only
+R1(config)# no cdp run                                 ! Disable CDP globally
+
+! Disable unused interfaces
+R1(config)# interface range gi0/1-4
+R1(config-if-range)# shutdown
+R1(config-if-range)# description UNUSED</pre>
+
+</div>
+<div id="topic-wireless-security" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Wireless Security</h3>
+
+<h2>Wireless Security</h2>
+<span class="topic-tag" style="background:rgba(123,97,255,0.15);color:#7b61ff">Security</span>
+
+<h3>Wireless Security Standards</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Standard</th><th>Encryption</th><th>Auth</th><th>Security</th></tr>
+<tr><td>WEP</td><td>RC4 (40/104-bit)</td><td>PSK</td><td>Broken — do not use</td></tr>
+<tr><td>WPA</td><td>TKIP (RC4)</td><td>PSK / 802.1X</td><td>Weak — legacy only</td></tr>
+<tr><td>WPA2</td><td>CCMP (AES-128)</td><td>PSK / 802.1X</td><td>Good — current standard</td></tr>
+<tr><td>WPA3</td><td>GCMP (AES-192/256)</td><td>SAE / 802.1X</td><td>Best — latest standard</td></tr>
+</table></div>
+
+<h3>WPA2/WPA3 Modes</h3>
+<ul>
+<li><strong>Personal (PSK):</strong> Pre-shared key. All users share same password. Home/small business.</li>
+<li><strong>Enterprise (802.1X):</strong> Per-user authentication via RADIUS server. EAP variants. Enterprise use.</li>
+</ul>
+
+<h3>802.1X Components</h3>
+<ul>
+<li><strong>Supplicant:</strong> Client device (PC, phone) — sends credentials</li>
+<li><strong>Authenticator:</strong> Switch or AP — relays auth between supplicant and server</li>
+<li><strong>Authentication Server:</strong> RADIUS server — verifies credentials</li>
+</ul>
+
+<h3>Wireless Threats</h3>
+<ul>
+<li><strong>Rogue AP:</strong> Unauthorized AP on the network. Detected via WIDS/WIPS.</li>
+<li><strong>Evil Twin:</strong> AP with same SSID as legitimate AP. MITM attack.</li>
+<li><strong>Deauthentication Attack:</strong> Spoofed deauth frames force client disconnect.</li>
+<li><strong>War Driving:</strong> Discovering wireless networks from a moving vehicle.</li>
+<li><strong>KRACK:</strong> Key Reinstallation Attack targeting WPA2 handshake.</li>
+</ul>
+
+<h3>Wireless Best Practices</h3>
+<ul>
+<li>Use WPA3 or WPA2-Enterprise where possible</li>
+<li>Change default SSID and admin credentials</li>
+<li>Use separate VLANs for guest and corporate wireless</li>
+<li>Enable WIDS/WIPS to detect rogue APs</li>
+<li>Disable WPS (Wi-Fi Protected Setup)</li>
+<li>Use 802.1X for enterprise authentication</li>
+<li>Implement wireless IPS for monitoring</li>
+</ul>
+
+</div>
+</div>
+<div class="content-section section-card" id="cat-automation">
+<h2>📑 Automation</h2>
+<div id="topic-network-automation" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Network Automation</h3>
+
+<h2>Network Automation & Programmability</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Automation</span>
+
+<h3>Why Network Automation?</h3>
+<ul>
+<li>Eliminate human error in repetitive configuration tasks</li>
+<li>Faster deployment and changes</li>
+<li>Consistent configurations across devices</li>
+<li>Better scalability and visibility</li>
+</ul>
+
+<h3>Data Formats</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">JSON</div>
+<p>JavaScript Object Notation. Human-readable. Key-value pairs, arrays. Widely used in REST APIs.</p>
+<pre style="margin-top:8px">{"hostname": "R1",
+ "interfaces": ["gi0/0","gi0/1"],
+ "ip": "192.168.1.1"}</pre>
+</div>
+<div class="card"><div class="card-title">XML</div>
+<p>eXtensible Markup Language. Tag-based. Verbose but very structured. Used by NETCONF.</p>
+<pre style="margin-top:8px">&lt;router&gt;
+  &lt;name&gt;R1&lt;/name&gt;
+  &lt;ip&gt;192.168.1.1&lt;/ip&gt;
+&lt;/router&gt;</pre>
+</div>
+<div class="card"><div class="card-title">YAML</div>
+<p>YAML Ain't Markup Language. Indentation-based. Very readable. Used by Ansible.</p>
+<pre style="margin-top:8px">hostname: R1
+interfaces:
+  - gi0/0
+  - gi0/1
+ip: 192.168.1.1</pre>
+</div>
+</div>
+
+<h3>APIs</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">REST API</div><p>Representational State Transfer. HTTP-based. JSON/XML. Stateless. Uses verbs: GET (read), POST (create), PUT (update), DELETE (remove). Most modern APIs.</p></div>
+<div class="card"><div class="card-title">NETCONF</div><p>Network Configuration Protocol. Uses XML over SSH (TCP 830). YANG data models. get-config, edit-config operations. More structured than REST.</p></div>
+<div class="card"><div class="card-title">RESTCONF</div><p>REST-based version of NETCONF. HTTP/HTTPS. JSON or XML. YANG models. Simpler than NETCONF.</p></div>
+<div class="card"><div class="card-title">gRPC/gNMI</div><p>Google RPC. Binary (Protobuf). High performance. Used for telemetry streaming. gNMI for network management.</p></div>
+</div>
+
+<h3>Configuration Management Tools</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Tool</th><th>Agent</th><th>Language</th><th>Protocol</th><th>Notes</th></tr>
+<tr><td>Ansible</td><td>Agentless</td><td>Python/YAML</td><td>SSH/API</td><td>Easiest for network; playbooks</td></tr>
+<tr><td>Puppet</td><td>Agent-based</td><td>Ruby (DSL)</td><td>HTTPS</td><td>Manifests; pull model</td></tr>
+<tr><td>Chef</td><td>Agent-based</td><td>Ruby</td><td>HTTPS</td><td>Cookbooks/recipes; pull model</td></tr>
+<tr><td>Terraform</td><td>Agentless</td><td>HCL</td><td>API</td><td>Infrastructure as Code; provisioning</td></tr>
+</table></div>
+
+<h3>Cisco DNA Center & SD-Access</h3>
+<ul>
+<li><strong>Cisco DNA Center:</strong> Intent-based networking controller. Automates campus networks. REST APIs. GUI-based policy.</li>
+<li><strong>SD-Access:</strong> Software-Defined Access. Fabric-based campus. Underlay + Overlay. VXLAN + LISP. Micro-segmentation via SGT.</li>
+<li><strong>Cisco vManage:</strong> SD-WAN controller (Viptela). Centralized policy and management.</li>
+</ul>
+
+<h3>Version Control — Git Basics</h3>
+<pre>git init               # Initialize repo
+git clone &lt;url&gt;        # Clone remote repo
+git add .              # Stage all changes
+git commit -m "msg"    # Commit changes
+git push origin main   # Push to remote
+git pull               # Pull latest
+git status             # Check status
+git log                # View history</pre>
+
+</div>
+<div id="topic-python-networking" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Python for Networking</h3>
+
+<h2>Python for Network Automation</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Automation</span>
+
+<h3>Key Libraries</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">Netmiko</div><p>SSH-based library for network devices. Abstracts SSH connections. Supports 200+ device types including Cisco IOS, NX-OS, Junos, EOS.</p></div>
+<div class="card"><div class="card-title">NAPALM</div><p>Network Automation and Programmability Abstraction Layer with Multivendor support. Vendor-agnostic API. get_facts(), get_interfaces(), load_config().</p></div>
+<div class="card"><div class="card-title">Paramiko</div><p>Pure Python SSH library. Lower-level than Netmiko. Basis for Netmiko. Used when you need more control.</p></div>
+<div class="card"><div class="card-title">Requests</div><p>HTTP library for REST API calls. Simple GET/POST/PUT/DELETE. JSON handling. Used with Cisco DNA Center, Meraki, etc.</p></div>
+<div class="card"><div class="card-title">Nornir</div><p>Automation framework (not tool). Parallel execution. Inventory management. Works with Netmiko/NAPALM.</p></div>
+<div class="card"><div class="card-title">TextFSM/NTC-Templates</div><p>Parse unstructured CLI output into structured data. Google TextFSM + community templates for Cisco, Juniper, Arista.</p></div>
+</div>
+
+<h3>Netmiko Example</h3>
+<pre>from netmiko import ConnectHandler
+
+device = {
+    'device_type': 'cisco_ios',
+    'host':        '192.168.1.1',
+    'username':    'admin',
+    'password':    'cisco123',
+    'secret':      'enable_pass'
+}
+
+with ConnectHandler(**device) as net_connect:
+    net_connect.enable()
+    output = net_connect.send_command('show ip route')
+    print(output)
+    
+    # Send config commands
+    commands = [
+        'interface gi0/0',
+        'description WAN Link',
+        'no shutdown'
+    ]
+    net_connect.send_config_set(commands)</pre>
+
+<h3>REST API Example (Cisco DNA Center)</h3>
+<pre>import requests
+import json
+
+BASE_URL = "https://sandboxdnac.cisco.com/dna"
+AUTH_URL = f"{BASE_URL}/system/api/v1/auth/token"
+
+# Authenticate
+response = requests.post(
+    AUTH_URL,
+    auth=('devnetuser', 'Cisco123!'),
+    verify=False
+)
+token = response.json()['Token']
+
+# Get devices
+headers = {
+    'x-auth-token': token,
+    'Content-Type': 'application/json'
+}
+devices = requests.get(
+    f"{BASE_URL}/intent/api/v1/network-device",
+    headers=headers,
+    verify=False
+)
+for device in devices.json()['response']:
+    print(f"{device['hostname']} - {device['managementIpAddress']}")</pre>
+
+<h3>Ansible Playbook Example</h3>
+<pre>---
+- name: Configure Cisco Router Interfaces
+  hosts: routers
+  gather_facts: no
+  
+  tasks:
+    - name: Configure GigabitEthernet0/0
+      cisco.ios.ios_interfaces:
+        config:
+          - name: GigabitEthernet0/0
+            description: "WAN Interface"
+            enabled: true
+        state: merged
+    
+    - name: Get interface status
+      cisco.ios.ios_command:
+        commands:
+          - show ip interface brief
+      register: output
+    
+    - name: Print output
+      debug:
+        var: output.stdout_lines</pre>
+
+</div>
+<div id="topic-cloud-virtualization" style="margin-bottom:28px;scroll-margin-top:80px">
+<h3 style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px">Cloud & Virtualization</h3>
+
+<h2>Cloud Computing & Virtualization</h2>
+<span class="topic-tag" style="background:rgba(0,201,255,0.15);color:#00c9ff">Automation</span>
+
+<h3>Cloud Service Models</h3>
+<div class="card-grid">
+<div class="card"><div class="card-title">IaaS — Infrastructure as a Service</div><p>Provides compute, storage, networking. You manage OS and above. Examples: AWS EC2, Azure VMs, Google Compute Engine.</p></div>
+<div class="card"><div class="card-title">PaaS — Platform as a Service</div><p>Provides development platform, runtime, middleware. You manage application and data. Examples: Heroku, AWS Elastic Beanstalk, Google App Engine.</p></div>
+<div class="card"><div class="card-title">SaaS — Software as a Service</div><p>Fully managed software. You use the application. Examples: Office 365, Salesforce, Google Workspace, WebEx.</p></div>
+</div>
+
+<h3>Cloud Deployment Models</h3>
+<ul>
+<li><strong>Public Cloud:</strong> Resources shared among multiple customers. Owned by provider (AWS, Azure, GCP). Pay-per-use.</li>
+<li><strong>Private Cloud:</strong> Resources dedicated to one organization. On-premises or hosted. More control, higher cost.</li>
+<li><strong>Hybrid Cloud:</strong> Mix of public and private. Data can move between them. Most common enterprise approach.</li>
+<li><strong>Community Cloud:</strong> Shared by organizations with common interests (healthcare, government).</li>
+</ul>
+
+<h3>Virtualization</h3>
+<ul>
+<li><strong>Hypervisor Type 1 (Bare Metal):</strong> Runs directly on hardware. VMware ESXi, Hyper-V, KVM. Better performance.</li>
+<li><strong>Hypervisor Type 2 (Hosted):</strong> Runs on OS. VMware Workstation, VirtualBox. Easier to deploy.</li>
+<li><strong>Containers:</strong> Share OS kernel. Docker, Kubernetes. Lighter than VMs. Fast startup.</li>
+<li><strong>NFV (Network Functions Virtualization):</strong> Run network functions (firewall, load balancer) as software on commodity hardware.</li>
+<li><strong>SDN (Software-Defined Networking):</strong> Separates control plane from data plane. Centralized controller (e.g., OpenFlow).</li>
+</ul>
+
+<h3>SDN Architecture</h3>
+<pre>┌─────────────────────────────┐
+│    Applications / Business   │  ← Application Layer
+│    (NMS, Security, Analytics)│
+└──────────────┬──────────────┘
+               │ Northbound API (REST)
+┌──────────────▼──────────────┐
+│       SDN Controller         │  ← Control Plane (centralized)
+│    (OpenDaylight, ONOS)      │
+└──────────────┬──────────────┘
+               │ Southbound API (OpenFlow, NETCONF, gRPC)
+┌──────────────▼──────────────┐
+│    Network Infrastructure    │  ← Data Plane (forwarding)
+│    (Switches, Routers)       │
+└─────────────────────────────┘</pre>
+
+<div class="note"><strong>Traditional vs SDN:</strong> In traditional networks, each device has both control plane (routing decisions) and data plane (forwarding). In SDN, the control plane is centralized in a controller, leaving devices to focus on forwarding.</div>
+
+</div>
+</div>
+
+
+  </main>
+
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#cat-network-fundamentals" class="toc-link">📑 Network Fundamentals</a><a href="#topic-network-models" class="toc-link h3">OSI & TCP/IP Models</a><a href="#topic-network-topologies" class="toc-link h3">Network Topologies & Media</a><a href="#topic-network-devices" class="toc-link h3">Network Devices</a><a href="#topic-cdp-lldp" class="toc-link h3">CDP & LLDP</a><a href="#topic-troubleshooting" class="toc-link h3">Troubleshooting</a><a href="#topic-wireless-arch" class="toc-link h3">Wireless Architecture</a><a href="#topic-ios-basics" class="toc-link h3">IOS CLI Basics</a><a href="#cat-ip-addressing" class="toc-link">📑 IP Addressing</a><a href="#topic-ipv4-addressing" class="toc-link h3">IPv4 Addressing</a><a href="#topic-ipv6" class="toc-link h3">IPv6 Addressing</a><a href="#topic-vlsm-nat" class="toc-link h3">VLSM & NAT</a><a href="#cat-switching" class="toc-link">📑 Switching</a><a href="#topic-ethernet-switching" class="toc-link h3">Ethernet & Switching</a><a href="#topic-vlans" class="toc-link h3">VLANs & Trunking</a><a href="#topic-stp" class="toc-link h3">Spanning Tree Protocol</a><a href="#topic-etherchannel" class="toc-link h3">EtherChannel</a><a href="#cat-routing" class="toc-link">📑 Routing</a><a href="#topic-routing-fundamentals" class="toc-link h3">Routing Fundamentals</a><a href="#topic-ospf" class="toc-link h3">OSPF</a><a href="#topic-eigrp" class="toc-link h3">EIGRP</a><a href="#topic-rip" class="toc-link h3">RIP</a><a href="#topic-bgp-basics" class="toc-link h3">BGP Basics</a><a href="#topic-hsrp-fhrp" class="toc-link h3">HSRP & FHRP</a><a href="#topic-ipv4-layer3" class="toc-link h3">Layer 3 Forwarding</a><a href="#cat-wan-services" class="toc-link">📑 WAN & Services</a><a href="#topic-wan-technologies" class="toc-link h3">WAN Technologies</a><a href="#topic-dhcp-dns" class="toc-link h3">DHCP & DNS</a><a href="#topic-ntp-snmp-syslog" class="toc-link h3">NTP, SNMP & Syslog</a><a href="#topic-qos" class="toc-link h3">QoS</a><a href="#cat-security" class="toc-link">📑 Security</a><a href="#topic-acl" class="toc-link h3">Access Control Lists</a><a href="#topic-network-security" class="toc-link h3">Network Security</a><a href="#topic-wireless-security" class="toc-link h3">Wireless Security</a><a href="#cat-automation" class="toc-link">📑 Automation</a><a href="#topic-network-automation" class="toc-link h3">Network Automation</a><a href="#topic-python-networking" class="toc-link h3">Python for Networking</a><a href="#topic-cloud-virtualization" class="toc-link h3">Cloud & Virtualization</a></nav>
+</div>
+
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer id="site-footer">
+  <span>StudyHub — Technical Reference Library</span>
+  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+</footer>
+
+<script>
+// Progress + back-to-top
+const pr = document.getElementById('prog');
+const bt = document.getElementById('btt');
+addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const m = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+  if (pr) pr.style.width = (m > 0 ? Math.min(s / m * 100, 100) : 0) + '%';
+  if (bt) bt.classList.toggle('vis', s > 280);
+}, {passive: true});
+
+// Nav toggle
+function toggleNav() {
+  const nav = document.getElementById('site-nav');
+  const ov = document.getElementById('mob-ov');
+  nav.classList.toggle('open');
+  ov.classList.toggle('on');
+}
+
+// Active ToC highlighting
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('.content-section[id]');
+function updateToc() {
+  const top = window.scrollY + 80;
+  let cur = null;
+  sections.forEach(s => { if (s.offsetTop <= top) cur = s.id; });
+  tocLinks.forEach(l => {
+    l.classList.toggle('active-toc', l.getAttribute('href') === '#' + cur);
+  });
+}
+if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
+
+
+</script>
+</body>
+</html>
