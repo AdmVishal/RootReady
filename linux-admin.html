@@ -302,6 +302,99 @@ tr:hover td { background:rgba(255,255,255,.025); }
 /* hide leftover chevrons from source HTML */
 .chevron { display: none !important; }
 
+
+/* ── Slow Server section ── */
+.slow-method-pill {
+  display: flex; flex-direction: column; align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 16px; font-size: .82rem;
+  gap: 2px; text-align: center; min-width: 100px;
+}
+.slow-method-pill span { color: var(--text3); font-size: .75rem; }
+
+.slow-table-head {
+  display: flex; gap: 12px; padding: 8px 14px;
+  background: rgba(27,79,138,.35); border-radius: 8px;
+  font-size: .68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--sky); margin-bottom: 10px;
+  font-family: var(--font-mono);
+}
+@media (max-width: 768px) { .slow-table-head { display: none; } }
+
+.slow-step { border-left: 3px solid var(--green) !important; margin-bottom: 12px !important; padding: 0 !important; }
+
+.slow-step-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  background: rgba(16,185,129,.06);
+}
+.slow-step-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--green); color: #000;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: .78rem; font-weight: 800;
+  flex-shrink: 0;
+}
+.slow-step-title { font-weight: 700; font-size: .98rem; color: var(--text); }
+.slow-step-sub   { font-size: .78rem; color: var(--text3); margin-top: 2px; }
+
+.slow-step-body {
+  display: grid;
+  grid-template-columns: 1.1fr 1.4fr 1.4fr;
+  gap: 0;
+  padding: 0;
+}
+.slow-col {
+  padding: 14px 16px;
+  border-right: 1px solid var(--border);
+}
+.slow-col:last-child { border-right: none; }
+
+@media (max-width: 800px) {
+  .slow-step-body { grid-template-columns: 1fr; }
+  .slow-col { border-right: none; border-bottom: 1px solid var(--border); }
+  .slow-col:last-child { border-bottom: none; }
+}
+
+.slow-flags {
+  list-style: none; padding: 0; margin: 6px 0 0;
+}
+.slow-flags li {
+  font-size: .83rem; color: var(--text2); padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  line-height: 1.4;
+}
+.slow-flags li:last-child { border-bottom: none; }
+.slow-flags li::before { content: "• "; color: var(--green); }
+
+/* Flow */
+.slow-flow-steps {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 8px; margin-top: 4px;
+}
+.slow-flow-step {
+  display: flex; flex-direction: column; align-items: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; text-align: center;
+  font-size: .8rem; gap: 4px; flex: 1; min-width: 110px;
+}
+.slow-flow-icon { font-size: 1.4rem; }
+.slow-flow-step strong { color: var(--text); font-size: .85rem; }
+.slow-flow-step span   { color: var(--text3); font-size: .74rem; }
+.slow-flow-arrow { color: var(--green); font-size: 1.3rem; font-weight: 700; flex-shrink: 0; }
+@media (max-width: 600px) { .slow-flow-arrow { display: none; } }
+
+/* Bottom 3-col grid */
+.slow-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-top: 16px;
+}
+@media (max-width: 800px) {
+  .slow-bottom-grid { grid-template-columns: 1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -329,7 +422,18 @@ tr:hover td { background:rgba(255,255,255,.025); }
 <a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
 <a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
 
-  </nav>
+  <a href="#s11" class="toc-link">🐢 Linux Server Running Slow</a>
+<a href="#slow-01" class="toc-link h3">01 CPU Saturation</a>
+<a href="#slow-02" class="toc-link h3">02 Memory Pressure</a>
+<a href="#slow-03" class="toc-link h3">03 Disk I/O</a>
+<a href="#slow-04" class="toc-link h3">04 Network Latency</a>
+<a href="#slow-05" class="toc-link h3">05 TCP Connections</a>
+<a href="#slow-06" class="toc-link h3">06 DNS Resolution</a>
+<a href="#slow-07" class="toc-link h3">07 Kernel Errors</a>
+<a href="#slow-08" class="toc-link h3">08 Process Analysis</a>
+<a href="#slow-09" class="toc-link h3">09 Filesystem &amp; Inodes</a>
+<a href="#slow-10" class="toc-link h3">10 App &amp; Dependencies</a>
+</nav>
 
   <main id="main-content">
     
@@ -1544,7 +1648,461 @@ find /opt/Tanium/TaniumClient/tmp -mtime +30 -type f \
 </div>
 
 
-  </main>
+  
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION: Linux Server Running Slow — Pro Level Diagnostic Guide
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="content-section la-section" id="s11">
+
+  <div class="la-section-header">
+    <div class="la-section-icon">🐢</div>
+    <div>
+      <h2 class="la-section-title">Linux Server Running Slow? — Pro Level Diagnostic Guide</h2>
+      <p class="la-section-desc">Diagnose like a pro. Fix the right problem. 10-step systematic approach — Measure · Isolate · Verify · Fix · Prevent</p>
+    </div>
+  </div>
+
+  <!-- Methodology banner -->
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px">
+    <div class="slow-method-pill">📊 <strong>Measure</strong><span>Don't guess</span></div>
+    <div class="slow-method-pill">🔍 <strong>Isolate</strong><span>Find the bottleneck</span></div>
+    <div class="slow-method-pill">✅ <strong>Verify</strong><span>Prove the root cause</span></div>
+    <div class="slow-method-pill">🔧 <strong>Fix</strong><span>Resolve &amp; optimise</span></div>
+    <div class="slow-method-pill">🛡️ <strong>Prevent</strong><span>Monitor &amp; automate</span></div>
+  </div>
+
+  <!-- Always start callout -->
+  <div class="note" style="margin-bottom:20px">
+    <strong>Always start with the big picture:</strong>
+    <code>$ uptime</code> — check load average (e.g. <code>10:42:01 up 45 days, 2:15, 2 users, load average: 28.76, 27.91, 25.32</code>). High load &gt; CPU count = overloaded system.
+  </div>
+
+  <!-- Step table header -->
+  <div class="slow-table-head">
+    <span style="min-width:44px">STEP</span>
+    <span style="flex:1.2">POSSIBLE BOTTLENECK</span>
+    <span style="flex:2">COMMANDS — Run &amp; Analyse</span>
+    <span style="flex:2">WHAT IT TELLS YOU</span>
+    <span style="flex:2">WHAT TO LOOK FOR — Red Flags</span>
+  </div>
+
+  <!-- ── Steps 1–10 ── -->
+
+  <div class="la-topic slow-step" id="slow-01">
+    <div class="slow-step-header">
+      <span class="slow-step-num">01</span>
+      <div>
+        <div class="slow-step-title">🖥️ CPU Saturation</div>
+        <div class="slow-step-sub">Too much CPU being used</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ mpstat -P ALL 1 5
+$ top -b -n1 | head -20
+$ pidstat -u 1
+$ sar -u 1 5</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Shows CPU usage per core, user/system time, context switches, interrupts and per-process CPU usage.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li>High <code>%usr</code> → Application using CPU</li>
+          <li>High <code>%sys</code> → Kernel overhead</li>
+          <li>High <code>%iowait</code> → Wait on I/O (not CPU)</li>
+          <li>High <code>%steal</code> → VM contention</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-02">
+    <div class="slow-step-header">
+      <span class="slow-step-num">02</span>
+      <div>
+        <div class="slow-step-title">🧠 Memory Pressure</div>
+        <div class="slow-step-sub">Not enough RAM or swapping</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ vmstat 1 5
+$ cat /proc/meminfo
+$ free -m
+$ pidstat -r 1</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Reveals memory usage, swap activity, page faults, and memory pressure indicators.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li><code>si/so &gt; 0</code> → Swap in/out (bad)</li>
+          <li>High <code>pgmajfault/s</code> → Memory pressure</li>
+          <li>Low available memory</li>
+          <li style="color:var(--red)"><strong>OOM kills in dmesg</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-03">
+    <div class="slow-step-header">
+      <span class="slow-step-num">03</span>
+      <div>
+        <div class="slow-step-title">💾 Disk I/O Bottleneck</div>
+        <div class="slow-step-sub">Storage is the real problem</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ iostat -x 1 5
+$ iotop -oPa
+$ pidstat -d 1 5
+$ dstat -d --top-io</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Shows disk utilisation, I/O wait, queue depth, read/write latency and which processes are causing it.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li><code>%util → 100%</code> → Disk saturated</li>
+          <li><code>await &gt; 20ms</code> → High latency</li>
+          <li><code>avgqu-sz &gt; 1</code> → I/O queue buildup</li>
+          <li>Reads/Writes high → Heavy I/O</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-04">
+    <div class="slow-step-header">
+      <span class="slow-step-num">04</span>
+      <div>
+        <div class="slow-step-title">🌐 Network Latency / Throughput</div>
+        <div class="slow-step-sub">Network issues or congestion</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ ss -s
+$ nload
+$ sar -n DEV 1 5
+$ mtr -rwzbc 100 &lt;host&gt;</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Analyzes network connections, throughput, packet loss, latency and interface stats.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li>High retransmits / packet loss</li>
+          <li>Many TIME_WAIT connections</li>
+          <li>High latency or jitter</li>
+          <li>Interface errors / dropped packets</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-05">
+    <div class="slow-step-header">
+      <span class="slow-step-num">05</span>
+      <div>
+        <div class="slow-step-title">🔌 TCP Connection Issues</div>
+        <div class="slow-step-sub">Too many or stuck connections</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ ss -s
+$ ss -tan state time-wait | wc -l
+$ ss -tanp | awk '{print $2}' | sort | uniq -c | sort -nr | head</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Shows TCP states, connection counts and potential exhaustion or leaks.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li>TIME_WAIT in hundreds of thousands</li>
+          <li>Many CLOSE_WAIT connections</li>
+          <li>Many connections to same IP:PORT</li>
+          <li>Ephemeral port exhaustion</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-06">
+    <div class="slow-step-header">
+      <span class="slow-step-num">06</span>
+      <div>
+        <div class="slow-step-title">🌍 DNS Resolution</div>
+        <div class="slow-step-sub">DNS slowness kills apps</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ dig +stats example.com
+$ dig @8.8.8.8 example.com
+$ systemd-resolve --statistics
+$ cat /etc/resolv.conf</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Checks DNS resolution time, failure rate, cache hits/misses and resolver performance.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li>High Query time (&gt;50ms)</li>
+          <li>SERVFAIL / NXDOMAIN errors</li>
+          <li>High cache miss rate</li>
+          <li>Using slow or unreachable DNS</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-07">
+    <div class="slow-step-header">
+      <span class="slow-step-num">07</span>
+      <div>
+        <div class="slow-step-title">⚠️ System / Kernel Errors &amp; Warnings</div>
+        <div class="slow-step-sub">Kernel or system component issues</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ dmesg -T | tail -n 50
+$ journalctl -k -xe
+$ journalctl -p err -b
+$ lsblk -o NAME,STATE,MODEL</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Finds kernel errors, hardware issues, driver problems, device resets, OOM kills and other critical events.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li>I/O errors, device resets</li>
+          <li>Out of memory: Kill process</li>
+          <li>EXT4 / XFS errors</li>
+          <li>Hardware / driver failures</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-08">
+    <div class="slow-step-header">
+      <span class="slow-step-num">08</span>
+      <div>
+        <div class="slow-step-title">🔎 Process Analysis</div>
+        <div class="slow-step-sub">Find the real resource hogs</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ ps aux --sort=-%cpu | head -20
+$ ps aux --sort=-%mem | head -20
+$ pmap -x &lt;pid&gt; | less
+$ lsof -p &lt;pid&gt; | wc -l</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Identifies top CPU/RAM consumers, memory maps, open files, threads and resource leaks.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li>Single process using too much CPU</li>
+          <li>High memory RSS</li>
+          <li>Too many open files</li>
+          <li>Thread explosion</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-09">
+    <div class="slow-step-header">
+      <span class="slow-step-num">09</span>
+      <div>
+        <div class="slow-step-title">📂 Filesystem &amp; Inodes</div>
+        <div class="slow-step-sub">Disk full or inode exhaustion</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ df -hT
+$ df -i
+$ du -xh --max-depth=1 / | sort -h
+$ ncdu /</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Checks disk usage, inode usage, filesystem health and largest directories.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li><code>Use% = 100%</code></li>
+          <li>Inodes <code>IUse% = 100%</code></li>
+          <li>Large log files / growing dirs</li>
+          <li>Read-only filesystem</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="la-topic slow-step" id="slow-10">
+    <div class="slow-step-header">
+      <span class="slow-step-num">10</span>
+      <div>
+        <div class="slow-step-title">&lt;/&gt; Application &amp; Dependencies</div>
+        <div class="slow-step-sub">App, DB or external service slowness</div>
+      </div>
+    </div>
+    <div class="slow-step-body">
+      <div class="slow-col">
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-block">$ systemctl status &lt;service&gt;
+$ curl -w '%{time_total}\n' &lt;url&gt;
+$ mysqladmin processlist
+$ redis-cli info stats</div>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">What it tells you</div>
+        <p class="body-text">Validates application health, external dependencies, DB performance and response times.</p>
+      </div>
+      <div class="slow-col">
+        <div class="cmd-label">Red Flags</div>
+        <ul class="slow-flags">
+          <li>Service flapping / restarting</li>
+          <li>Slow API / external calls</li>
+          <li>DB locks / too many connections</li>
+          <li>High response time</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Pro Troubleshooting Flow ── -->
+  <div class="la-topic" id="slow-flow" style="margin-top:8px">
+    <div class="la-topic-header">
+      <span class="la-topic-num">FLOW</span>
+      <h3 class="la-topic-title">Pro Troubleshooting Flow</h3>
+    </div>
+    <div class="slow-flow-steps">
+      <div class="slow-flow-step">
+        <div class="slow-flow-icon">🔁</div>
+        <strong>Reproduce</strong>
+        <span>Confirm the slowdown</span>
+      </div>
+      <div class="slow-flow-arrow">→</div>
+      <div class="slow-flow-step">
+        <div class="slow-flow-icon">🔢</div>
+        <strong>Check Big 4</strong>
+        <span>CPU, Memory, Disk, Network</span>
+      </div>
+      <div class="slow-flow-arrow">→</div>
+      <div class="slow-flow-step">
+        <div class="slow-flow-icon">🔍</div>
+        <strong>Drill Down</strong>
+        <span>Find the offending process / cause</span>
+      </div>
+      <div class="slow-flow-arrow">→</div>
+      <div class="slow-flow-step">
+        <div class="slow-flow-icon">✅</div>
+        <strong>Validate</strong>
+        <span>Confirm with metrics &amp; logs</span>
+      </div>
+      <div class="slow-flow-arrow">→</div>
+      <div class="slow-flow-step">
+        <div class="slow-flow-icon">🛠️</div>
+        <strong>Fix &amp; Prevent</strong>
+        <span>Resolve, Monitor, Automate</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bottom 3 boxes ── -->
+  <div class="slow-bottom-grid">
+
+    <div class="la-topic" style="margin:0">
+      <div class="la-topic-header">
+        <span class="la-topic-num">TIPS</span>
+        <h3 class="la-topic-title">⏱️ Time Saving Tips</h3>
+      </div>
+      <ul class="slow-flags" style="margin:0">
+        <li>✔ Use <code>sar</code> for historical analysis</li>
+        <li>✔ Use <code>dstat</code> for a quick overview</li>
+        <li>✔ Collect data before and after the issue</li>
+        <li>✔ Automate log collection on incidents</li>
+        <li>✔ Build dashboards. Don't rely on memory</li>
+      </ul>
+    </div>
+
+    <div class="la-topic" style="margin:0">
+      <div class="la-topic-header">
+        <span class="la-topic-num">RULES</span>
+        <h3 class="la-topic-title">⭐ Golden Rules</h3>
+      </div>
+      <ul class="slow-flags" style="margin:0">
+        <li>⭐ Measure first, then act</li>
+        <li>⭐ Don't optimise the wrong thing</li>
+        <li>⭐ Logs don't lie. Users sometimes do</li>
+        <li>⭐ Document the root cause</li>
+        <li>⭐ Automate to prevent recurrence</li>
+      </ul>
+    </div>
+
+    <div class="la-topic" style="margin:0">
+      <div class="la-topic-header">
+        <span class="la-topic-num">TOOLS</span>
+        <h3 class="la-topic-title">🧰 Boden Tools</h3>
+      </div>
+      <ul class="slow-flags" style="margin:0">
+        <li><code>nmon</code> — system monitor</li>
+        <li><code>perf</code> — kernel profiling</li>
+        <li><code>bpftrace</code> — eBPF tracing</li>
+        <li><code>bcc-tools</code> — BPF Compiler Collection</li>
+        <li><code>prometheus</code> + <code>grafana</code> — metrics &amp; dashboards</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Pro tip quote -->
+  <div class="note" style="margin-top:20px;text-align:center;font-size:.95rem">
+    💡 <strong>Pro Tip:</strong> &nbsp;"A slow server is a symptom. A systematic approach finds the cure."
+    &nbsp;·&nbsp; <em>Stay curious. Keep learning. Keep automating.</em>
+  </div>
+
+</div>
+<!-- end s11 -->
+
+</main>
 
   <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#s1" class="toc-link">💾 LVM & Filesystem Management</a><a href="#lvm1" class="toc-link h3">01 PV → VG → LV Creation Workflow</a><a href="#lvm2" class="toc-link h3">02 LV Extension Commands & Resize Scenarios</a><a href="#lvm3" class="toc-link h3">03 fstab Management & Mount Operations</a><a href="#s2" class="toc-link">🔌 SAN & Multipath Storage</a><a href="#san1" class="toc-link h3">01 SAN Pre/Post Check Commands</a><a href="#san2" class="toc-link h3">02 FC HBA Troubleshooting & Path Management</a><a href="#s3" class="toc-link">🗄️ Backup & NetBackup (Veritas)</a><a href="#nb1" class="toc-link h3">01 NetBackup Error 7641 — Certificate & Host Cache Fix</a><a href="#nb2" class="toc-link h3">02 Log Compression & Archival (find + gzip/bzip2)</a><a href="#s4" class="toc-link">🖥️ HP & IBM Server Hardware Management</a><a href="#hw1" class="toc-link h3">01 HP HPSSACLI / HPACUCLI — Smart Array Commands</a><a href="#hw2" class="toc-link h3">02 IBM MegaRAID storcli & MegaCli Commands</a><a href="#hw3" class="toc-link h3">03 HP ILO — Out-of-Band Management</a><a href="#s5" class="toc-link">⚙️ sed, awk & Shell Scripting</a><a href="#sed1" class="toc-link h3">01 sed — In-place File Editing Patterns</a><a href="#sed2" class="toc-link h3">02 Shell Loops — For Loops Over Server Lists</a><a href="#sed3" class="toc-link h3">03 ACL Management — setfacl / nfs4_setfacl</a><a href="#s6" class="toc-link">☀️ Solaris & LDOM (Logical Domains)</a><a href="#sol1" class="toc-link h3">01 LDOM Live Migration Steps</a><a href="#sol2" class="toc-link h3">02 Solaris SVM Disk Mirroring Procedure</a><a href="#sol3" class="toc-link h3">03 Solaris Health Check Commands</a><a href="#s7" class="toc-link">📊 Performance Monitoring & SAR</a><a href="#perf1" class="toc-link h3">01 SAR — System Activity Reporter Commands</a><a href="#perf2" class="toc-link h3">02 Reboot Reason Investigation</a><a href="#s8" class="toc-link">🔒 Security, SELinux & PAM</a><a href="#sec1" class="toc-link h3">01 SELinux Management</a><a href="#sec2" class="toc-link h3">02 PAM Configuration — Crontab Access Control</a><a href="#sec3" class="toc-link h3">03 RPM Database Rebuild Procedure</a><a href="#s9" class="toc-link">🔑 SSH Key Management & Kerberos Keytabs</a><a href="#ssh1" class="toc-link h3">01 SSH Key Conversion & Deployment</a><a href="#ssh2" class="toc-link h3">02 NSCD Troubleshooting — Name Service Cache Daemon</a><a href="#s10" class="toc-link">🧠 Kernel Parameters & System Configuration</a><a href="#kern1" class="toc-link h3">01 Kernel Parameter Tuning — sysctl</a><a href="#kern2" class="toc-link h3">02 GRUB2 — Boot Kernel Management (Dracut Issue Fix)</a><a href="#kern3" class="toc-link h3">03 VCS (Veritas Cluster Server) — Cluster Management</a><a href="#kern4" class="toc-link h3">04 Tanium Client Troubleshooting</a></nav>
 </div>
