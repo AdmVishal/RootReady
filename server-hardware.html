@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server Hardware Reference Guide — RootReady</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* ── site-wide overrides ── */
+:root { --topbar-h:58px; --sidebar-w:240px; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* topbar */
+#site-topbar {
+  position:fixed; top:0; left:0; right:0; z-index:9000;
+  height:var(--topbar-h); background:var(--navy);
+  display:flex; align-items:center; padding:0 20px; gap:14px;
+  border-bottom:2px solid var(--blue);
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo span { color:var(--accent); }
+.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.topbar-spacer { flex:1; }
+#menu-btn { display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
+
+/* progress bar */
+#prog { position:fixed; top:var(--topbar-h); left:0; height:3px; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--sky)); z-index:8999;
+  transition:width .08s linear; pointer-events:none; }
+
+/* back-to-top */
+#btt { position:fixed; bottom:24px; right:20px; width:42px; height:42px;
+  background:var(--blue); color:#fff; border:none; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; z-index:8998; opacity:0; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(27,79,138,.45); transition:opacity .2s,transform .2s; }
+#btt.vis { opacity:1; pointer-events:auto; }
+#btt:hover { background:var(--mid); transform:translateY(-2px); }
+
+/* layout */
+.site-body { display:flex; margin-top:var(--topbar-h); flex:1; min-height:calc(100vh - var(--topbar-h)); }
+
+/* left sidebar (page nav) */
+#site-nav {
+  width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.nav-sec { padding:10px 16px 2px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); }
+.nav-link { display:flex; align-items:center; gap:8px; padding:9px 16px;
+  color:var(--text2); text-decoration:none; font-size:.84rem; border-left:3px solid transparent;
+  transition:all .12s; }
+.nav-link:hover { background:rgba(255,255,255,.05); color:var(--text); border-left-color:var(--border2); }
+.nav-link.active { background:rgba(240,165,0,.09); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
+
+/* right toc sidebar */
+#toc-nav {
+  width:220px; flex-shrink:0; position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+  padding:16px 0; display:flex; flex-direction:column;
+}
+.toc-head { padding:0 16px 8px; font-size:.58rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--text3);
+  font-family:var(--font-mono); border-bottom:1px solid var(--border); margin-bottom:4px; }
+.toc-link { display:block; padding:6px 16px; color:var(--text3); text-decoration:none;
+  font-size:.78rem; line-height:1.35; transition:color .12s;
+  border-left:2px solid transparent; }
+.toc-link:hover { color:var(--sky); border-left-color:var(--sky); }
+.toc-link.h3 { padding-left:26px; font-size:.72rem; }
+
+/* main content */
+#main-content {
+  flex:1; padding:32px 40px; overflow-x:hidden; min-width:0;
+}
+.page-hero {
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.page-hero h1 { margin-bottom:6px; }
+.page-hero p { color:var(--text2); font-size:.95rem; margin:0; }
+.hero-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600;
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; }
+.badge-blue { background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:var(--green); border:1px solid rgba(16,185,129,.25); }
+.badge-gold { background:rgba(240,165,0,.15); color:var(--accent); border:1px solid rgba(240,165,0,.25); }
+.badge-purple { background:rgba(139,92,246,.15); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+
+/* content sections */
+.content-section { margin-bottom:40px; scroll-margin-top:calc(var(--topbar-h) + 16px); }
+.section-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px; margin-bottom:20px;
+}
+.section-card h2 { margin-top:0; }
+
+/* code blocks */
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; margin:12px 0 16px; }
+code { font-family:var(--font-mono); font-size:.82rem; color:var(--code-fg); }
+pre code { color:var(--code-fg); }
+:not(pre) > code { background:rgba(121,192,255,.1); color:var(--code-fg);
+  padding:2px 6px; border-radius:4px; font-size:.8em; }
+
+/* tables */
+table { width:100%; border-collapse:collapse; margin:12px 0 16px; font-size:.875rem; }
+th { background:rgba(27,79,138,.35); color:var(--sky); padding:9px 12px;
+  text-align:left; font-weight:600; border-bottom:2px solid var(--border2); font-size:.78rem; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:top; }
+tr:hover td { background:rgba(255,255,255,.025); }
+.tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid var(--border); margin:12px 0 16px; }
+.tbl-wrap table { margin:0; border:none; }
+
+/* Q&A cards */
+.qa-card {
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:12px; overflow:hidden;
+}
+.qa-q { padding:12px 16px; background:rgba(27,79,138,.2);
+  color:var(--text); font-weight:600; font-size:.9rem;
+  display:flex; gap:10px; align-items:flex-start; }
+.qa-q::before { content:"Q"; font-family:var(--font-mono); color:var(--accent);
+  font-size:.7rem; font-weight:700; background:rgba(240,165,0,.1);
+  border-radius:4px; padding:2px 6px; flex-shrink:0; margin-top:1px; }
+.qa-a { padding:12px 16px 14px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.qa-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+  font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-family:var(--font-mono); margin-left:8px; }
+.qa-badge-concept { background:rgba(74,159,213,.15); color:var(--sky); }
+.qa-badge-cmd { background:rgba(16,185,129,.15); color:var(--green); }
+.qa-badge-crit { background:rgba(239,68,68,.15); color:var(--red); }
+.qa-badge-task { background:rgba(240,165,0,.15); color:var(--accent); }
+.qa-badge-scenario { background:rgba(139,92,246,.15); color:var(--purple); }
+
+/* callout boxes */
+.callout { border-left:4px solid; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0; }
+.callout-note { border-color:var(--sky); background:rgba(74,159,213,.08); }
+.callout-warn { border-color:var(--accent); background:rgba(240,165,0,.08); }
+.callout-danger { border-color:var(--red); background:rgba(239,68,68,.08); }
+.callout-tip { border-color:var(--green); background:rgba(16,185,129,.08); }
+.callout-title { font-weight:700; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:4px; }
+
+/* topic tag */
+.topic-tag { display:inline-flex; align-items:center; padding:3px 10px;
+  border-radius:20px; font-size:.7rem; font-weight:600; margin-bottom:10px; }
+
+/* section divider */
+.section-divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* version badges in RHEL */
+.ver-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem;
+  font-weight:700; font-family:var(--font-mono); margin-right:4px;
+  background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.2); }
+
+/* footer */
+#site-footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:20px 40px; display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--text3);
+}
+#site-footer a { color:var(--sky); text-decoration:none; }
+
+/* mobile overlay */
+#mob-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:8800; }
+#mob-ov.on { display:block; }
+
+@media (max-width:1100px) {
+  #toc-nav { display:none; }
+}
+@media (max-width:768px) {
+  #site-nav { position:fixed; left:0; top:var(--topbar-h);
+    bottom:0; transform:translateX(-100%); z-index:8900;
+    transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  #site-nav.open { transform:translateX(0); }
+  #menu-btn { display:block; }
+  #main-content { padding:20px 16px; }
+  #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
+}
+
+
+.la-section{margin-bottom:52px;scroll-margin-top:74px}
+.la-section-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid var(--border)}
+.la-section-icon{width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.la-section-title{margin:0 0 4px!important;font-size:1.25rem!important;color:var(--sky)!important}
+.la-section-desc{margin:0!important;font-size:.83rem;color:var(--text3)}
+.la-topic{margin-bottom:24px;padding:20px 22px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:10px;scroll-margin-top:74px}
+.la-topic-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.la-topic-num{font-family:var(--font-mono);font-size:.66rem;font-weight:700;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0}
+.la-topic-title{font-size:1rem!important;font-weight:700!important;color:var(--text)!important;margin:0!important}
+.la-topic-body .qa-a{display:block!important}
+.la-topic-body .qa-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin:10px 0;overflow:hidden}
+.la-topic-body .qa-q{display:flex!important;gap:10px;align-items:flex-start;padding:.85rem 1rem;background:rgba(27,79,138,.2);cursor:default}
+.la-topic-body .qa-a{display:block!important;padding:.85rem 1rem 1rem;border-top:1px solid var(--border)}
+.q-badge{font-family:var(--font-mono);font-size:10px;font-weight:700;background:rgba(74,159,213,.15);color:var(--sky);border:1px solid rgba(74,159,213,.25);padding:2px 7px;border-radius:3px;flex-shrink:0;margin-top:2px}
+.q-text{font-weight:600;color:var(--text);font-size:.93rem;line-height:1.4}
+.a-badge{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--accent);margin-bottom:6px;display:block}
+.note,.info-box{background:rgba(74,159,213,.07);border:1px solid rgba(74,159,213,.2);border-left:3px solid var(--sky);border-radius:8px;padding:.85rem 1rem;margin:.7rem 0 1.2rem;font-size:14px;color:var(--text2)}
+.warn-box,.warning{background:rgba(240,165,0,.07);border:1px solid rgba(240,165,0,.2);border-left:3px solid var(--accent);border-radius:8px;padding:.85rem 1rem;margin:.7rem 0 1.2rem;font-size:14px;color:var(--text2)}
+.cmd-block,.code-block{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--sky);border-radius:8px;padding:1rem 1.1rem;font-family:var(--font-mono);font-size:13px;color:var(--code-fg);overflow-x:auto;line-height:1.6;margin:.7rem 0 1.2rem;white-space:pre;display:block!important}
+.cmd-label{font-family:var(--font-mono);font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;margin-top:14px;display:block!important}
+.comment{color:#5c7a5c;font-style:italic}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+@media(max-width:640px){.card-grid{grid-template-columns:1fr!important}}
+.body-text{color:var(--text2);font-size:.92rem;line-height:1.75;margin-bottom:.75rem}
+.chevron{display:none!important}
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border);margin:12px 0 16px}
+.tbl-wrap table{margin:0;border:none;width:100%;border-collapse:collapse}
+.tbl-wrap th{background:rgba(27,79,138,.35);color:var(--sky);padding:9px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border2);font-size:.78rem}
+.tbl-wrap td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;font-size:.875rem}
+.phc-scenario{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--red,#ef4444);border-radius:10px;margin-bottom:14px;overflow:hidden;scroll-margin-top:74px}
+.phc-scenario-header{padding:12px 18px;background:rgba(239,68,68,.08);font-family:var(--font-head);font-weight:700;font-size:.96rem;color:var(--text);border-bottom:1px solid var(--border)}
+.phc-scenario-body{padding:14px 18px;font-size:.875rem;color:var(--text2);line-height:1.7}
+.phc-scenario-desc{font-style:italic;color:var(--text3);background:rgba(255,255,255,.03);border-left:2px solid var(--border2);padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:12px}
+.phc-a{font-size:.875rem;color:var(--text2);line-height:1.75}
+.phc-abadge{display:block;font-family:var(--font-mono);font-size:.65rem;font-weight:700;color:var(--accent);margin-bottom:8px}
+.hw-sub{display:flex;align-items:center;gap:14px;margin:28px 0 8px;padding:10px 14px;background:rgba(27,79,138,.15);border-left:3px solid var(--sky);border-radius:0 8px 8px 0}
+.hw-sub h3{margin:0;font-size:1rem;color:var(--sky)}
+.phc-sub-title{font-size:1rem!important;color:var(--sky)!important;margin:0 0 14px!important;padding:10px 14px;background:rgba(27,79,138,.15);border-left:3px solid var(--sky);border-radius:0 8px 8px 0}
+.slow-flags{list-style:none;padding:0;margin:6px 0 0}
+.slow-flags li{font-size:.83rem;color:var(--text2);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.4}
+.slow-flags li:last-child{border-bottom:none}
+.slow-flags li::before{content:"• ";color:var(--green)}
+
+</style>
+</head>
+<body>
+
+<div id="site-topbar">
+  <a href="index.html" class="logo">Root<span>Ready</span></a>
+  <span class="page-title-bar">HP ProLiant BL · Dell PowerEdge · IBM MegaRAID</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov"></div>
+
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link ">🏠 Home</a>
+<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a><a href="server-hardware.html" class="nav-link active">🖥️ Server Hardware</a>
+
+  </nav>
+
+  <main id="main-content">
+    
+<div class="page-hero">
+  <h1>🖥️ Server Hardware Reference Guide</h1>
+  <p>HP ProLiant BL Series · HP C7000 Blade Chassis · Dell PowerEdge · IBM MegaRAID · L3 Deep Technical Q&amp;A</p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">HP iLO / OA</span>
+    <span class="badge badge-green">Dell iDRAC / racadm</span>
+    <span class="badge badge-gold">C7000 Blade Chassis</span>
+    <span class="badge badge-purple">RAID · Firmware · Scenarios</span>
+  </div>
+</div>
+
+<div class="content-section la-section" id="hw-raid">
+  <div class="la-section-header">
+    <div class="la-section-icon">💽</div>
+    <div>
+      <h2 class="la-section-title">HP Smart Array, IBM MegaRAID & HP ILO</h2>
+      <p class="la-section-desc">RAID controller management, Smart Array commands, IBM MegaRAID storcli/MegaCli, and HP iLO out-of-band management</p>
+    </div>
+  </div>
+  
+<div class="la-topic" id="hw1">
+  <div class="la-topic-header">
+    <span class="la-topic-num">01</span>
+    <h3 class="la-topic-title">HP HPSSACLI / HPACUCLI — Smart Array Commands</h3>
+  </div>
+  <div class="la-topic-body"><div class="topic-body">
+<div class="cmd-block"><span class="comment"># Show full controller config</span>
+hpssacli ctrl all show config
+hpssacli ctrl all show config | egrep -i 'reb|rec'  <span class="comment"># rebuilding/recovery</span>
+<span class="comment"># Controller status</span>
+hpssacli ctrl all show status
+hpssacli ctrl all show detail | egrep "Firmware Version:|Array"
+
+<span class="comment"># Physical drive status</span>
+hpssacli ctrl slot=0 pd all show status
+hpssacli ctrl slot=0 pd 2I:1:6 show detail
+
+<span class="comment"># View logical drives</span>
+hpssacli ctrl slot=0 ld all show
+hpssacli ctrl slot=0 ld 2 show
+
+<span class="comment"># Create RAID logical drives</span>
+hpssacli ctrl slot=0 create type=ld drives=1I:1:3 raid=0
+hpssacli ctrl slot=0 create type=ld drives=1I:1:3,1I:1:4 raid=1
+hpssacli ctrl slot=0 create type=ld drives=1I:1:3,1I:1:4,2I:1:6,2I:1:7,2I:1:8 raid=5
+
+<span class="comment"># LED management (locate physical disk)</span>
+hpssacli ctrl slot=0 ld 2 modify led=on
+hpssacli ctrl slot=0 ld 2 modify led=off
+hpssacli ctrl slot=0 pd 1I:4:1 modify led=on   <span class="comment"># Blink Fault LED</span>
+<span class="comment"># Reenable a failed logical drive</span>
+hpssacli ctrl slot=0 ld 10 modify reenable forced
+
+<span class="comment"># Add spare disks</span>
+hpssacli ctrl slot=0 array all add spares=2I:1:6,2I:1:7
+
+<span class="comment"># HP hardware health check</span>
+hpasmcli -s 'SHOW FAN; SHOW TEMP; SHOW POWERSUPPLY'
+
+<span class="comment"># Individual drive detail</span>
+ssacli ctrl slot=0 pd 1I:1:14 show detail</div>
+<div class="qa-block">
+<div class="qa-item" id="q-hw1a">
+<div class="qa-q"><span class="q-badge">Q</span><span class="q-text">Explain RAID levels 0, 1, and 5. When would you use each?</span></div>
+<div class="qa-a" style="display:block !important"><span class="a-badge">▸ ANSWER</span><p><strong>RAID 0 (Striping)</strong> — data split across all disks, best performance, NO redundancy. If one disk fails, ALL data lost. Use for: temp/scratch data, caches. <strong>RAID 1 (Mirroring)</strong> — exact copy on two disks. Can lose one disk. Reads are fast (both disks serve reads). Use for: OS drives, boot volumes. <strong>RAID 5 (Distributed Parity)</strong> — data + parity distributed across 3+ disks. Can lose 1 disk. Good balance of performance/redundancy. Use for: data volumes. <strong>RAID 6</strong> — like RAID 5 but can lose 2 disks (double parity). For production critical storage.</p></div>
+</div>
+<div class="qa-item" id="q-hw1b">
+<div class="qa-q"><span class="q-badge">Q</span><span class="q-text">How do you identify a failing physical disk and replace it in HP server?</span></div>
+<div class="qa-a" style="display:block !important"><span class="a-badge">▸ ANSWER</span>
+<ol class="step-list">
+<li><span class="step-n">1</span>Check status: <code>hpssacli ctrl slot=0 pd all show status</code> — look for "Predictive Failure" or "Failed"</li>
+<li><span class="step-n">2</span>Get drive location: <code>hpssacli ctrl slot=0 pd 2I:1:6 show detail</code> — note Port, Box, Bay</li>
+<li><span class="step-n">3</span>Blink the LED: <code>hpssacli ctrl slot=0 pd 2I:1:6 modify led=on</code> — physically identify the drive</li>
+<li><span class="step-n">4</span>Hot-swap the drive (if RAID allows)</li>
+<li><span class="step-n">5</span>Turn off LED: <code>hpssacli ctrl slot=0 pd 2I:1:6 modify led=off</code></li>
+<li><span class="step-n">6</span>Rescan: <code>hpssacli rescan</code></li>
+<li><span class="step-n">7</span>Monitor rebuild: <code>hpssacli ctrl slot=0 ld all show status</code></li>
+</ol>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+<div class="la-topic" id="hw2">
+  <div class="la-topic-header">
+    <span class="la-topic-num">02</span>
+    <h3 class="la-topic-title">IBM MegaRAID storcli & MegaCli Commands</h3>
+  </div>
+  <div class="la-topic-body"><div class="topic-body">
+<div class="cmd-block"><span class="comment"># Show controller info</span>
+/opt/MegaRAID/storcli/storcli64 /c0 show all
+
+<span class="comment"># Physical disk slot/state list</span>
+/opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL \
+  | egrep -i 'slot|state' | grep -v Forei | paste - -
+
+<span class="comment"># Locate a disk (blink LED)</span>
+/opt/MegaRAID/storcli/storcli64 /c0/e23/s12 start locate
+/opt/MegaRAID/storcli/storcli64 /c0/e8/s0 start locate
+
+<span class="comment"># Delete preserved cache (use if controller stuck)</span>
+/opt/MegaRAID/storcli/storcli64 /c0/v11 delete preservedcache
+
+<span class="comment"># IBM RAID creation (RAID 0, disk at enclosure:slot)</span>
+/opt/MegaRAID/MegaCli/MegaCli64 -CfgLdAdd -r0 [8:5] -a0
+
+<span class="comment"># Firmware check</span>
+dmidecode | egrep -i 'rel|rev|prod'
+dmidecode -t 0 | grep Firmware</div>
+<div class="qa-block">
+<div class="qa-item" id="q-hw2a">
+<div class="qa-q"><span class="q-badge">Q</span><span class="q-text">What is "preserved cache" in MegaRAID and when do you delete it?</span></div>
+<div class="qa-a" style="display:block !important"><span class="a-badge">▸ ANSWER</span><p>Preserved cache is write-back cache stored in the controller's battery-backed memory when a virtual drive goes offline unexpectedly (e.g., power loss, disk failure). The controller preserves this cache to prevent data loss hoping the drives come back. If the drives are gone permanently (replaced), the controller keeps this orphaned cache and may block operations. You then run <code>storcli64 /c0/v11 delete preservedcache</code> to clear it. Only do this when you're certain the data isn't needed — it's a destructive operation.</p></div>
+</div>
+</div>
+</div></div>
+</div>
+<div class="la-topic" id="hw3">
+  <div class="la-topic-header">
+    <span class="la-topic-num">03</span>
+    <h3 class="la-topic-title">HP ILO — Out-of-Band Management</h3>
+  </div>
+  <div class="la-topic-body"><div class="topic-body">
+<div class="cmd-block"><span class="comment"># Find ILO IP address</span>
+hponcfg -w /tmp/ilo.out
+cat /tmp/ilo.out
+
+<span class="comment"># Reset ILO password via XML</span>
+rpm -ivh /mnt/ilo6_hponcfg-3.2.0-0.noarch.rpm
+
+<span class="comment"># Create XML file: /tmp/pwd_ilo.xml</span>
+cat &gt; /tmp/pwd_ilo.xml &lt;&lt;'EOF'
+&lt;RIBCL VERSION="2.0"&gt;
+  &lt;LOGIN USER_LOGIN="x" PASSWORD="x"&gt;
+  &lt;USER_INFO MODE="write"&gt;
+    &lt;MOD_USER USER_LOGIN="Administrator"&gt;
+      &lt;PASSWORD value="Welcome1"/&gt;
+    &lt;/MOD_USER&gt;
+  &lt;/USER_INFO&gt;
+  &lt;/LOGIN&gt;
+&lt;/RIBCL&gt;
+EOF
+
+chmod 755 /tmp/pwd_ilo.xml
+hponcfg -f /tmp/pwd_ilo.xml</div>
+<div class="qa-block">
+<div class="qa-item" id="q-hw3a">
+<div class="qa-q"><span class="q-badge">Q</span><span class="q-text">What is ILO and why is it important in enterprise server management?</span></div>
+<div class="qa-a" style="display:block !important"><span class="a-badge">▸ ANSWER</span><p>ILO (Integrated Lights-Out) is HP's out-of-band management technology. It's a dedicated management processor with its own network port that allows admins to manage servers even when the OS is down, crashed, or the server is powered off. Features: remote console (KVM), remote power on/off/reset, hardware health monitoring, firmware updates, virtual media mounting, BIOS configuration. IBM equivalent is IMM (Integrated Management Module). Dell calls it iDRAC. Essential for remote data centers where physical access is impractical.</p></div>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+<div class="content-section la-section" id="hw-c7000">
+  <div class="la-section-header">
+    <div class="la-section-icon">🔷</div>
+    <div>
+      <h2 class="la-section-title">HP BladeSystem C7000 & BL Series</h2>
+      <p class="la-section-desc">c7000 chassis components, Onboard Administrator, Virtual Connect, iLO deep dive, blade recovery, firmware updates</p>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-c7000-arch">
+<div class="la-topic-header">
+<span class="la-topic-num">Q1</span>
+<h3 class="la-topic-title">Describe the HP BladeSystem c7000 chassis architecture — all major hardware components.</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>c7000</strong> is a 10U enclosure housing up to 16 half-height or 8 full-height blade servers.<br/><br/><ul class="slow-flags"><li><strong>Onboard Administrator (OA)</strong> — dual redundant management modules (slots 1 &amp; 2). Provides web UI, CLI, SNMP, REST API. Manages power, cooling, firmware, and inter-module communication.</li><li><strong>Blade Server Bays (1–16)</strong> — house BL460c, BL680c, BL2x220c. Half-height blades = 1 bay; full-height = 2 bays.</li><li><strong>Power Supply Bays (1–6)</strong> — up to six hot-plug PSUs. Minimum 4 for N+1 redundancy under full load.</li><li><strong>Fan Bays (1–10)</strong> — ten hot-plug redundant fans with zone-based cooling. Active Cool fans auto-adjust from thermal sensors.</li><li><strong>Interconnect Module Bays (1–8)</strong> — network (FlexFabric, VC) and SAN (FC, SAS) modules. Bays 1–2 = LOM connected; Bays 3–8 = mezzanine card connected.</li><li><strong>Insight Display</strong> — front LCD for chassis status, IP config, and UID control.</li><li><strong>Midplane</strong> — backplane connecting blades to interconnect modules and power distribution.</li></ul><div class="note"><strong>Key OA CLI:</strong> <code>show enclosure info</code> | <code>show server list</code> | <code>poweroff server 3</code> | <code>iLO reset 5</code> | <code>show interconnect list</code> | <code>show power</code></div></div>
+</div>
+</div><div class="la-topic" id="hw-oa">
+<div class="la-topic-header">
+<span class="la-topic-num">Q2</span>
+<h3 class="la-topic-title">What is the HP Onboard Administrator (OA)? What can and cannot be configured through it?</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>The OA is the chassis management controller</strong> — equivalent to Dell's CMC. Runs embedded firmware.<div class="card-grid" style="margin-top:12px"><div class="note"><strong>✅ CAN DO</strong><ul class="slow-flags"><li>Power on/off/reset individual blades, set power capping per bay</li><li>Configure interconnect modules</li><li>Update blade iLO firmware remotely</li><li>Configure LDAP/RADIUS for OA authentication</li><li>Configure enclosure SNMP traps</li><li>Manage Virtual Connect from OA CLI</li><li>Configure UID LEDs, download chassis-wide logs</li><li>Configure rack topology</li></ul></div><div class="warn-box"><strong>❌ CANNOT DO</strong><ul class="slow-flags"><li>OS-level management (that is iLO's job)</li><li>Configure BIOS/boot order (done via iLO or iLO RESTful API)</li><li>Access individual disk controllers (done via Smart Array in iLO)</li><li>Manage VM workloads</li></ul></div></div><div class="note">Access: SSH to OA IP, HTTPS web UI, SNMP. Dual OA setup — primary active, secondary standby. Failover is automatic on primary OA failure.</div></div>
+</div>
+</div><div class="la-topic" id="hw-vc">
+<div class="la-topic-header">
+<span class="la-topic-num">Q3</span>
+<h3 class="la-topic-title">Explain the Virtual Connect (VC) module in c7000. What problem does it solve and how do you manage it?</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Virtual Connect solves the N×M cabling problem</strong> in blade environments. Without VC, each blade's NICs would require individual cables to top-of-rack switches — in a 16-blade chassis that's 32+ cables.<ul class="slow-flags"><li><strong>Abstraction:</strong> VC presents virtual MAC addresses and WWNs to blades. Physical upstream connections are shared. When a blade is replaced, the same virtual MAC/WWN is reassigned — server identity preserved without switch reconfiguration.</li><li><strong>Uplink aggregation:</strong> VC modules aggregate blade traffic to a small number of uplinks to the core network.</li><li><strong>Server Profiles:</strong> define which networks and fabrics a blade can access. Profiles contain virtual MACs, WWNs, network assignments, and bandwidth policies.</li><li><strong>Management:</strong> HP OneView or VC Manager GUI, OA CLI (<code>vc manager</code> commands), or REST API.</li><li><strong>Common issue:</strong> Server profile conflict when re-seating blades — resolve by reassigning or cloning the profile.</li></ul><div class="note"><strong>★ PRO TIP:</strong> Interviewers ask: "What happens when a blade is removed and re-inserted in a different bay?" Answer: VC profile re-assignment — the virtual MAC/WWN follows the profile, not the physical blade bay.</div></div>
+</div>
+</div><div class="la-topic" id="hw-ilo-deep">
+<div class="la-topic-header">
+<span class="la-topic-num">Q4</span>
+<h3 class="la-topic-title">What is HP iLO and how is it different from the OA? What can you do in iLO that you cannot do in OA?</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>iLO (Integrated Lights-Out)</strong> is the per-blade management controller embedded on every HP ProLiant server. It is independent of the OS — has its own processor, memory, NIC, and power from the chassis standby rail. You can access iLO even when the OS is down, hung at POST, or powered off.<div class="tbl-wrap"><table><thead><tr><th>Capability</th><th>iLO</th><th>OA</th></tr></thead><tbody><tr><td>Management scope</td><td>Individual server (OS + hardware level)</td><td>Entire chassis (power, cooling, interconnects)</td></tr><tr><td>OS independence</td><td>Yes — works when OS is down</td><td>Yes — chassis level</td></tr><tr><td>Virtual console (KVM)</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>BIOS configuration</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>RAID management</td><td>✅ via Smart Array</td><td>❌ No</td></tr><tr><td>Virtual media (ISO mount)</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>iLO versions</td><td>iLO 4 (Gen8/9), iLO 5 (Gen10), iLO 6 (Gen11)</td><td>N/A</td></tr><tr><td>API</td><td>Redfish (iLO 5+)</td><td>REST/SNMP</td></tr></tbody></table></div><div class="note">In BL blades, iLO uses OA backplane connection — there is no physical iLO NIC port on the blade itself.</div></div>
+</div>
+</div><div class="la-topic" id="hw-blade-recovery">
+<div class="la-topic-header">
+<span class="la-topic-num">Q5</span>
+<h3 class="la-topic-title">Walk me through remotely recovering a blade server with a hung kernel (OS unresponsive).</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>L3 remote recovery procedure using iLO:</strong><ol style="color:var(--text2);font-size:.9rem;line-height:1.8;padding-left:20px;margin-top:8px"><li>Access iLO web UI or SSH: <code>ssh Administrator@&lt;iLO-IP&gt;</code>. If iLO unreachable, access via OA CLI → <code>iLO connect &lt;blade-number&gt;</code></li><li>Check IML: verify iLO System Health for hardware faults (memory ECC errors, processor faults, storage alerts)</li><li>Virtual Console: launch HTML5 iLO remote console — if hung kernel, you'll see the Linux panic output or frozen screen</li><li>Attempt graceful shutdown first: iLO Power &amp; Thermal → Momentary Press (sends ACPI power button signal). Wait 60 seconds.</li><li>If no response: Force Power Off (hard power cycle). Document as unclean shutdown.</li><li>After reboot: use virtual console to monitor POST and OS boot. If boot fails, mount ISO via iLO Virtual Media to boot from rescue image.</li><li>Post-recovery: check IML for hardware alerts, check OS logs (<code>/var/log/messages</code>, <code>dmesg</code>) after recovery.</li></ol></div>
+</div>
+</div><div class="la-topic" id="hw-firmware">
+<div class="la-topic-header">
+<span class="la-topic-num">Q6</span>
+<h3 class="la-topic-title">How do you update iLO firmware, BIOS, and Smart Array firmware on HP BL blades in production?</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Method</th><th>Description</th><th>Requires Reboot?</th></tr></thead><tbody><tr><td>HP SPP (Service Pack for ProLiant)</td><td>Bootable ISO containing all firmware/drivers. Mount via iLO Virtual Media, run interactive/automated update. Best for full stack updates.</td><td>Yes</td></tr><tr><td>HP iLO Amplifier / OneView</td><td>Centralized firmware management. Detects versions, applies baseline. Can update iLO firmware online (no reboot for iLO-only in iLO 4+).</td><td>iLO: No; BIOS: Yes</td></tr><tr><td>OA CLI push</td><td><code>FIRMWARE UPDATE &lt;bay&gt;</code> — updates iLO firmware to all blades from OA without booting OS.</td><td>No (iLO only)</td></tr><tr><td>HP Smart Update Manager (SUM)</td><td>Run on Linux, deploys RPM packages for online firmware update. Updates BIOS, NIC, Smart Array online.</td><td>Yes (BIOS)</td></tr><tr><td>Satellite + firmware RPMs</td><td>HP provides firmware as RPMs via HPE Software Delivery Repository. Deploy via package management.</td><td>Yes</td></tr></tbody></table></div><div class="warn-box"><strong>Production best practice:</strong> test on non-production blade first, schedule change window, verify iLO firmware compatibility matrix before BIOS update, always have iLO console access ready during BIOS update in case of POST failure.</div></div>
+</div>
+</div>
+</div>
+<div class="content-section la-section" id="hw-dell">
+  <div class="la-section-header">
+    <div class="la-section-icon">🔶</div>
+    <div>
+      <h2 class="la-section-title">Dell PowerEdge — iDRAC, PERC & Lifecycle Controller</h2>
+      <p class="la-section-desc">iDRAC vs iLO comparison, racadm CLI commands, Lifecycle Controller, PERC RAID management</p>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-idrac-compare">
+<div class="la-topic-header">
+<span class="la-topic-num">Q7</span>
+<h3 class="la-topic-title">Compare HP iLO and Dell iDRAC — functional equivalents and key differences.</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Feature</th><th>HP iLO</th><th>Dell iDRAC</th></tr></thead><tbody><tr><td>Management Controller</td><td>iLO (Integrated Lights-Out)</td><td>iDRAC (Integrated Dell Remote Access Controller)</td></tr><tr><td>Current Generation</td><td>iLO 6 (Gen11)</td><td>iDRAC9 (14G/15G), iDRAC10 (16G)</td></tr><tr><td>Chassis Management</td><td>OA (Onboard Administrator)</td><td>CMC (M-series), OME (rack)</td></tr><tr><td>API Standard</td><td>Redfish (iLO 5+), REST API</td><td>Redfish, WSMAN, REST API</td></tr><tr><td>Remote Console</td><td>IRC Java/HTML5</td><td>Virtual Console Java/HTML5, iDRAC Direct</td></tr><tr><td>Firmware Management</td><td>HPE OneView, SPP, SUM</td><td>iDRAC, OMSA, Lifecycle Controller</td></tr><tr><td>Storage Management</td><td>HP SSA / SSACLI</td><td>OMSA / racadm / PERC / storcli</td></tr><tr><td>OS Deployment</td><td>iLO Virtual Media + PXE</td><td>iDRAC Virtual Media + Lifecycle Controller</td></tr><tr><td>Free License</td><td>iLO Standard (basic)</td><td>iDRAC Basic (limited), Enterprise (full)</td></tr></tbody></table></div></div>
+</div>
+</div><div class="la-topic" id="hw-racadm">
+<div class="la-topic-header">
+<span class="la-topic-num">Q8</span>
+<h3 class="la-topic-title">What is racadm and how do you use it for remote Dell server management? Give key commands.</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>racadm</strong> is the Dell CLI for iDRAC management. Available as remote racadm, local racadm, or SSH to iDRAC.<div class="cmd-block"># System info &amp; sensors
+racadm -r &lt;iDRAC-IP&gt; -u root -p &lt;pass&gt; getsysinfo
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsensorinfo
+
+# Power actions
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction graceshutdown
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction hardreset
+
+# iDRAC network config
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getniccfg
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; setniccfg -s &lt;static-IP&gt; &lt;mask&gt; &lt;gateway&gt;
+
+# PERC RAID status
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; raid get vdisks -t
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; raid get pdisks -t
+
+# Hardware event log
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsel
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; clrsel
+
+# Soft reset iDRAC (does NOT power cycle server)
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; racreset
+
+# Mount virtual media
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; remoteimage -c -u &lt;user&gt; -p &lt;pass&gt; -l &lt;NFS/CIFS-path&gt;</div></div>
+</div>
+</div><div class="la-topic" id="hw-lc">
+<div class="la-topic-header">
+<span class="la-topic-num">Q9</span>
+<h3 class="la-topic-title">What is the Dell Lifecycle Controller and how is it used in production?</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>The Lifecycle Controller</strong> is firmware embedded in iDRAC providing OS-independent hardware management — accessed during server boot (F10) or via iDRAC.<ul class="slow-flags"><li><strong>OS Deployment:</strong> deploy OS from ISO via virtual media or network share without a PXE server. Configures drivers automatically.</li><li><strong>Firmware Update:</strong> update all server firmware (BIOS, iDRAC, PERC, NIC, PSU) from a network share or attached media in one pass.</li><li><strong>Hardware Configuration:</strong> configure BIOS settings, RAID arrays, network adapter settings, and boot order without booting the OS.</li><li><strong>Part Replacement:</strong> when replacing a system board or PERC controller, LC restores previous configuration from backup — critical for blade swap scenarios.</li><li><strong>System Erase:</strong> securely wipe all data and configuration — used for decommissioning.</li><li><strong>SupportAssist:</strong> collect hardware diagnostics for Dell support.</li></ul><div class="note">Access: Boot server → press F10 → Lifecycle Controller UI. Or via iDRAC: Configuration &gt; Lifecycle Controller. Or via racadm: <code>racadm get BIOS.*</code> to view and set BIOS settings.</div></div>
+</div>
+</div><div class="la-topic" id="hw-perc">
+<div class="la-topic-header">
+<span class="la-topic-num">Q10</span>
+<h3 class="la-topic-title">How do you manage a Dell PERC RAID controller? Health check, failed drive replacement, storage expansion.</h3>
+</div>
+<div class="la-topic-body">
+<div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>PERC (PowerEdge RAID Controller)</strong> management tools:<div class="cmd-block"># Show controller status and all drives
+storcli /c0 show all
+storcli /c0 /vall show          # Virtual drives
+storcli /c0 /eall/sall show     # All physical disks
+
+# RAID health via racadm
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; raid get vdisks -t
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; raid get pdisks -t
+
+# Monitor rebuild progress after hot-swap
+storcli /c0/v0 show | grep Progress
+
+# Add hot spare
+storcli /c0/e&lt;encl&gt;/s&lt;slot&gt; add hotsparedrive
+
+# Expand storage online (no downtime)
+storcli /c0/v0 expand size=&lt;GB&gt;
+
+# Run consistency check (schedule monthly)
+storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Never remove a second disk from a RAID 5 array while first is rebuilding — this causes data loss. Verify rebuild completion before any maintenance.</div></div>
+</div>
+</div>
+</div>
+<div class="content-section la-section" id="hw-scenarios">
+  <div class="la-section-header">
+    <div class="la-section-icon">🔴</div>
+    <div>
+      <h2 class="la-section-title">Hardware Troubleshooting Scenarios</h2>
+      <p class="la-section-desc">5 real-world scenarios — power loss, POST failure, VC network outage, iDRAC unreachable, temperature alerts</p>
+    </div>
+  </div>
+  <div class="phc-scenario" id="sc-c7000-power" style="scroll-margin-top:74px">
+<div class="phc-scenario-header">🔴 Scenario: HP C7000: Full Enclosure Power Loss</div>
+<div class="phc-scenario-body">
+<p class="phc-scenario-desc">You receive a P1 alert that an HP c7000 blade enclosure has lost power. 14 of 16 blades are offline. Two blades show "insufficient power" in OA. The data center reports no power failure at the PDU level. You have OA CLI and iLO access.</p>
+<div class="cmd-label">Interviewer Probe Questions</div>
+<ul class="slow-flags" style="margin-bottom:12px"><li>What is your first diagnostic step via OA CLI?</li><li>How do you determine if it is a PSU failure or a power budget issue?</li><li>What OA commands do you use to check power status and PSU health?</li><li>If two PSUs have failed, what is the recovery procedure?</li><li>How do you bring the 14 offline blades back online safely?</li></ul>
+<div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+<ul class="slow-flags"><li><code>SSH to OA IP</code> → <code>show enclosure power</code> (overall power status) → <code>show powersupply all</code> (lists all 6 PSU slots with status, input voltage, output wattage, health) → <code>show server list</code> (power state of all 16 bays)</li><li>c7000 requires minimum 4 PSUs for N+1 under full load — 2 failures may trip power budget protection.</li><li>If PSUs failed: identify failed units (status = Failed or Unknown), dispatch data center to physically inspect/replace.</li><li>Power budget: <code>show enclosure power</code> — if total blade demand exceeds available supply, OA enforces power capping. Solution: reduce power cap on non-critical blades or bring PSUs back online.</li><li>Safe restart: power on blades in priority order — <code>poweron server &lt;bay&gt;</code> — stagger by 30 seconds to avoid inrush current spike.</li><li>After recovery: check IML on each blade for hardware faults logged during unclean shutdown.</li></ul>
+<div class="cmd-label" style="color:var(--red,#ef4444);margin-top:12px">⚠️ Red Flags — Weak Answers</div><ul class="slow-flags"><li>Rebooting all 16 blades simultaneously — risks exceeding power budget and causing repeat failure</li><li>Not checking PSU input voltage — may indicate upstream PDU issue the DC team missed</li></ul>
+</div>
+</div><div class="phc-scenario" id="sc-blade-post" style="scroll-margin-top:74px">
+<div class="phc-scenario-header">🔴 Scenario: HP BL460c: Blade Fails to POST — No Console Output</div>
+<div class="phc-scenario-body">
+<p class="phc-scenario-desc">A critical application blade (BL460c Gen9) does not respond after a scheduled maintenance reboot. iLO shows the server is powered on but the virtual console shows a black screen. OA shows the blade as "Powered On — Health: Degraded".</p>
+<div class="cmd-label">Interviewer Probe Questions</div>
+<ul class="slow-flags" style="margin-bottom:12px"><li>How do you access the server when the console shows a black screen?</li><li>What is your step-by-step diagnostic process via iLO?</li><li>What does "Degraded" health in OA typically indicate?</li><li>How do you check for POST failure codes?</li><li>What is your escalation path if iLO itself is unresponsive?</li></ul>
+<div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+<ul class="slow-flags"><li>Try iLO virtual console via both Java IWS and HTML5 — sometimes one works when the other does not. Also try iLO text console: <code>ssh to iLO → start /system1/oemhp_vsp1</code></li><li>Check IML: iLO &gt; Information &gt; Integrated Management Log — look for critical alerts (DIMM fault, processor fault, POST error code).</li><li>"Degraded" usually means: failed DIMM (ECC uncorrectable), failed CPU, overtemperature event, or failed storage controller.</li><li>POST error codes display on the virtual console. On Gen9, check iLO Physical Activity Log for POST-phase errors. HP POST error codes are documented in the server maintenance guide.</li><li>If black screen persists: perform iLO reset (does NOT reboot the server): OA CLI: <code>iLO reset &lt;bay&gt;</code>. Wait 90 seconds.</li><li>Escalation: if hardware fault confirmed (e.g., DIMM failure), open HPE support case with IML export and plan blade swap maintenance window.</li></ul>
+</div>
+</div><div class="phc-scenario" id="sc-vc-network" style="scroll-margin-top:74px">
+<div class="phc-scenario-header">🔴 Scenario: C7000 VC Module: Network Connectivity Lost on 8 Blades</div>
+<div class="phc-scenario-body">
+<p class="phc-scenario-desc">All 8 blades connected to VC module in interconnect bay 1 have lost network connectivity simultaneously. Blades in bay 2 are fine. Servers respond to iLO management but have no data network.</p>
+<div class="cmd-label">Interviewer Probe Questions</div>
+<ul class="slow-flags" style="margin-bottom:12px"><li>How do you determine if this is a VC module failure, uplink failure, or server profile issue?</li><li>What OA and VC CLI commands do you use for diagnosis?</li><li>How do you check uplink status on the VC module?</li><li>What is the recovery procedure if the VC module has failed?</li><li>How do you verify server profile assignments during the outage?</li></ul>
+<div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+<ul class="slow-flags"><li>OA CLI: <code>show interconnect list</code> — shows status of all 8 interconnect bays, health, and link state. <code>show interconnect &lt;bay1&gt;</code> — port statistics, link status, firmware version.</li><li>Connect to VC Manager: <code>vc manager login</code> → <code>show ports</code>, <code>show networks</code>, <code>show uplinksets</code> — check if uplinks are down.</li><li>Check VC uplinks: if uplinks to core switch are down, blades lose connectivity but VC module itself may be healthy. Verify on core switch side — are VC trunk ports showing link?</li><li>If VC module failed: hot-swap replacement is possible in c7000. VC module in bay 1 can be replaced while bay 2 continues. Server profiles are stored in OA, not the VC module — they restore on new module insertion.</li><li>VC module firmware mismatch after replacement: new module may need firmware update to match bay 2 — do this before re-activating.</li></ul>
+</div>
+</div><div class="phc-scenario" id="sc-idrac-unreachable" style="scroll-margin-top:74px">
+<div class="phc-scenario-header">🔴 Scenario: Dell PowerEdge: iDRAC Unreachable After OS Patch</div>
+<div class="phc-scenario-body">
+<p class="phc-scenario-desc">After applying OS patches on a Dell R740 server, iDRAC becomes unreachable on the network. The OS is running fine. The iDRAC was accessible before the patch. You have console access to the OS.</p>
+<div class="cmd-label">Interviewer Probe Questions</div>
+<ul class="slow-flags" style="margin-bottom:12px"><li>What could cause iDRAC to lose network connectivity after an OS patch?</li><li>How do you diagnose and recover iDRAC network settings from within the OS?</li><li>What racadm commands do you use locally to reset iDRAC network configuration?</li><li>How do you reset iDRAC to factory defaults if configuration is corrupted?</li><li>What should you check to prevent this from recurring?</li></ul>
+<div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+<ul class="slow-flags"><li>Root causes: OS network config change affected shared NIC used by iDRAC; iDRAC firmware update in patch triggered reset of NIC config; patching disabled iDRAC Service Module (ISM) which manages shared NIC arbitration.</li><li>From OS (local racadm): <code>racadm getniccfg</code> — verify current iDRAC IP settings. Reset: <code>racadm setniccfg -s &lt;static-IP&gt; &lt;mask&gt; &lt;gateway&gt;</code></li><li>If ISM was affected: <code>systemctl status dcismeng</code> → restart if stopped: <code>systemctl restart dcismeng</code></li><li>If config corrupted: <code>racadm racreset</code> — soft reset iDRAC (~2 minutes, does NOT power cycle server). Or: <code>racadm factorydefaults</code> — WARNING: resets all config including credentials.</li><li>Prevention: exclude iDRAC shared NIC driver packages from OS patching scope, or switch to dedicated iDRAC NIC port to eliminate shared NIC dependency.</li></ul>
+<div class="cmd-label" style="color:var(--red,#ef4444);margin-top:12px">⚠️ Red Flags — Weak Answers</div><ul class="slow-flags"><li>Attempting iDRAC factory reset without knowing the recovery credentials — locks you out permanently</li></ul>
+</div>
+</div><div class="phc-scenario" id="sc-dell-temp" style="scroll-margin-top:74px">
+<div class="phc-scenario-header">🔴 Scenario: Dell PowerEdge: Critical Temperature Alert — Degraded Fans</div>
+<div class="phc-scenario-body">
+<p class="phc-scenario-desc">You receive a critical alert: a Dell R640 in production reports inlet temperature at 35°C (threshold 30°C) and CPU temperature at 85°C. Two fans are reported as degraded in iDRAC. Server is still running.</p>
+<div class="cmd-label">Interviewer Probe Questions</div>
+<ul class="slow-flags" style="margin-bottom:12px"><li>What is your immediate triage process?</li><li>How do you check fan and temperature status via iDRAC and racadm?</li><li>What Dell thermal management options can you use?</li><li>At what point do you proactively shutdown the server to prevent hardware damage?</li><li>What is the root cause investigation process?</li></ul>
+<div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+<ul class="slow-flags"><li><code>racadm -r &lt;IP&gt; getsensorinfo | grep -i temp</code> — get all temperature readings. <code>racadm -r &lt;IP&gt; getsensorinfo | grep -i fan</code> — check fan RPMs.</li><li>iDRAC GUI: Hardware &gt; Fans — shows all fan RPMs and status. Identify the two degraded fans (bay location, current RPM vs expected).</li><li>Dell thermal management: iDRAC &gt; Configuration &gt; Thermal — switch to Maximum Cooling mode (forces all fans to max RPM) as emergency measure while degraded fans are replaced.</li><li>IPMI force max fan speed: <code>ipmitool -I lanplus -H &lt;iDRAC-IP&gt; -U root -P &lt;pass&gt; raw 0x30 0x30 0x01 0x00</code></li><li>Shutdown threshold: if inlet temp exceeds 40°C or any CPU exceeds 95°C, proactive graceful shutdown is warranted. Do not wait for iDRAC auto-shutdown at critical threshold.</li><li>Root cause: failed fans (bearing failure), blocked airflow (cable management, empty bay without filler panel), cooling system failure (CRACs/CRAHs), elevated DC ambient temperature.</li></ul>
+</div>
+</div>
+</div>
+<div class="content-section la-section" id="hw-ref">
+  <div class="la-section-header">
+    <div class="la-section-icon">📋</div>
+    <div>
+      <h2 class="la-section-title">Quick Reference — HP OA/iLO & Dell iDRAC/racadm Cheat Sheet</h2>
+      <p class="la-section-desc">Complete command reference for HP OA CLI, iLO CLI, SSACLI, Dell racadm, and storcli</p>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-ref-tables">
+<div class="la-topic-header">
+<span class="la-topic-num">REF</span>
+<h3 class="la-topic-title">Quick Reference — HP OA/iLO &amp; Dell iDRAC/racadm Command Cheat Sheet</h3>
+</div>
+<div class="la-topic-body">
+<div class="tbl-wrap"><table><thead><tr><th>Task</th><th>HP OA / iLO Command</th></tr></thead><tbody><tr><td>Show all blades status</td><td><code>show server list</code> (OA CLI)</td></tr><tr><td>Power on blade in bay 3</td><td><code>poweron server 3</code> (OA CLI)</td></tr><tr><td>Reset iLO on bay 5</td><td><code>iLO reset 5</code> (OA CLI)</td></tr><tr><td>Show PSU status</td><td><code>show powersupply all</code> (OA CLI)</td></tr><tr><td>Show enclosure power</td><td><code>show enclosure power</code> (OA CLI)</td></tr><tr><td>Show interconnect modules</td><td><code>show interconnect list</code> (OA CLI)</td></tr><tr><td>iLO SSH login</td><td><code>ssh Administrator@&lt;iLO-IP&gt;</code></td></tr><tr><td>Show IML via iLO CLI</td><td><code>show /system1/log1</code> (iLO CLI)</td></tr><tr><td>Start virtual console</td><td><code>start /system1/oemhp_vsp1</code> (iLO CLI)</td></tr><tr><td>Show RAID via SSACLI</td><td><code>ssacli ctrl slot=0 ld all show</code></td></tr><tr><td>Show physical disks</td><td><code>ssacli ctrl slot=0 pd all show status</code></td></tr><tr><td>Rebuild status</td><td><code>ssacli ctrl slot=0 ld 1 show detail | grep -i progress</code></td></tr></tbody></table></div><div class="tbl-wrap"><table><thead><tr><th>Task</th><th>racadm / storcli Command</th></tr></thead><tbody><tr><td>Get system info</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsysinfo</code></td></tr><tr><td>Get all sensor data</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsensorinfo</code></td></tr><tr><td>Graceful shutdown</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction graceshutdown</code></td></tr><tr><td>Hard reset</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction hardreset</code></td></tr><tr><td>Get hardware event log</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsel</code></td></tr><tr><td>Get iDRAC NIC config</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getniccfg</code></td></tr><tr><td>Soft reset iDRAC</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; racreset</code></td></tr><tr><td>Show RAID virtual disks</td><td><code>storcli /c0 /vall show</code></td></tr><tr><td>Show all physical disks</td><td><code>storcli /c0 /eall/sall show</code></td></tr><tr><td>Check rebuild progress</td><td><code>storcli /c0/v0 show | grep Progress</code></td></tr><tr><td>Add hot spare</td><td><code>storcli /c0/e&lt;enc&gt;/s&lt;slot&gt; add hotsparedrive</code></td></tr><tr><td>Run consistency check</td><td><code>storcli /c0/v0 start cc</code></td></tr></tbody></table></div>
+</div>
+</div>
+</div>
+  </main>
+
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#hw-raid" class="toc-link">💽 HP Smart Array & IBM MegaRAID</a><a href="#hw1" class="toc-link h3">01 HP HPSSACLI / HPACUCLI — Smart Array Commands</a><a href="#hw2" class="toc-link h3">02 IBM MegaRAID storcli & MegaCli Commands</a><a href="#hw3" class="toc-link h3">03 HP ILO — Out-of-Band Management</a><a href="#hw-c7000" class="toc-link">🔷 HP BladeSystem C7000 & BL Series</a><a href="#hw-c7000-arch" class="toc-link h3">HP BladeSystem c7000 Chassis Architecture</a><a href="#hw-oa" class="toc-link h3">Onboard Administrator (OA) — Capabilities & Limits</a><a href="#hw-vc" class="toc-link h3">Virtual Connect (VC) Module</a><a href="#hw-ilo-deep" class="toc-link h3">HP iLO vs OA — Deep Dive</a><a href="#hw-blade-recovery" class="toc-link h3">Remote Recovery — Hung Kernel Blade</a><a href="#hw-firmware" class="toc-link h3">Firmware Updates — iLO, BIOS, Smart Array</a><a href="#hw-dell" class="toc-link">🔶 Dell PowerEdge — iDRAC, PERC & Lifecycle Controller</a><a href="#hw-idrac-compare" class="toc-link h3">HP iLO vs Dell iDRAC — Comparison</a><a href="#hw-racadm" class="toc-link h3">racadm CLI — Key Commands</a><a href="#hw-lc" class="toc-link h3">Dell Lifecycle Controller</a><a href="#hw-perc" class="toc-link h3">Dell PERC RAID — Health, Replace, Expand</a><a href="#hw-scenarios" class="toc-link">🔴 Hardware Troubleshooting Scenarios</a><a href="#sc-c7000-power" class="toc-link h3">HP C7000 Full Enclosure Power Loss</a><a href="#sc-blade-post" class="toc-link h3">HP BL460c Blade Fails to POST</a><a href="#sc-vc-network" class="toc-link h3">C7000 VC Module — 8 Blades Lose Network</a><a href="#sc-idrac-unreachable" class="toc-link h3">Dell iDRAC Unreachable After OS Patch</a><a href="#sc-dell-temp" class="toc-link h3">Dell R640 Critical Temperature Alert</a><a href="#hw-ref" class="toc-link">📋 Command Reference Cheat Sheet</a></nav>
+</div>
+
+<button id="btt">↑</button>
+
+<footer id="site-footer">
+  <span>RootReady — Technical Reference Library</span>
+  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+</footer>
+
+<script>
+// Progress + back-to-top
+const pr = document.getElementById('prog');
+const bt = document.getElementById('btt');
+addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const m = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+  if (pr) pr.style.width = (m > 0 ? Math.min(s / m * 100, 100) : 0) + '%';
+  if (bt) bt.classList.toggle('vis', s > 280);
+}, {passive: true});
+
+// Nav toggle
+function toggleNav() {
+  const nav = document.getElementById('site-nav');
+  const ov = document.getElementById('mob-ov');
+  nav.classList.toggle('open');
+  ov.classList.toggle('on');
+}
+
+// Active ToC highlighting
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('.content-section[id]');
+function updateToc() {
+  const top = window.scrollY + 80;
+  let cur = null;
+  sections.forEach(s => { if (s.offsetTop <= top) cur = s.id; });
+  tocLinks.forEach(l => {
+    l.classList.toggle('active-toc', l.getAttribute('href') === '#' + cur);
+  });
+}
+if (tocLinks.length && sections.length) addEventListener('scroll', updateToc, {passive: true});
+
+
+</script>
+</body>
+</html>
