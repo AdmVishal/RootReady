@@ -395,6 +395,11 @@ tr:hover td { background:rgba(255,255,255,.025); }
   .slow-bottom-grid { grid-template-columns: 1fr; }
 }
 
+
+/* kernel-devel section 3-col card grid */
+#s12 .card-grid { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 900px) { #s12 .card-grid { grid-template-columns: 1fr !important; } }
+
 </style>
 </head>
 <body>
@@ -433,6 +438,12 @@ tr:hover td { background:rgba(255,255,255,.025); }
 <a href="#slow-08" class="toc-link h3">08 Process Analysis</a>
 <a href="#slow-09" class="toc-link h3">09 Filesystem &amp; Inodes</a>
 <a href="#slow-10" class="toc-link h3">10 App &amp; Dependencies</a>
+<a href="#s12" class="toc-link">⚙️ kernel-devel</a>
+<a href="#kd-what" class="toc-link h3">What is kernel-devel</a>
+<a href="#kd-db2" class="toc-link h3">Why Db2 checks it</a>
+<a href="#kd-usecases" class="toc-link h3">Common use cases</a>
+<a href="#kd-packages" class="toc-link h3">Package differences</a>
+<a href="#kd-commands" class="toc-link h3">Verify commands</a>
 </nav>
 
   <main id="main-content">
@@ -2101,6 +2112,160 @@ $ redis-cli info stats</div>
 
 </div>
 <!-- end s11 -->
+
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 12: kernel-devel — What It Is & Why It Matters
+     ══════════════════════════════════════════════════ -->
+<div class="content-section la-section" id="s12">
+
+  <div class="la-section-header">
+    <div class="la-section-icon">⚙️</div>
+    <div>
+      <h2 class="la-section-title">kernel-devel — Linux Kernel Development Package</h2>
+      <p class="la-section-desc">Header files and build files for the Linux kernel — required for compiling kernel modules, drivers, and enterprise software prerequisites</p>
+    </div>
+  </div>
+
+  <!-- What is kernel-devel -->
+  <div class="la-topic" id="kd-what">
+    <div class="la-topic-header">
+      <span class="la-topic-num">01</span>
+      <h3 class="la-topic-title">What is kernel-devel?</h3>
+    </div>
+    <div class="la-topic-body">
+      <p class="body-text"><strong>kernel-devel</strong> is a Linux package that contains the <strong>header files and build files for the Linux kernel</strong>. It is primarily used when software needs to <strong>compile kernel-dependent modules or drivers</strong> against the currently running kernel.</p>
+
+      <div class="cmd-label">What's inside kernel-devel</div>
+      <ul class="slow-flags" style="margin-bottom:14px">
+        <li>Kernel header files (<code>*.h</code>)</li>
+        <li>Makefiles required for building kernel modules</li>
+        <li>Kernel configuration files</li>
+        <li>Symbol definitions and interfaces exposed by the kernel</li>
+      </ul>
+
+      <div class="cmd-label">Example location</div>
+      <div class="cmd-block">/usr/src/kernels/$(uname -r)/</div>
+    </div>
+  </div>
+
+  <!-- Why Db2 checks for kernel-devel -->
+  <div class="la-topic" id="kd-db2">
+    <div class="la-topic-header">
+      <span class="la-topic-num">02</span>
+      <h3 class="la-topic-title">Why Db2 Checks for kernel-devel</h3>
+    </div>
+    <div class="la-topic-body">
+      <p class="body-text">During installation, <strong>Db2's prerequisite checker</strong> verifies that the system has the development files needed for certain low-level integrations and kernel-related operations. Even though Db2 itself is not a kernel module, IBM includes this check to ensure the system has a complete build environment and compatible kernel interfaces.</p>
+      <div class="note">
+        <strong>Key point:</strong> The installed <code>kernel-devel</code> version <strong>must match</strong> the output of <code>uname -r</code> exactly. A version mismatch will cause the prerequisite check to fail.
+      </div>
+    </div>
+  </div>
+
+  <!-- Common use cases -->
+  <div class="la-topic" id="kd-usecases">
+    <div class="la-topic-header">
+      <span class="la-topic-num">03</span>
+      <h3 class="la-topic-title">Common Use Cases for kernel-devel</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="card-grid">
+        <div class="note">
+          <strong>🔌 Third-party Drivers</strong>
+          <ul class="slow-flags" style="margin-top:8px">
+            <li>Network drivers</li>
+            <li>Storage drivers</li>
+            <li>GPU drivers</li>
+          </ul>
+        </div>
+        <div class="note">
+          <strong>🧩 Building Kernel Modules</strong>
+          <ul class="slow-flags" style="margin-top:8px">
+            <li>VMware Tools</li>
+            <li>VirtualBox Guest Additions</li>
+            <li>Security / monitoring agents</li>
+          </ul>
+        </div>
+        <div class="note">
+          <strong>🏢 Enterprise Software</strong>
+          <ul class="slow-flags" style="margin-top:8px">
+            <li>IBM Db2</li>
+            <li>Oracle products</li>
+            <li>Backup and monitoring solutions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Package comparison table -->
+  <div class="la-topic" id="kd-packages">
+    <div class="la-topic-header">
+      <span class="la-topic-num">04</span>
+      <h3 class="la-topic-title">Difference Between Kernel-Related Packages</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Package</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>kernel</code></td><td>The running Linux kernel itself</td></tr>
+            <tr><td><code>kernel-devel</code></td><td>Files needed to build kernel modules (must match running kernel version)</td></tr>
+            <tr><td><code>kernel-headers</code></td><td>Userspace header files for compiling applications</td></tr>
+            <tr><td><code>gcc</code></td><td>C compiler — required to actually build modules</td></tr>
+            <tr><td><code>make</code></td><td>Build utility — drives the compilation process</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commands on your server -->
+  <div class="la-topic" id="kd-commands">
+    <div class="la-topic-header">
+      <span class="la-topic-num">05</span>
+      <h3 class="la-topic-title">Commands — Check &amp; Verify on Your Server</h3>
+    </div>
+    <div class="la-topic-body">
+
+      <div class="cmd-label">Check if kernel-devel is installed</div>
+      <div class="cmd-block">rpm -q kernel-devel</div>
+
+      <div class="cmd-label">Check the running kernel version</div>
+      <div class="cmd-block">uname -r</div>
+
+      <div class="cmd-label">Check if the matching version exists</div>
+      <div class="cmd-block">rpm -qa | grep kernel-devel</div>
+
+      <div class="warn-box">
+        <strong>⚠️ Version match is critical for Db2:</strong><br>
+        The <code>kernel-devel</code> version must exactly match <code>uname -r</code> output.<br><br>
+        <strong>Example:</strong>
+        <div class="cmd-block" style="margin-top:8px"><span class="comment"># Check running kernel</span>
+uname -r
+3.10.0-1160.el7.x86_64
+
+<span class="comment"># You must have this exact package installed:</span>
+kernel-devel-3.10.0-1160.el7.x86_64
+
+<span class="comment"># Install matching version if missing:</span>
+yum install kernel-devel-$(uname -r)
+
+<span class="comment"># Verify after install:</span>
+rpm -q kernel-devel-$(uname -r)</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- end s12 -->
 
 </main>
 
