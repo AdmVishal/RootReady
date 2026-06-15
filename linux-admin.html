@@ -400,6 +400,15 @@ tr:hover td { background:rgba(255,255,255,.025); }
 #s12 .card-grid { grid-template-columns: 1fr 1fr 1fr; }
 @media (max-width: 900px) { #s12 .card-grid { grid-template-columns: 1fr !important; } }
 
+
+/* ── Hardware & Satellite additions ── */
+.phc-scenario { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--red,#ef4444); border-radius:10px; margin-bottom:14px; overflow:hidden; scroll-margin-top:74px; }
+.phc-scenario-header { padding:12px 18px; background:rgba(239,68,68,.08); font-family:var(--font-head); font-weight:700; font-size:.96rem; color:var(--text); border-bottom:1px solid var(--border); }
+.phc-scenario-body { padding:14px 18px; font-size:.875rem; color:var(--text2); line-height:1.7; }
+.phc-scenario-desc { font-style:italic; color:var(--text3); background:rgba(255,255,255,.03); border-left:2px solid var(--border2); padding:8px 12px; border-radius:0 6px 6px 0; margin-bottom:12px; }
+.phc-a { font-size:.875rem; color:var(--text2); line-height:1.75; }
+.phc-abadge { display:block; font-family:var(--font-mono); font-size:.65rem; font-weight:700; color:var(--accent); margin-bottom:8px; }
+
 </style>
 </head>
 <body>
@@ -444,6 +453,22 @@ tr:hover td { background:rgba(255,255,255,.025); }
 <a href="#kd-usecases" class="toc-link h3">Common use cases</a>
 <a href="#kd-packages" class="toc-link h3">Package differences</a>
 <a href="#kd-commands" class="toc-link h3">Verify commands</a>
+<a href="#hw-c7000-arch" class="toc-link h3">HP C7000 Architecture</a>
+<a href="#hw-oa" class="toc-link h3">Onboard Administrator (OA)</a>
+<a href="#hw-vc" class="toc-link h3">Virtual Connect (VC)</a>
+<a href="#hw-ilo-deep" class="toc-link h3">iLO Deep Dive</a>
+<a href="#hw-blade-recovery" class="toc-link h3">Blade Recovery</a>
+<a href="#hw-firmware" class="toc-link h3">Firmware Updates</a>
+<a href="#hw-idrac-compare" class="toc-link h3">iLO vs iDRAC Compare</a>
+<a href="#hw-racadm" class="toc-link h3">racadm CLI</a>
+<a href="#hw-lc" class="toc-link h3">Lifecycle Controller</a>
+<a href="#hw-perc" class="toc-link h3">Dell PERC RAID</a>
+<a href="#s13" class="toc-link">🛰️ Satellite Patching</a>
+<a href="#sat-arch" class="toc-link h3">Architecture</a>
+<a href="#sat-lce" class="toc-link h3">Lifecycle Environments</a>
+<a href="#sat-patching" class="toc-link h3">Patching Workflows</a>
+<a href="#sat-hammer" class="toc-link h3">Hammer CLI</a>
+<a href="#sat-scenarios" class="toc-link h3">Scenarios</a>
 </nav>
 
   <main id="main-content">
@@ -946,6 +971,223 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div></div>
   </div>
 </div>
+
+
+  <!-- ── NEW: HP C7000 Blade Enclosure ── -->
+  <div style="margin:28px 0 8px;padding:10px 14px;background:rgba(27,79,138,.15);border-left:3px solid var(--sky);border-radius:0 8px 8px 0;">
+    <h3 style="margin:0;font-size:1rem;color:var(--sky)">HP BladeSystem C7000 &amp; BL Series</h3>
+  </div>
+
+  <div class="la-topic" id="hw-c7000-arch">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q1</span>
+      <h3 class="la-topic-title">Describe the HP BladeSystem c7000 chassis architecture — all major hardware components.</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>c7000</strong> is a 10U enclosure housing up to 16 half-height or 8 full-height blade servers.<br><br><ul class="slow-flags"><li><strong>Onboard Administrator (OA)</strong> — dual redundant management modules (slots 1 & 2). Provides web UI, CLI, SNMP, REST API. Manages power, cooling, firmware, and inter-module communication.</li><li><strong>Blade Server Bays (1–16)</strong> — house BL460c, BL680c, BL2x220c. Half-height blades = 1 bay; full-height = 2 bays.</li><li><strong>Power Supply Bays (1–6)</strong> — up to six hot-plug PSUs. Minimum 4 for N+1 redundancy under full load.</li><li><strong>Fan Bays (1–10)</strong> — ten hot-plug redundant fans with zone-based cooling. Active Cool fans auto-adjust from thermal sensors.</li><li><strong>Interconnect Module Bays (1–8)</strong> — network (FlexFabric, VC) and SAN (FC, SAS) modules. Bays 1–2 = LOM connected; Bays 3–8 = mezzanine card connected.</li><li><strong>Insight Display</strong> — front LCD for chassis status, IP config, and UID control.</li><li><strong>Midplane</strong> — backplane connecting blades to interconnect modules and power distribution.</li></ul><div class="note"><strong>Key OA CLI:</strong> <code>show enclosure info</code> | <code>show server list</code> | <code>poweroff server 3</code> | <code>iLO reset 5</code> | <code>show interconnect list</code> | <code>show power</code></div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-oa">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q2</span>
+      <h3 class="la-topic-title">What is the HP Onboard Administrator (OA)? What can and cannot be configured through it?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>The OA is the chassis management controller</strong> — equivalent to Dell's CMC. Runs embedded firmware.<div class="card-grid" style="margin-top:12px"><div class="note"><strong>✅ CAN DO</strong><ul class="slow-flags"><li>Power on/off/reset individual blades, set power capping per bay</li><li>Configure interconnect modules</li><li>Update blade iLO firmware remotely</li><li>Configure LDAP/RADIUS for OA authentication</li><li>Configure enclosure SNMP traps</li><li>Manage Virtual Connect from OA CLI</li><li>Configure UID LEDs, download chassis-wide logs</li><li>Configure rack topology</li></ul></div><div class="warn-box"><strong>❌ CANNOT DO</strong><ul class="slow-flags"><li>OS-level management (that is iLO's job)</li><li>Configure BIOS/boot order (done via iLO or iLO RESTful API)</li><li>Access individual disk controllers (done via Smart Array in iLO)</li><li>Manage VM workloads</li></ul></div></div><div class="note">Access: SSH to OA IP, HTTPS web UI, SNMP. Dual OA setup — primary active, secondary standby. Failover is automatic on primary OA failure.</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-vc">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q3</span>
+      <h3 class="la-topic-title">Explain the Virtual Connect (VC) module in c7000. What problem does it solve and how do you manage it?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Virtual Connect solves the N×M cabling problem</strong> in blade environments. Without VC, each blade's NICs would require individual cables to top-of-rack switches — in a 16-blade chassis that's 32+ cables.<ul class="slow-flags"><li><strong>Abstraction:</strong> VC presents virtual MAC addresses and WWNs to blades. Physical upstream connections are shared. When a blade is replaced, the same virtual MAC/WWN is reassigned — server identity preserved without switch reconfiguration.</li><li><strong>Uplink aggregation:</strong> VC modules aggregate blade traffic to a small number of uplinks to the core network.</li><li><strong>Server Profiles:</strong> define which networks and fabrics a blade can access. Profiles contain virtual MACs, WWNs, network assignments, and bandwidth policies.</li><li><strong>Management:</strong> HP OneView or VC Manager GUI, OA CLI (<code>vc manager</code> commands), or REST API.</li><li><strong>Common issue:</strong> Server profile conflict when re-seating blades — resolve by reassigning or cloning the profile.</li></ul><div class="note"><strong>★ PRO TIP:</strong> Interviewers ask: "What happens when a blade is removed and re-inserted in a different bay?" Answer: VC profile re-assignment — the virtual MAC/WWN follows the profile, not the physical blade bay.</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-ilo-deep">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q4</span>
+      <h3 class="la-topic-title">What is HP iLO and how is it different from the OA? What can you do in iLO that you cannot do in OA?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>iLO (Integrated Lights-Out)</strong> is the per-blade management controller embedded on every HP ProLiant server. It is independent of the OS — has its own processor, memory, NIC, and power from the chassis standby rail. You can access iLO even when the OS is down, hung at POST, or powered off.<div class="tbl-wrap"><table><thead><tr><th>Capability</th><th>iLO</th><th>OA</th></tr></thead><tbody><tr><td>Management scope</td><td>Individual server (OS + hardware level)</td><td>Entire chassis (power, cooling, interconnects)</td></tr><tr><td>OS independence</td><td>Yes — works when OS is down</td><td>Yes — chassis level</td></tr><tr><td>Virtual console (KVM)</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>BIOS configuration</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>RAID management</td><td>✅ via Smart Array</td><td>❌ No</td></tr><tr><td>Virtual media (ISO mount)</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>iLO versions</td><td>iLO 4 (Gen8/9), iLO 5 (Gen10), iLO 6 (Gen11)</td><td>N/A</td></tr><tr><td>API</td><td>Redfish (iLO 5+)</td><td>REST/SNMP</td></tr></tbody></table></div><div class="note">In BL blades, iLO uses OA backplane connection — there is no physical iLO NIC port on the blade itself.</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-blade-recovery">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q5</span>
+      <h3 class="la-topic-title">Walk me through remotely recovering a blade server with a hung kernel (OS unresponsive).</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>L3 remote recovery procedure using iLO:</strong><ol style="color:var(--text2);font-size:.9rem;line-height:1.8;padding-left:20px;margin-top:8px"><li>Access iLO web UI or SSH: <code>ssh Administrator@&lt;iLO-IP&gt;</code>. If iLO unreachable, access via OA CLI → <code>iLO connect &lt;blade-number&gt;</code></li><li>Check IML: verify iLO System Health for hardware faults (memory ECC errors, processor faults, storage alerts)</li><li>Virtual Console: launch HTML5 iLO remote console — if hung kernel, you'll see the Linux panic output or frozen screen</li><li>Attempt graceful shutdown first: iLO Power &amp; Thermal → Momentary Press (sends ACPI power button signal). Wait 60 seconds.</li><li>If no response: Force Power Off (hard power cycle). Document as unclean shutdown.</li><li>After reboot: use virtual console to monitor POST and OS boot. If boot fails, mount ISO via iLO Virtual Media to boot from rescue image.</li><li>Post-recovery: check IML for hardware alerts, check OS logs (<code>/var/log/messages</code>, <code>dmesg</code>) after recovery.</li></ol></div>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-firmware">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q6</span>
+      <h3 class="la-topic-title">How do you update iLO firmware, BIOS, and Smart Array firmware on HP BL blades in production?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Method</th><th>Description</th><th>Requires Reboot?</th></tr></thead><tbody><tr><td>HP SPP (Service Pack for ProLiant)</td><td>Bootable ISO containing all firmware/drivers. Mount via iLO Virtual Media, run interactive/automated update. Best for full stack updates.</td><td>Yes</td></tr><tr><td>HP iLO Amplifier / OneView</td><td>Centralized firmware management. Detects versions, applies baseline. Can update iLO firmware online (no reboot for iLO-only in iLO 4+).</td><td>iLO: No; BIOS: Yes</td></tr><tr><td>OA CLI push</td><td><code>FIRMWARE UPDATE &lt;bay&gt;</code> — updates iLO firmware to all blades from OA without booting OS.</td><td>No (iLO only)</td></tr><tr><td>HP Smart Update Manager (SUM)</td><td>Run on Linux, deploys RPM packages for online firmware update. Updates BIOS, NIC, Smart Array online.</td><td>Yes (BIOS)</td></tr><tr><td>Satellite + firmware RPMs</td><td>HP provides firmware as RPMs via HPE Software Delivery Repository. Deploy via package management.</td><td>Yes</td></tr></tbody></table></div><div class="warn-box"><strong>Production best practice:</strong> test on non-production blade first, schedule change window, verify iLO firmware compatibility matrix before BIOS update, always have iLO console access ready during BIOS update in case of POST failure.</div></div>
+    </div>
+  </div>
+  <div style="margin:28px 0 8px;padding:10px 14px;background:rgba(27,79,138,.15);border-left:3px solid var(--sky);border-radius:0 8px 8px 0;">
+    <h3 style="margin:0;font-size:1rem;color:var(--sky)">Dell PowerEdge — iDRAC, PERC &amp; Hardware Management</h3>
+  </div>
+
+  <div class="la-topic" id="hw-idrac-compare">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q7</span>
+      <h3 class="la-topic-title">Compare HP iLO and Dell iDRAC — functional equivalents and key differences.</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Feature</th><th>HP iLO</th><th>Dell iDRAC</th></tr></thead><tbody><tr><td>Management Controller</td><td>iLO (Integrated Lights-Out)</td><td>iDRAC (Integrated Dell Remote Access Controller)</td></tr><tr><td>Current Generation</td><td>iLO 6 (Gen11)</td><td>iDRAC9 (14G/15G), iDRAC10 (16G)</td></tr><tr><td>Chassis Management</td><td>OA (Onboard Administrator)</td><td>CMC (M-series), OME (rack)</td></tr><tr><td>API Standard</td><td>Redfish (iLO 5+), REST API</td><td>Redfish, WSMAN, REST API</td></tr><tr><td>Remote Console</td><td>IRC Java/HTML5</td><td>Virtual Console Java/HTML5, iDRAC Direct</td></tr><tr><td>Firmware Management</td><td>HPE OneView, SPP, SUM</td><td>iDRAC, OMSA, Lifecycle Controller</td></tr><tr><td>Storage Management</td><td>HP SSA / SSACLI</td><td>OMSA / racadm / PERC / storcli</td></tr><tr><td>OS Deployment</td><td>iLO Virtual Media + PXE</td><td>iDRAC Virtual Media + Lifecycle Controller</td></tr><tr><td>Free License</td><td>iLO Standard (basic)</td><td>iDRAC Basic (limited), Enterprise (full)</td></tr></tbody></table></div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-racadm">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q8</span>
+      <h3 class="la-topic-title">What is racadm and how do you use it for remote Dell server management? Give key commands.</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>racadm</strong> is the Dell CLI for iDRAC management. Available as remote racadm, local racadm, or SSH to iDRAC.<div class="cmd-block"># System info & sensors
+racadm -r &lt;iDRAC-IP&gt; -u root -p &lt;pass&gt; getsysinfo
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsensorinfo
+
+# Power actions
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction graceshutdown
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction hardreset
+
+# iDRAC network config
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getniccfg
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; setniccfg -s &lt;static-IP&gt; &lt;mask&gt; &lt;gateway&gt;
+
+# PERC RAID status
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; raid get vdisks -t
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; raid get pdisks -t
+
+# Hardware event log
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsel
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; clrsel
+
+# Soft reset iDRAC (does NOT power cycle server)
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; racreset
+
+# Mount virtual media
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; remoteimage -c -u &lt;user&gt; -p &lt;pass&gt; -l &lt;NFS/CIFS-path&gt;</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-lc">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q9</span>
+      <h3 class="la-topic-title">What is the Dell Lifecycle Controller and how is it used in production?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>The Lifecycle Controller</strong> is firmware embedded in iDRAC providing OS-independent hardware management — accessed during server boot (F10) or via iDRAC.<ul class="slow-flags"><li><strong>OS Deployment:</strong> deploy OS from ISO via virtual media or network share without a PXE server. Configures drivers automatically.</li><li><strong>Firmware Update:</strong> update all server firmware (BIOS, iDRAC, PERC, NIC, PSU) from a network share or attached media in one pass.</li><li><strong>Hardware Configuration:</strong> configure BIOS settings, RAID arrays, network adapter settings, and boot order without booting the OS.</li><li><strong>Part Replacement:</strong> when replacing a system board or PERC controller, LC restores previous configuration from backup — critical for blade swap scenarios.</li><li><strong>System Erase:</strong> securely wipe all data and configuration — used for decommissioning.</li><li><strong>SupportAssist:</strong> collect hardware diagnostics for Dell support.</li></ul><div class="note">Access: Boot server → press F10 → Lifecycle Controller UI. Or via iDRAC: Configuration > Lifecycle Controller. Or via racadm: <code>racadm get BIOS.*</code> to view and set BIOS settings.</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="hw-perc">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q10</span>
+      <h3 class="la-topic-title">How do you manage a Dell PERC RAID controller? Health check, failed drive replacement, storage expansion.</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>PERC (PowerEdge RAID Controller)</strong> management tools:<div class="cmd-block"># Show controller status and all drives
+storcli /c0 show all
+storcli /c0 /vall show          # Virtual drives
+storcli /c0 /eall/sall show     # All physical disks
+
+# RAID health via racadm
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; raid get vdisks -t
+racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; raid get pdisks -t
+
+# Monitor rebuild progress after hot-swap
+storcli /c0/v0 show | grep Progress
+
+# Add hot spare
+storcli /c0/e&lt;encl&gt;/s&lt;slot&gt; add hotsparedrive
+
+# Expand storage online (no downtime)
+storcli /c0/v0 expand size=&lt;GB&gt;
+
+# Run consistency check (schedule monthly)
+storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Never remove a second disk from a RAID 5 array while first is rebuilding — this causes data loss. Verify rebuild completion before any maintenance.</div></div>
+    </div>
+  </div>
+  <!-- ── NEW: HP & Dell Hardware Troubleshooting Scenarios ── -->
+  <div style="margin:28px 0 8px;padding:10px 14px;background:rgba(27,79,138,.15);border-left:3px solid var(--sky);border-radius:0 8px 8px 0;">
+    <h3 style="margin:0;font-size:1rem;color:var(--sky)">Hardware Troubleshooting Scenarios</h3>
+  </div>
+
+  <div class="phc-scenario" id="sc-c7000-power" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: HP C7000: Full Enclosure Power Loss</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">You receive a P1 alert that an HP c7000 blade enclosure has lost power. 14 of 16 blades are offline. Two blades show "insufficient power" in OA. The data center reports no power failure at the PDU level. You have OA CLI and iLO access.</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>What is your first diagnostic step via OA CLI?</li><li>How do you determine if it is a PSU failure or a power budget issue?</li><li>What OA commands do you use to check power status and PSU health?</li><li>If two PSUs have failed, what is the recovery procedure?</li><li>How do you bring the 14 offline blades back online safely?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li><code>SSH to OA IP</code> → <code>show enclosure power</code> (overall power status) → <code>show powersupply all</code> (lists all 6 PSU slots with status, input voltage, output wattage, health) → <code>show server list</code> (power state of all 16 bays)</li><li>c7000 requires minimum 4 PSUs for N+1 under full load — 2 failures may trip power budget protection.</li><li>If PSUs failed: identify failed units (status = Failed or Unknown), dispatch data center to physically inspect/replace.</li><li>Power budget: <code>show enclosure power</code> — if total blade demand exceeds available supply, OA enforces power capping. Solution: reduce power cap on non-critical blades or bring PSUs back online.</li><li>Safe restart: power on blades in priority order — <code>poweron server &lt;bay&gt;</code> — stagger by 30 seconds to avoid inrush current spike.</li><li>After recovery: check IML on each blade for hardware faults logged during unclean shutdown.</li></ul>
+      <div class="cmd-label" style="color:var(--red,#ef4444);margin-top:12px">⚠️ Red Flags — Weak Answers</div><ul class="slow-flags"><li>Rebooting all 16 blades simultaneously — risks exceeding power budget and causing repeat failure</li><li>Not checking PSU input voltage — may indicate upstream PDU issue the DC team missed</li></ul>
+    </div>
+  </div>
+  <div class="phc-scenario" id="sc-blade-post" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: HP BL460c: Blade Fails to POST — No Console Output</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">A critical application blade (BL460c Gen9) does not respond after a scheduled maintenance reboot. iLO shows the server is powered on but the virtual console shows a black screen. OA shows the blade as "Powered On — Health: Degraded".</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>How do you access the server when the console shows a black screen?</li><li>What is your step-by-step diagnostic process via iLO?</li><li>What does "Degraded" health in OA typically indicate?</li><li>How do you check for POST failure codes?</li><li>What is your escalation path if iLO itself is unresponsive?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li>Try iLO virtual console via both Java IWS and HTML5 — sometimes one works when the other does not. Also try iLO text console: <code>ssh to iLO → start /system1/oemhp_vsp1</code></li><li>Check IML: iLO > Information > Integrated Management Log — look for critical alerts (DIMM fault, processor fault, POST error code).</li><li>"Degraded" usually means: failed DIMM (ECC uncorrectable), failed CPU, overtemperature event, or failed storage controller.</li><li>POST error codes display on the virtual console. On Gen9, check iLO Physical Activity Log for POST-phase errors. HP POST error codes are documented in the server maintenance guide.</li><li>If black screen persists: perform iLO reset (does NOT reboot the server): OA CLI: <code>iLO reset &lt;bay&gt;</code>. Wait 90 seconds.</li><li>Escalation: if hardware fault confirmed (e.g., DIMM failure), open HPE support case with IML export and plan blade swap maintenance window.</li></ul>
+      
+    </div>
+  </div>
+  <div class="phc-scenario" id="sc-vc-network" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: C7000 VC Module: Network Connectivity Lost on 8 Blades</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">All 8 blades connected to VC module in interconnect bay 1 have lost network connectivity simultaneously. Blades in bay 2 are fine. Servers respond to iLO management but have no data network.</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>How do you determine if this is a VC module failure, uplink failure, or server profile issue?</li><li>What OA and VC CLI commands do you use for diagnosis?</li><li>How do you check uplink status on the VC module?</li><li>What is the recovery procedure if the VC module has failed?</li><li>How do you verify server profile assignments during the outage?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li>OA CLI: <code>show interconnect list</code> — shows status of all 8 interconnect bays, health, and link state. <code>show interconnect &lt;bay1&gt;</code> — port statistics, link status, firmware version.</li><li>Connect to VC Manager: <code>vc manager login</code> → <code>show ports</code>, <code>show networks</code>, <code>show uplinksets</code> — check if uplinks are down.</li><li>Check VC uplinks: if uplinks to core switch are down, blades lose connectivity but VC module itself may be healthy. Verify on core switch side — are VC trunk ports showing link?</li><li>If VC module failed: hot-swap replacement is possible in c7000. VC module in bay 1 can be replaced while bay 2 continues. Server profiles are stored in OA, not the VC module — they restore on new module insertion.</li><li>VC module firmware mismatch after replacement: new module may need firmware update to match bay 2 — do this before re-activating.</li></ul>
+      
+    </div>
+  </div>
+  <div class="phc-scenario" id="sc-idrac-unreachable" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: Dell PowerEdge: iDRAC Unreachable After OS Patch</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">After applying OS patches on a Dell R740 server, iDRAC becomes unreachable on the network. The OS is running fine. The iDRAC was accessible before the patch. You have console access to the OS.</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>What could cause iDRAC to lose network connectivity after an OS patch?</li><li>How do you diagnose and recover iDRAC network settings from within the OS?</li><li>What racadm commands do you use locally to reset iDRAC network configuration?</li><li>How do you reset iDRAC to factory defaults if configuration is corrupted?</li><li>What should you check to prevent this from recurring?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li>Root causes: OS network config change affected shared NIC used by iDRAC; iDRAC firmware update in patch triggered reset of NIC config; patching disabled iDRAC Service Module (ISM) which manages shared NIC arbitration.</li><li>From OS (local racadm): <code>racadm getniccfg</code> — verify current iDRAC IP settings. Reset: <code>racadm setniccfg -s &lt;static-IP&gt; &lt;mask&gt; &lt;gateway&gt;</code></li><li>If ISM was affected: <code>systemctl status dcismeng</code> → restart if stopped: <code>systemctl restart dcismeng</code></li><li>If config corrupted: <code>racadm racreset</code> — soft reset iDRAC (~2 minutes, does NOT power cycle server). Or: <code>racadm factorydefaults</code> — WARNING: resets all config including credentials.</li><li>Prevention: exclude iDRAC shared NIC driver packages from OS patching scope, or switch to dedicated iDRAC NIC port to eliminate shared NIC dependency.</li></ul>
+      <div class="cmd-label" style="color:var(--red,#ef4444);margin-top:12px">⚠️ Red Flags — Weak Answers</div><ul class="slow-flags"><li>Attempting iDRAC factory reset without knowing the recovery credentials — locks you out permanently</li></ul>
+    </div>
+  </div>
+  <div class="phc-scenario" id="sc-dell-temp" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: Dell PowerEdge: Critical Temperature Alert — Degraded Fans</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">You receive a critical alert: a Dell R640 in production reports inlet temperature at 35°C (threshold 30°C) and CPU temperature at 85°C. Two fans are reported as degraded in iDRAC. Server is still running.</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>What is your immediate triage process?</li><li>How do you check fan and temperature status via iDRAC and racadm?</li><li>What Dell thermal management options can you use?</li><li>At what point do you proactively shutdown the server to prevent hardware damage?</li><li>What is the root cause investigation process?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li><code>racadm -r &lt;IP&gt; getsensorinfo | grep -i temp</code> — get all temperature readings. <code>racadm -r &lt;IP&gt; getsensorinfo | grep -i fan</code> — check fan RPMs.</li><li>iDRAC GUI: Hardware > Fans — shows all fan RPMs and status. Identify the two degraded fans (bay location, current RPM vs expected).</li><li>Dell thermal management: iDRAC > Configuration > Thermal — switch to Maximum Cooling mode (forces all fans to max RPM) as emergency measure while degraded fans are replaced.</li><li>IPMI force max fan speed: <code>ipmitool -I lanplus -H &lt;iDRAC-IP&gt; -U root -P &lt;pass&gt; raw 0x30 0x30 0x01 0x00</code></li><li>Shutdown threshold: if inlet temp exceeds 40°C or any CPU exceeds 95°C, proactive graceful shutdown is warranted. Do not wait for iDRAC auto-shutdown at critical threshold.</li><li>Root cause: failed fans (bearing failure), blocked airflow (cable management, empty bay without filler panel), cooling system failure (CRACs/CRAHs), elevated DC ambient temperature.</li></ul>
+      
+    </div>
+  </div>
+  <!-- ── Reference tables ── -->
+  <div class="la-topic" id="hw-ref-tables">
+    <div class="la-topic-header">
+      <span class="la-topic-num">REF</span>
+      <h3 class="la-topic-title">Quick Reference — HP OA/iLO &amp; Dell iDRAC/racadm Command Cheat Sheet</h3>
+    </div>
+    <div class="la-topic-body">
+<div class="tbl-wrap"><table><thead><tr><th>Task</th><th>HP OA / iLO Command</th></tr></thead><tbody><tr><td>Show all blades status</td><td><code>show server list</code> (OA CLI)</td></tr><tr><td>Power on blade in bay 3</td><td><code>poweron server 3</code> (OA CLI)</td></tr><tr><td>Reset iLO on bay 5</td><td><code>iLO reset 5</code> (OA CLI)</td></tr><tr><td>Show PSU status</td><td><code>show powersupply all</code> (OA CLI)</td></tr><tr><td>Show enclosure power</td><td><code>show enclosure power</code> (OA CLI)</td></tr><tr><td>Show interconnect modules</td><td><code>show interconnect list</code> (OA CLI)</td></tr><tr><td>iLO SSH login</td><td><code>ssh Administrator@&lt;iLO-IP&gt;</code></td></tr><tr><td>Show IML via iLO CLI</td><td><code>show /system1/log1</code> (iLO CLI)</td></tr><tr><td>Start virtual console</td><td><code>start /system1/oemhp_vsp1</code> (iLO CLI)</td></tr><tr><td>Show RAID via SSACLI</td><td><code>ssacli ctrl slot=0 ld all show</code></td></tr><tr><td>Show physical disks</td><td><code>ssacli ctrl slot=0 pd all show status</code></td></tr><tr><td>Rebuild status</td><td><code>ssacli ctrl slot=0 ld 1 show detail | grep -i progress</code></td></tr></tbody></table></div><div class="tbl-wrap"><table><thead><tr><th>Task</th><th>racadm / storcli Command</th></tr></thead><tbody><tr><td>Get system info</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsysinfo</code></td></tr><tr><td>Get all sensor data</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsensorinfo</code></td></tr><tr><td>Graceful shutdown</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction graceshutdown</code></td></tr><tr><td>Hard reset</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction hardreset</code></td></tr><tr><td>Get hardware event log</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsel</code></td></tr><tr><td>Get iDRAC NIC config</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getniccfg</code></td></tr><tr><td>Soft reset iDRAC</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; racreset</code></td></tr><tr><td>Show RAID virtual disks</td><td><code>storcli /c0 /vall show</code></td></tr><tr><td>Show all physical disks</td><td><code>storcli /c0 /eall/sall show</code></td></tr><tr><td>Check rebuild progress</td><td><code>storcli /c0/v0 show | grep Progress</code></td></tr><tr><td>Add hot spare</td><td><code>storcli /c0/e&lt;enc&gt;/s&lt;slot&gt; add hotsparedrive</code></td></tr><tr><td>Run consistency check</td><td><code>storcli /c0/v0 start cc</code></td></tr></tbody></table></div>
+    </div>
+  </div>
+
+</div>
+<!-- end s4 injected -->
 
 <div class="content-section la-section" id="s5">
   <div class="la-section-header">
@@ -2266,6 +2508,284 @@ rpm -q kernel-devel-$(uname -r)</div>
 
 </div>
 <!-- end s12 -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 13: Red Hat Satellite 6/7 — Lifecycle & Patching
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="content-section la-section" id="s13">
+
+  <div class="la-section-header">
+    <div class="la-section-icon">🛰️</div>
+    <div>
+      <h2 class="la-section-title">Red Hat Satellite 6/7 — Lifecycle Environments &amp; Patching</h2>
+      <p class="la-section-desc">Architecture, content views, activation keys, patching workflows, Hammer CLI, troubleshooting — deep L3 operational reference</p>
+    </div>
+  </div>
+
+  <!-- Architecture sub-header -->
+  <div class="phc-sub-title" style="margin-bottom:14px" id="sat-arch">3.1 — Satellite Architecture</div>
+
+  <div class="la-topic" id="sat-q13">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q1</span>
+      <h3 class="la-topic-title">Explain the Red Hat Satellite architecture — all major components and how they interact.</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><ul class="slow-flags"><li><strong>Foreman:</strong> the core of Satellite — handles host provisioning, lifecycle management, and the web UI. Provides the host model, host groups, lifecycle environments, and content views.</li><li><strong>Katello:</strong> the content management layer. Handles syncing from Red Hat CDN, creating content views, managing lifecycle environments, applying errata, and activation keys. Built on Pulp for content storage.</li><li><strong>Pulp 3:</strong> the content repository management backend. Stores synced RPM packages, errata, kickstart trees, and file content.</li><li><strong>Candlepin:</strong> the subscription management component. Tracks Red Hat subscriptions, registers hosts, and manages entitlements.</li><li><strong>Capsule Server (Smart Proxy):</strong> optional distributed component. Syncs content from Satellite and serves it locally to registered clients. Reduces WAN bandwidth. Runs Pulp, DHCP, DNS, TFTP for local provisioning.</li><li><strong>Satellite DB:</strong> PostgreSQL database storing all Satellite metadata — host records, content view versions, lifecycle environments, activation keys, tasks.</li><li><strong>Client tools:</strong> subscription-manager (registers host, manages repos), remote execution (REX) via SSH for job dispatch.</li></ul><div class="note"><strong>Data flow:</strong> Red Hat CDN → Satellite (sync) → Capsule (sync from Satellite) → Registered RHEL Hosts (yum/dnf updates)</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="sat-q14">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q2</span>
+      <h3 class="la-topic-title">What is the difference between a Satellite Organization and a Location? Why does it matter for patching?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="card-grid"><div class="note"><strong>Organization</strong><br>Logical grouping of resources by business unit or department. Each org has its own: content views, lifecycle environments, activation keys, subscriptions, repositories, and hosts. A host belongs to exactly one org. In multi-tenant environments (MSPs), each customer is typically a separate org.<br><br><strong>Key rule:</strong> Content views and lifecycle environments are org-scoped. You cannot share a content view across organizations — each org is self-contained from a content perspective.</div><div class="note"><strong>Location</strong><br>Physical or logical grouping representing a datacenter, region, or site. Used to route provisioning (which capsule serves this location's DHCP/DNS/TFTP). A host belongs to a location.<br><br><strong>Patching relevance:</strong> Selecting the wrong org means you do not see the right hosts or content. Trying to promote a content view version from Org-A into Org-B is not possible.</div></div></div>
+    </div>
+  </div>
+  <div class="phc-sub-title" style="margin:24px 0 14px" id="sat-lce">3.2 — Lifecycle Environments</div>
+
+  <div class="la-topic" id="sat-q15">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q3</span>
+      <h3 class="la-topic-title">Explain the Lifecycle Environment concept in Satellite. How do you design a typical lifecycle path for enterprise patching?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>A Lifecycle Environment (LCE)</strong> represents a stage in the software promotion pipeline — analogous to SDLC stages. Environments are chained:<br><br><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 14px"><span class="la-topic-num">Library</span><span style="color:var(--green)">→</span><span class="la-topic-num">DEV</span><span style="color:var(--green)">→</span><span class="la-topic-num">SIT</span><span style="color:var(--green)">→</span><span class="la-topic-num">UAT</span><span style="color:var(--green)">→</span><span class="la-topic-num">PREPROD</span><span style="color:var(--green)">→</span><span class="la-topic-num">PROD</span></div><ul class="slow-flags"><li><strong>Library</strong> — the source environment. Contains all synced content from CDN. Content views are built from Library. Never directly register hosts to Library.</li><li><strong>Hosts are pinned to an environment</strong> — a production host registered to PROD only sees packages that have been explicitly promoted to PROD. It will NOT see a new package until the content view version is promoted to PROD.</li><li><strong>Time-delayed promotion:</strong> enforce that a CV version must sit in UAT for 7 days before promoting to PROD — gives time for testing. This is manual governance.</li></ul><div class="cmd-block"># Create lifecycle environment via Hammer CLI
+hammer lifecycle-environment create --name 'PROD' --prior 'PREPROD' --organization 'MyOrg'
+
+# Via Satellite API
+POST /api/v2/environments  {path, organization_id}</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="sat-q16">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q4</span>
+      <h3 class="la-topic-title">What is a Content View in Satellite? Explain its components and the publish/promote workflow.</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>A Content View (CV)</strong> is a filtered, version-controlled snapshot of repository content. It controls exactly which packages, errata, and files are available to hosts in each lifecycle environment.<br><br><strong>Components:</strong><ul class="slow-flags"><li><strong>Repositories</strong> — which yum repos, file repos, and docker repos are included.</li><li><strong>Filters</strong> — include/exclude specific packages or errata by name, version, date, or type.</li><li><strong>Published versions</strong> — each publish creates an immutable version with a snapshot of content at that point in time.</li><li><strong>Composite Content View (CCV)</strong> — a CV made of other CVs. Used to combine OS content (RHEL BaseOS + AppStream) with middleware content into one deployable unit.</li></ul><div class="cmd-block"># Publish a new content view version
+hammer content-view publish --name 'RHEL8-Base' --organization 'MyOrg'
+
+# Promote to PROD
+hammer content-view version promote \
+  --content-view 'RHEL8-Base' \
+  --version '1.12' \
+  --to-lifecycle-environment 'PROD' \
+  --organization 'MyOrg'</div><div class="note">Publishing does NOT affect hosts — it only creates the version in Library. Promote the version through environments after validation.</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="sat-q17">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q5</span>
+      <h3 class="la-topic-title">What is an Activation Key and how does it control what a host gets when it registers to Satellite?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>An Activation Key (AK)</strong> is a pre-configured registration token that automatically applies settings to a host upon registration.<br><br><strong>What AK configures on registration:</strong><ul class="slow-flags"><li><strong>Organization</strong> — which org the host joins.</li><li><strong>Lifecycle Environment</strong> — which LCE the host is pinned to (e.g., PROD).</li><li><strong>Content View</strong> — which CV the host uses.</li><li><strong>Subscriptions</strong> — which Red Hat subscriptions are attached.</li><li><strong>Host Collections</strong> — which groups the host is added to (used for bulk job targeting).</li><li><strong>Enabled repositories</strong> — which repos are enabled by default.</li></ul><div class="cmd-block"># One-command registration — applies all AK settings
+subscription-manager register --org='MyOrg' --activationkey='PROD-RHEL8-AK'
+
+# Multiple stacked AKs
+subscription-manager register --org='MyOrg' --activationkey='base-ak,security-ak,app-ak'
+
+# Create AK via Hammer
+hammer activation-key create \
+  --name 'PROD-RHEL8-AK' \
+  --lifecycle-environment 'PROD' \
+  --content-view 'RHEL8-Base' \
+  --organization 'MyOrg'</div><div class="note"><strong>Best practice:</strong> one AK per lifecycle environment per OS version — DEV-RHEL8-AK, UAT-RHEL8-AK, PROD-RHEL8-AK. This ensures hosts are pinned correctly.</div></div>
+    </div>
+  </div>
+  <div class="phc-sub-title" style="margin:24px 0 14px" id="sat-patching">3.3 — Patching Workflows in Detail</div>
+
+  <div class="la-topic" id="sat-q18">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q6</span>
+      <h3 class="la-topic-title">Walk me through the complete end-to-end patching workflow in Red Hat Satellite — from CDN sync to applying patches to production servers.</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Full enterprise patching workflow — the core L3 operational procedure:</strong><ol style="color:var(--text2);font-size:.9rem;line-height:1.9;padding-left:20px;margin-top:10px"><li><strong>CDN Sync:</strong> Satellite syncs latest packages and errata from Red Hat CDN.<br><code>hammer repository synchronize --name 'RHEL8-BaseOS' --product 'RHEL8' --organization 'MyOrg'</code><br>Confirm sync completes without errors in Content > Sync Status.</li><li><strong>Review new errata:</strong> Content > Errata — filter by "New" or by CVE. Identify applicable security/bugfix errata for the upcoming patch cycle.</li><li><strong>Update Content View:</strong> if CV has date-based filters, update the filter date to include new errata. Publish a new CV version with version notes (e.g., "March 2025 Patch Set").</li><li><strong>Promote to DEV:</strong> promote new CV version to DEV. Hosts in DEV now see new packages. Run <code>yum clean all</code> on DEV hosts to refresh metadata cache.</li><li><strong>Test in DEV:</strong> Hosts > All Hosts > filter LCE=DEV > Schedule Remote Job > "Apply Errata". Verify application health post-patch.</li><li><strong>Promote to UAT then PROD:</strong> after successful DEV validation (48–72hr), promote same CV version to UAT. After UAT sign-off, promote to PROD.</li><li><strong>Apply patches to PROD:</strong> Hosts > select PROD hosts > Schedule Remote Job > Apply Errata. Schedule during change window. Use <code>yum update --security -y</code> for security-only updates.</li><li><strong>Verify:</strong> Hosts > host detail > Errata tab — should show 0 applicable errata. Generate compliance report.</li></ol></div>
+    </div>
+  </div>
+  <div class="la-topic" id="sat-q19">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q7</span>
+      <h3 class="la-topic-title">What is the difference between "Apply Errata" and "yum update" in the Satellite context? When do you use each?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Method</th><th>What It Does</th><th>When to Use</th></tr></thead><tbody><tr><td>Apply Errata (Satellite REX)</td><td>Targets specific errata IDs (e.g., RHSA-2024:1234). Satellite installs only the affected packages. Gives precise, auditable control.</td><td>PROD — when you know exactly what is being changed. CVE-mandated patches.</td></tr><tr><td>yum update -y</td><td>Updates ALL installed packages to latest available in subscribed repositories. Less controlled — may update packages not covered by specific errata.</td><td>DEV environments or when you want full currency.</td></tr><tr><td>yum update --security</td><td>Updates only packages for which security errata exist.</td><td>Middle ground between errata-specific and full update.</td></tr><tr><td>REX — Package Update</td><td>Runs <code>yum update &lt;package-list&gt;</code> for specific packages.</td><td>When you need to update one specific package without touching others.</td></tr></tbody></table></div><div class="note"><strong>Errata visibility:</strong> Hosts > host > Errata tab shows exactly which errata are applicable, installable, and whether they are security/bugfix/enhancement. This data comes from Satellite cross-referencing installed packages against CDN errata metadata.</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="sat-q20">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q8</span>
+      <h3 class="la-topic-title">How do you use Host Collections in Satellite for bulk patching? What is the workflow?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Host Collections</strong> are static or dynamic groups of hosts used for bulk operations — the primary way to apply patches to sets of servers efficiently.<ul class="slow-flags"><li><strong>Creating Host Collections:</strong> Hosts > Host Collections > Create. Add hosts manually or via search filter (dynamic). Example collections: RHEL8-PROD-AppServers, RHEL8-PROD-DBServers.</li><li><strong>Bulk patching:</strong> Hosts > Host Collections > select collection > Run Job > Apply Errata > select errata by type or ID > Schedule.</li><li><strong>Remote Execution (REX):</strong> Satellite uses SSH-based REX to push commands. Hosts must have the satellite-capsule's public key in <code>/root/.ssh/authorized_keys</code>.</li><li><strong>Concurrency control — critical for production:</strong> set "Concurrency Level" in job settings. Never patch all production hosts simultaneously. Use time-delayed scheduling or staggered execution.</li><li><strong>Monitor job:</strong> Monitor > Jobs — shows real-time status per host, stdout/stderr output, success/failure count.</li><li><strong>Post-job:</strong> run a compliance report — Hosts > All Hosts > filter collection > check Errata count column — should be 0.</li></ul><div class="cmd-block"># Add hosts to collection
+hammer host-collection add-host --name 'PROD-AppServers' --hosts 'server01,server02' --organization 'MyOrg'
+
+# List job invocations
+hammer job-invocation list
+hammer job-invocation output --id &lt;job-id&gt;</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="sat-q21">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q9</span>
+      <h3 class="la-topic-title">How do you handle a Satellite-registered host that stops receiving yum metadata updates (host shows old package list in Satellite)?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Root cause candidates:</strong> katello-agent not running (deprecated in Satellite 6.7+), subscription-manager facts are stale, REX connection failing, host was re-installed without re-registering, certificate expired.<div class="cmd-block"># Step 1: Refresh entitlement certificates from Satellite
+subscription-manager refresh
+
+# Step 2: Force refresh package metadata
+yum clean all && yum makecache
+
+# Step 3: Check Satellite connection
+curl -k https://&lt;satellite-fqdn&gt;/katello/api/v2/ping
+
+# Step 4: Check subscription status
+subscription-manager status
+
+# Step 5: Trigger fact upload via REX job
+subscription-manager facts --update
+
+# Step 6: If certificate expired — clean and re-register
+subscription-manager clean
+subscription-manager register --org='MyOrg' --activationkey='PROD-AK'</div><div class="note">Check Satellite logs: <code>/var/log/foreman/production.log</code> and <code>/var/log/foreman-proxy/proxy.log</code> for errors related to the host.</div></div>
+    </div>
+  </div>
+  <div class="phc-sub-title" style="margin:24px 0 14px" id="sat-hammer">3.4 — Hammer CLI Reference</div>
+
+  <div class="la-topic" id="sat-q22">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q10</span>
+      <h3 class="la-topic-title">What is Hammer CLI and what are the most important commands an L3 admin must know?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Hammer</strong> is Satellite's command-line interface — essential for scripting, automation, and bulk operations.<div class="cmd-block"># ── Organization & Lifecycle Environments ──
+hammer organization list
+hammer lifecycle-environment list --organization 'MyOrg'
+hammer lifecycle-environment create --name 'PROD' --prior 'PREPROD' --organization 'MyOrg'
+
+# ── Content Views ──
+hammer content-view list --organization 'MyOrg'
+hammer content-view publish --name 'RHEL8-Base' --organization 'MyOrg'
+hammer content-view version list --content-view 'RHEL8-Base' --organization 'MyOrg'
+hammer content-view version promote --content-view 'RHEL8-Base' \
+  --version '1.12' --to-lifecycle-environment 'PROD' --organization 'MyOrg'
+
+# ── Hosts & Errata ──
+hammer host list --organization 'MyOrg' --lifecycle-environment 'PROD'
+hammer host errata list --host 'server01.example.com'
+hammer host errata apply --host 'server01.example.com' --errata-ids RHSA-2024:1234
+
+# ── Sync & Products ──
+hammer repository synchronize --name 'RHEL8-BaseOS' --product 'RHEL8' --organization 'MyOrg'
+
+# ── Activation Keys ──
+hammer activation-key list --organization 'MyOrg'
+hammer activation-key create --name 'PROD-AK' --lifecycle-environment 'PROD' \
+  --content-view 'RHEL8-Base' --organization 'MyOrg'
+
+# ── Host Collections ──
+hammer host-collection list --organization 'MyOrg'
+hammer host-collection add-host --name 'PROD-AppServers' --hosts 'server01,server02' --organization 'MyOrg'
+
+# ── Satellite Maintenance ──
+satellite-maintain service status
+satellite-maintain service restart --only=pulpcore-worker@*
+foreman-rake katello:delete_orphaned_content</div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="sat-q23">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q11</span>
+      <h3 class="la-topic-title">How does Satellite handle subscription management? What is the difference between Simple Content Access (SCA) and the traditional subscription-attach model?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Aspect</th><th>Traditional Model</th><th>Simple Content Access (SCA)</th></tr></thead><tbody><tr><td>Host access</td><td>Each host must explicitly attach one or more Red Hat subscriptions</td><td>All hosts in the org can access all entitled content — no per-host attachment</td></tr><tr><td>Satellite enforcement</td><td>Tracks consumed vs entitled counts. Hosts exceeding count show as "Insufficient"</td><td>Tracks usage for reporting but does not enforce per-host count limits</td></tr><tr><td>Registration command</td><td><code>register</code> + separate <code>attach --auto</code> step</td><td><code>register</code> only — access via AK is immediate</td></tr><tr><td>Enable</td><td>N/A (default)</td><td>Satellite UI > Subscriptions > Manage Manifest > Simple Content Access toggle. Or via Red Hat Customer Portal.</td></tr></tbody></table></div><div class="note"><strong>Common issue:</strong> manifest not refreshed after purchasing new subscription — hosts cannot access new product repos until manifest is re-imported.<br><code>hammer subscription refresh-manifest --organization 'MyOrg'</code></div></div>
+    </div>
+  </div>
+  <div class="la-topic" id="sat-q24">
+    <div class="la-topic-header">
+      <span class="la-topic-num">Q12</span>
+      <h3 class="la-topic-title">What is a Capsule Server in Satellite and when is it required? How do you configure host registration to a Capsule?</h3>
+    </div>
+    <div class="la-topic-body">
+      <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Satellite Capsule</strong> is a distributed Satellite component that reduces WAN bandwidth by caching synced content locally. It also provides local DHCP, DNS, TFTP for provisioning remote sites.<ul class="slow-flags"><li><strong>Required when:</strong> hosts are in remote sites with limited WAN to central Satellite, or when Satellite is in one datacenter and hosts are in another region.</li><li><strong>Capsule syncs from Satellite:</strong> Satellite > Infrastructure > Capsules > select capsule > Synchronize. Choose: optimize (incremental) or complete (full sync).</li><li><strong>Host registration to Capsule:</strong></li></ul><div class="cmd-block">subscription-manager register \
+  --org='MyOrg' \
+  --activationkey='PROD-AK' \
+  --serverurl=https://&lt;capsule-fqdn&gt;:8443/rhsm \
+  --baseurl=https://&lt;capsule-fqdn&gt;/pulp/repos
+
+# Capsule health check (run on capsule)
+satellite-maintain service status
+
+# Capsule troubleshoot logs
+/var/log/foreman-proxy/proxy.log</div></div>
+    </div>
+  </div>
+  <div class="phc-sub-title" style="margin:24px 0 14px" id="sat-scenarios">3.5 — Satellite Patching Scenarios</div>
+
+  <div class="phc-scenario" id="sc-sat-cv-fail" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: Satellite: Content View Promotion Fails to PROD</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">You attempt to promote a content view version from PREPROD to PROD as part of the monthly patch cycle. The promotion task fails after 45 minutes with: "Pulp task timed out. Publish failed." 180 PROD servers are waiting for this patch. Change window closes at 2:00 AM.</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>What is your immediate diagnosis process?</li><li>Where do you check Satellite and Pulp logs for the root cause?</li><li>What Satellite maintenance commands do you use to resolve Pulp task failures?</li><li>If promotion cannot be completed, what is your fallback patching strategy?</li><li>How do you communicate status to stakeholders during the incident?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li>Immediate: check Monitor > Tasks in Satellite UI — find the failed task, read the full error message. Note the Pulp task UUID.</li><li>Log locations: <code>/var/log/foreman/production.log</code> (Satellite app), <code>/var/log/foreman-proxy/proxy.log</code> (capsule), <code>journalctl -u pulpcore-worker@*</code> (Pulp 3 workers)</li><li><strong>Common Pulp failure causes:</strong> Pulp workers crashed/hung, disk space exhausted on <code>/var/lib/pulp</code>, database connection timeout.</li><li><code>df -h /var/lib/pulp</code> — if full: clean orphan artifacts: <code>satellite-maintain content clean-orphans</code></li><li>Restart Pulp workers: <code>satellite-maintain service restart --only=pulpcore-worker@*</code> — clears stuck tasks.</li><li>Fallback if window closing: patch hosts using already-promoted content in PREPROD (temporary LCE change for PROD hosts, or apply errata directly via Satellite REX).</li><li>Stakeholder comms: update change record every 30 minutes. If window will be missed, escalate to change manager for window extension or deferral to emergency change.</li></ul>
+      <div class="cmd-label" style="color:var(--red,#ef4444);margin-top:12px">⚠️ Red Flags — Weak Answers</div><ul class="slow-flags"><li>Attempting to force-promote without investigating — may corrupt the content view version</li><li>Not checking disk space first — most common cause of Pulp failures</li></ul>
+    </div>
+  </div>
+  <div class="phc-scenario" id="sc-sat-errata-stale" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: Satellite: 50 Hosts Show "Applicable Errata" After Patching</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">After completing a patch cycle, your compliance report shows 50 PROD hosts still have applicable security errata — even though the patch job showed 100% success. The change window is now closed. The security team is asking for an explanation.</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>Why would a patch job succeed but hosts still show applicable errata?</li><li>How do you verify what actually happened on those 50 hosts?</li><li>What Satellite and host-side checks do you run?</li><li>How do you determine if these are genuinely missing patches or a Satellite data issue?</li><li>What is the remediation plan within existing change control?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li><strong>Root causes:</strong> (1) Packages updated but host fact upload not triggered — Satellite shows old installed package list. (2) Package conflicts caused some packages to be held back. (3) New errata released after the patch job ran. (4) Some hosts failed patching silently due to repo issues.</li><li>Verify on sample host: <code>rpm -q &lt;package-from-errata&gt;</code> — compare installed version vs errata-required version. If package IS updated, the issue is stale Satellite data.</li><li>Trigger fact refresh via Satellite REX: Run Job > "Upload package profile" on affected hosts. Or: <code>subscription-manager facts --update</code> on hosts.</li><li>Check yum history: <code>yum history list</code> → <code>yum history info &lt;transaction-id&gt;</code> — shows exactly what was installed.</li><li>Check for held-back packages: <code>yum check-update</code>. Check versionlock: <code>yum versionlock list</code>.</li><li>If genuine missing patches: raise emergency change and apply missing errata via REX job targeting only the 50 affected hosts.</li><li>Security team response: provide <code>yum history</code> output as proof. If Satellite shows stale data, provide direct RPM query output from hosts as evidence.</li></ul>
+      <div class="cmd-label" style="color:var(--red,#ef4444);margin-top:12px">⚠️ Red Flags — Weak Answers</div><ul class="slow-flags"><li>Claiming the job succeeded without verifying on the actual hosts</li><li>Applying patches outside change control without an emergency change</li></ul>
+    </div>
+  </div>
+  <div class="phc-scenario" id="sc-sat-cert" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: Satellite: Host Cannot Register — SSL Certificate Error</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">A new RHEL 8 server build fails to register to Satellite during automated provisioning. The error: "SSL: CERTIFICATE_VERIFY_FAILED. Unable to verify the first certificate." All other servers in the same environment register successfully.</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>What are the possible causes of this SSL error during Satellite registration?</li><li>What is the correct CA certificate installation procedure for Satellite clients?</li><li>How do you diagnose and fix the certificate trust issue on the new host?</li><li>What causes one host to fail while others succeed?</li><li>How do you verify the fix and complete registration?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li><strong>Root causes:</strong> (1) Satellite CA certificate not installed. (2) Wrong CA certificate version — Satellite CA may have been regenerated. (3) Host was built from a golden image that predates the current Satellite CA. (4) System clock skew — SSL certificate validity depends on correct time (chrony/NTP).</li><li>Install correct CA: <code>curl -k https://&lt;satellite-fqdn&gt;/pub/katello-ca-consumer-latest.noarch.rpm -o /tmp/katello-ca.rpm && rpm -ivh /tmp/katello-ca.rpm</code></li><li>Verify CA: <code>ls /etc/rhsm/ca/</code> — should show <code>katello-server-ca.pem</code>. Check time sync: <code>timedatectl status</code> → <code>chronyc tracking</code>.</li><li>If built from stale image: remove old CA: <code>rpm -e katello-ca-consumer</code> → re-install fresh CA from Satellite URL.</li><li>Verify fix: <code>curl https://&lt;satellite-fqdn&gt;/katello/api/v2/ping</code> — should return 200 without <code>-k</code> flag. Then register: <code>subscription-manager register --org='MyOrg' --activationkey='PROD-AK'</code></li><li><strong>For provisioning automation:</strong> ensure kickstart/build template always pulls fresh katello-ca RPM from current Satellite URL. Do NOT bake CA into golden image — it becomes stale after CA rotation.</li></ul>
+      
+    </div>
+  </div>
+  <div class="phc-scenario" id="sc-sat-sync" style="scroll-margin-top:74px">
+    <div class="phc-scenario-header">🔴 Scenario: Satellite: CDN Sync Failing — Repositories Stuck at Partial Completion</div>
+    <div class="phc-scenario-body">
+      <p class="phc-scenario-desc">The scheduled weekly CDN sync has failed for 3 days. Satellite shows "Sync Incomplete" for 4 repositories. RHEL 8 BaseOS and AppStream repositories are stuck at 62% and 78% respectively. A patch cycle is due in 2 days.</p>
+      <div class="cmd-label">Interviewer Probe Questions</div>
+      <ul class="slow-flags" style="margin-bottom:12px"><li>What are the common causes of CDN sync failures in Satellite?</li><li>What logs and commands do you use to diagnose the failure?</li><li>How do you force a clean re-sync of a specific repository?</li><li>What can you do to proceed with the patch cycle if sync cannot be completed in time?</li><li>How do you prevent recurring sync failures?</li></ul>
+      <div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div>
+      <ul class="slow-flags"><li><strong>Common causes:</strong> network connectivity to CDN (<code>cdn.redhat.com</code>), expired/invalid manifest, Pulp storage full, proxy configuration issues, corrupted repository metadata, Pulp worker issues.</li><li>Check network: <code>curl -v https://cdn.redhat.com</code>. Check proxy: <code>cat /etc/rhsm/rhsm.conf | grep proxy</code>.</li><li>Check Pulp workers: <code>systemctl status pulpcore-worker@* | grep -i fail</code>. Check disk: <code>df -h /var/lib/pulp</code>. Clean orphans: <code>foreman-rake katello:delete_orphaned_content</code></li><li>Force re-sync: Satellite UI > Content > Products > RHEL8 > RHEL8-BaseOS > Sync Now. Or: <code>hammer repository synchronize --name 'RHEL8-BaseOS' --product 'RHEL8' --organization 'MyOrg' --async</code></li><li>Fallback for patch cycle: work with existing promoted content view version. Apply available security patches from the last successful sync. Document coverage gap for security team.</li><li><strong>Prevention:</strong> schedule syncs 4–5 days before patch cycle (not 2 days). Monitor sync completion via alert. Set up Satellite monitoring on task success rate.</li></ul>
+      <div class="cmd-label" style="color:var(--red,#ef4444);margin-top:12px">⚠️ Red Flags — Weak Answers</div><ul class="slow-flags"><li>Deleting and re-adding a repository without understanding impact on published CVs — CVs referencing that repo may be affected</li></ul>
+    </div>
+  </div>
+  <!-- Satellite command reference table -->
+  <div class="la-topic" id="sat-ref">
+    <div class="la-topic-header">
+      <span class="la-topic-num">REF</span>
+      <h3 class="la-topic-title">Satellite / Hammer CLI Quick Reference Cheat Sheet</h3>
+    </div>
+    <div class="la-topic-body">
+<div class="tbl-wrap"><table><thead><tr><th>Task</th><th>Hammer / satellite-maintain Command</th></tr></thead><tbody><tr><td>List orgs</td><td><code>hammer organization list</code></td></tr><tr><td>List lifecycle environments</td><td><code>hammer lifecycle-environment list --organization 'Org'</code></td></tr><tr><td>List content views</td><td><code>hammer content-view list --organization 'Org'</code></td></tr><tr><td>Publish content view</td><td><code>hammer content-view publish --name 'CV' --organization 'Org'</code></td></tr><tr><td>Promote CV to LCE</td><td><code>hammer content-view version promote --content-view 'CV' --to-lifecycle-environment 'PROD' --organization 'Org'</code></td></tr><tr><td>List host errata</td><td><code>hammer host errata list --host 'hostname'</code></td></tr><tr><td>Apply errata to host</td><td><code>hammer host errata apply --host 'hostname' --errata-ids RHSA-2024:1234</code></td></tr><tr><td>Sync a repository</td><td><code>hammer repository synchronize --name 'repo' --product 'RHEL8' --organization 'Org'</code></td></tr><tr><td>Register host</td><td><code>subscription-manager register --org='Org' --activationkey='AK'</code></td></tr><tr><td>Refresh host facts</td><td><code>subscription-manager facts --update</code></td></tr><tr><td>Refresh entitlements</td><td><code>subscription-manager refresh</code></td></tr><tr><td>Check Satellite services</td><td><code>satellite-maintain service status</code></td></tr><tr><td>Restart Pulp workers</td><td><code>satellite-maintain service restart --only=pulpcore-worker@*</code></td></tr><tr><td>Clean orphan content</td><td><code>foreman-rake katello:delete_orphaned_content</code></td></tr><tr><td>Check host compliance</td><td><code>hammer host list --organization 'Org' | grep -v 'fully updated'</code></td></tr><tr><td>Refresh manifest</td><td><code>hammer subscription refresh-manifest --organization 'MyOrg'</code></td></tr></tbody></table></div>
+    </div>
+  </div>
+
+</div>
+<!-- end s13 -->
 
 </main>
 
