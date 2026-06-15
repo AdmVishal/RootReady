@@ -231,6 +231,15 @@ tr:hover td { background:rgba(255,255,255,.025); }
 .slow-flags li:last-child{border-bottom:none}
 .slow-flags li::before{content:"• ";color:var(--green)}
 
+
+/* Oracle SPARC additions */
+.phc-qa { border:1px solid var(--border); border-radius:10px; margin-bottom:14px; overflow:hidden; }
+.phc-q  { display:flex; gap:12px; align-items:flex-start; padding:14px 18px; background:rgba(27,79,138,.22); }
+.phc-badge { font-family:var(--font-mono); font-size:.65rem; font-weight:700; background:rgba(74,159,213,.15); color:var(--sky); border:1px solid rgba(74,159,213,.25); padding:2px 7px; border-radius:3px; flex-shrink:0; margin-top:2px; }
+.phc-qtext { font-family:var(--font-head); font-weight:600; color:var(--text); font-size:.95rem; line-height:1.45; }
+.phc-a { padding:14px 18px 16px; border-top:1px solid var(--border); font-size:.875rem; color:var(--text2); line-height:1.75; }
+.phc-abadge { display:block; font-family:var(--font-mono); font-size:.65rem; font-weight:700; color:var(--accent); margin-bottom:8px; }
+
 </style>
 </head>
 <body>
@@ -258,7 +267,34 @@ tr:hover td { background:rgba(255,255,255,.025); }
 <a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
 <a href="nutanix.html" class="nav-link ">☁️ Nutanix</a><a href="server-hardware.html" class="nav-link active">🖥️ Server Hardware</a>
 
-  </nav>
+  <a href="#sparc-overview" class="toc-link">☀️ Oracle SPARC Servers</a>
+<a href="#sparc-intro" class="toc-link h3">Series Overview & Comparison</a>
+<a href="#sparc-tseries" class="toc-link h3">T Series — CMT Servers</a>
+<a href="#sparc-t-arch" class="toc-link h3">· Architecture & Thread Density</a>
+<a href="#sparc-t-features" class="toc-link h3">· Software in Silicon & RAS</a>
+<a href="#sparc-t-admin" class="toc-link h3">· ILOM & Administration</a>
+<a href="#sparc-mseries" class="toc-link h3">M Series — Mission-Critical</a>
+<a href="#sparc-m-arch" class="toc-link h3">· Architecture & Models</a>
+<a href="#sparc-m-ras" class="toc-link h3">· RAS & XSCF</a>
+<a href="#sparc-m-dr" class="toc-link h3">· Dynamic Reconfiguration</a>
+<a href="#sparc-sseries" class="toc-link h3">S Series — SPARC S7</a>
+<a href="#sparc-s-arch" class="toc-link h3">· S7-2 Architecture</a>
+<a href="#sparc-s-ssm" class="toc-link h3">· Silicon Secured Memory</a>
+<a href="#sparc-vseries" class="toc-link h3">V Series & LDoms</a>
+<a href="#sparc-v-arch" class="toc-link h3">· LDom Architecture & Commands</a>
+<a href="#sparc-processors" class="toc-link h3">Processor Generations</a>
+<a href="#sparc-proc-gen" class="toc-link h3">· Generation Comparison Table</a>
+<a href="#sparc-proc-numa" class="toc-link h3">· NUMA Topology</a>
+<a href="#sparc-admin" class="toc-link h3">Administration Tasks</a>
+<a href="#sparc-boot-admin" class="toc-link h3">· Boot Management & OBP</a>
+<a href="#sparc-fma" class="toc-link h3">· FMA Fault Management</a>
+<a href="#sparc-zfs-hw" class="toc-link h3">· ZFS on SPARC</a>
+<a href="#sparc-interview" class="toc-link h3">Interview Q&A Guide</a>
+<a href="#sparc-qa-arch" class="toc-link h3">· Architecture Questions</a>
+<a href="#sparc-qa-ops" class="toc-link h3">· Operational Questions</a>
+<a href="#sparc-qa-scenarios" class="toc-link h3">· Scenario Questions</a>
+<a href="#sparc-quickref" class="toc-link h3">· Quick Reference</a>
+</nav>
 
   <main id="main-content">
     
@@ -634,7 +670,635 @@ storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Ne
 </div>
 </div>
 </div>
-  </main>
+  
+<!-- ══════════════════════════════════════════════════════════════════════
+     ORACLE SPARC SERVER HARDWARE — Complete Study Guide
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="content-section la-section" id="sparc-overview">
+  <div class="la-section-header">
+    <div class="la-section-icon">☀️</div>
+    <div>
+      <h2 class="la-section-title">Oracle SPARC Server Hardware — Complete Study Guide</h2>
+      <p class="la-section-desc">T Series · M Series · S Series · V Series · SuperCluster — Architecture, Features, Administration &amp; L3 Interview Guide</p>
+    </div>
+  </div>
+
+<div class="la-topic" id="sparc-intro">
+  <div class="la-topic-header">
+    <span class="la-topic-num">OVR</span>
+    <h3 class="la-topic-title">Oracle SPARC Server Portfolio — Overview & Series Comparison</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">Oracle SPARC servers are enterprise-grade systems built around the SPARC (Scalable Processor ARChitecture) processor family. Unlike x86, SPARC is RISC (Reduced Instruction Set Computing) architecture, designed for extreme reliability, RAS (Reliability, Availability, Serviceability), and mission-critical workloads. All SPARC servers run Oracle Solaris.</p>
+
+<div class="tbl-wrap"><table><thead><tr><th>Series</th><th>Processor</th><th>Market Segment</th><th>Key Strength</th><th>Typical Workloads</th></tr></thead><tbody><tr><td>T Series (CMT)</td><td>SPARC T4 → T8</td><td>Mid-range / Scale-out</td><td>Thread-dense — massive parallelism (256 threads in T8)</td><td>Web servers, Java apps, database frontends, cloud workloads</td></tr><tr><td>M Series (SMP)</td><td>SPARC M7 → M12</td><td>High-end / Mission-critical</td><td>Extreme RAS, large SMP, huge RAM capacity (up to 32TB)</td><td>Core banking, ERP, Oracle DB, mission-critical OLTP</td></tr><tr><td>S Series (Superserver)</td><td>SPARC S7</td><td>Entry-level / Department</td><td>Cost-effective, Software in Silicon, in-memory security</td><td>Dev/test, SMB workloads, departmental database</td></tr><tr><td>V Series (x86 + SPARC)</td><td>Varies</td><td>Virtual/Cloud</td><td>Engineered system integration, VM consolidation</td><td>Mixed Oracle workload consolidation</td></tr><tr><td>SuperCluster</td><td>T/M Series</td><td>Engineered System</td><td>Full-stack optimisation (HW+OS+DB+Middleware)</td><td>Oracle Exadata alternative — Oracle DB + middleware</td></tr></tbody></table></div>
+<div class="note"><strong>Key differentiator for interviews:</strong> SPARC servers feature <strong>Software in Silicon</strong> — hardware acceleration for cryptography, database compression, deduplication, and security monitoring built directly into the SPARC processor. This means zero CPU overhead for these operations.</div>
+</div>
+</div><div class="hw-sub" id="sparc-tseries" style="scroll-margin-top:74px"><h3>☀️ T Series — SPARC CMT (Chip Multithreading) Servers</h3></div>
+<div class="la-topic" id="sparc-t-arch">
+  <div class="la-topic-header">
+    <span class="la-topic-num">T-01</span>
+    <h3 class="la-topic-title">T Series Architecture — CMT & Thread Density</h3>
+  </div>
+  <div class="la-topic-body">
+<div class="note"><strong>CMT = Chip Multithreading</strong> — the defining characteristic of T Series. A single SPARC T8 chip has 32 cores × 8 threads = 256 hardware threads per socket. Compare to a typical x86 server: 32 cores × 2 threads = 64 threads.</div>
+
+<p class="body-text">CMT was designed to handle thousands of concurrent requests by keeping the CPU pipeline full with many threads, tolerating memory latency by switching threads during cache misses.</p>
+
+<div class="tbl-wrap"><table><thead><tr><th>Processor</th><th>Cores/Socket</th><th>Threads/Core</th><th>Max Threads/Socket</th><th>Max Clock Speed</th><th>L3 Cache</th></tr></thead><tbody><tr><td>SPARC T4</td><td>8</td><td>8</td><td>64</td><td>3.0 GHz</td><td>4 MB/core</td></tr><tr><td>SPARC T5</td><td>16</td><td>8</td><td>128</td><td>3.6 GHz</td><td>8 MB/core</td></tr><tr><td>SPARC T7</td><td>32</td><td>8</td><td>256</td><td>4.13 GHz</td><td>256 MB total</td></tr><tr><td>SPARC T8</td><td>32</td><td>8</td><td>256</td><td>4.5 GHz</td><td>256 MB total</td></tr></tbody></table></div>
+
+<p class="body-text"><strong>T Series Server Models:</strong></p>
+<ul class="slow-flags"><li><strong>T4-1 / T5-1 / T7-1 / T8-1</strong> — Single socket, 1U/2U rack server. Entry-level CMT.</li><li><strong>T4-2 / T5-2 / T7-2 / T8-2</strong> — Dual socket, 2U rack server. Most common deployment.</li><li><strong>T4-4 / T5-4 / T7-4</strong> — 4-socket server. 512 threads in a T5-4.</li><li><strong>T4-1B / T5-1B / T7-1B</strong> — Blade server form factor for Oracle SPARC T4 Blade Server System.</li><li><strong>T5-8 / T7-4</strong> — 8-socket/4-socket max scale CMT configurations.</li></ul>
+
+<div class="note"><strong>★ PRO TIP:</strong> When an interviewer asks "how many CPUs does a T5-2 have?" — answer: 2 sockets × 16 cores × 8 threads = 256 hardware threads total. Distinguish between sockets, cores, and threads. SPARC counts differ from x86.</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-t-features">
+  <div class="la-topic-header">
+    <span class="la-topic-num">T-02</span>
+    <h3 class="la-topic-title">T Series Key Features — Software in Silicon & RAS</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text"><strong>Software in Silicon</strong> — hardware-accelerated capabilities built into the SPARC T7/T8 processor die:</p>
+
+<div class="tbl-wrap"><table><thead><tr><th>Silicon Feature</th><th>Description</th><th>Benefit vs x86</th></tr></thead><tbody><tr><td>Crypto acceleration (DAX)</td><td>AES-NI equivalent but broader: RSA, SHA, DES, 3DES, RC4, MD5 all in hardware</td><td>Zero CPU overhead for TLS, VPN, database encryption</td></tr><tr><td>Database in Silicon</td><td>SQL operators (scan, filter, decompression) accelerated in hardware</td><td>Oracle DB queries run 2-10x faster with no software change</td></tr><tr><td>Dedup/Compression</td><td>ZFS inline compression/deduplication in hardware</td><td>Doubles effective storage, zero CPU penalty</td></tr><tr><td>Silicon Secured Memory (SSM)</td><td>Hardware memory tagging — detects buffer overflows at nanosecond speed</td><td>Catches exploits like HeartBleed in hardware, not software</td></tr><tr><td>Palomar (Query Acceleration)</td><td>Offloads Oracle DB column store scanning to the processor</td><td>Direct Oracle DB performance improvement built into CPU</td></tr></tbody></table></div>
+
+<p class="body-text"><strong>RAS Features (Reliability, Availability, Serviceability):</strong></p>
+<ul class="slow-flags"><li><strong>Chipkill ECC</strong> — corrects multi-bit memory errors. Goes beyond standard single-bit ECC correction.</li><li><strong>Hot-plug DIMMs</strong> (M Series) — replace memory modules without downtime.</li><li><strong>CPU/Core retirement</strong> — faulty cores are automatically retired and marked offline by the hypervisor. System continues operating.</li><li><strong>Memory mirroring</strong> — duplicate all memory writes to a mirror for immediate failover.</li><li><strong>Memory sparing</strong> — a DIMM row is held in reserve; activated automatically when a DIMM begins failing.</li><li><strong>Predictive self-healing (ASR)</strong> — Automatic System Recovery. Faulty components are detected before failure and automatically taken offline.</li><li><strong>FMA (Fault Management Architecture)</strong> — Solaris fault management framework. Every hardware fault generates a structured fault event (UUID) with automated diagnosis and suggested repair action.</li></ul>
+</div>
+</div>
+<div class="la-topic" id="sparc-t-admin">
+  <div class="la-topic-header">
+    <span class="la-topic-num">T-03</span>
+    <h3 class="la-topic-title">T Series Administration — ILOM, OBP & Key Commands</h3>
+  </div>
+  <div class="la-topic-body">
+<div class="cmd-label">ILOM — Integrated Lights Out Manager (equivalent to HP iLO / Dell iDRAC)</div>
+<div class="cmd-block"># Access ILOM via SSH
+ssh root@<ILOM-IP>
+
+# ILOM CLI — show system health
+-> show /System
+-> show /System/Fans
+-> show /System/Power_Supply
+-> show /System/Processors
+
+# Show environmental status
+-> show /SYS
+
+# Show host power state
+-> show /HOST
+
+# Power on/off server
+-> set /HOST/domain/control send_break_action=break
+-> set /System/component_state=Disabled    # graceful shutdown
+-> set /System/component_state=Enabled     # power on
+
+# Show fault list
+-> show -level all /SP/faultmgmt/shell
+
+# Reset ILOM (does NOT power cycle server)
+-> reset /SP
+
+# Show ILOM firmware version
+-> show /SP/firmware_version
+
+# Set ILOM IP (static)
+-> set /SP/network pendingipaddress=x.x.x.x pendingipnetmask=255.255.255.0 pendingipgateway=x.x.x.x
+-> set /SP/network commitpending=true
+
+# ILOM Web UI
+https://<ILOM-IP></div>
+
+<div class="cmd-label">OBP — OpenBoot PROM (Solaris boot firmware, equivalent to BIOS/UEFI)</div>
+<div class="cmd-block"># Access OBP — interrupt from ILOM:
+-> set /HOST/domain/control send_break_action=break
+# Or from console: Stop-A (keyboard) or Break (serial)
+
+# OBP key commands:
+ok> boot              # boot from default device
+ok> boot disk0        # boot from first disk
+ok> boot cdrom        # boot from CD/DVD
+ok> boot net          # boot from network (PXE/jumpstart)
+ok> boot net -v       # verbose network boot
+ok> boot -s           # boot to single user mode (maintenance)
+ok> boot -r           # reconfigure boot (like probe devices)
+ok> printenv          # show all OBP variables
+ok> setenv boot-device disk0 disk1   # set boot device (with failover)
+ok> setenv auto-boot? true           # enable auto-boot
+ok> reset-all         # cold reset
+ok> probe-scsi-all    # scan and show all SCSI/SAS devices
+ok> probe-ide-all     # scan IDE devices
+ok> .env              # show environment (temps, voltages)
+ok> show-devs         # show device tree</div>
+
+<div class="cmd-label">Solaris host administration</div>
+<div class="cmd-block"># Show CPU topology
+psrinfo -pv        # physical processors, cores, threads
+psrinfo -v | head  # detailed CPU info
+kstat cpu_info | grep -E "brand|model|ncore|nthread"
+
+# Show memory
+prtconf | grep Memory
+prtdiag -v | grep -i memory
+
+# Show full hardware config
+prtdiag -v         # all hardware components
+prtfru             # FRU (Field Replaceable Unit) list with serial numbers
+prtconf -vp        # OBP device tree
+
+# FMA — fault management
+fmadm faulty              # show active faults
+fmadm repaired <fmri>     # mark fault repaired
+fmstat                    # FMA module statistics
+fmdump -ev                # fault event log
+fmdump -V -u <UUID>       # detail for a specific fault UUID</div>
+</div>
+</div><div class="hw-sub" id="sparc-mseries" style="scroll-margin-top:74px"><h3>⬛ M Series — Mission-Critical SMP Servers</h3></div>
+<div class="la-topic" id="sparc-m-arch">
+  <div class="la-topic-header">
+    <span class="la-topic-num">M-01</span>
+    <h3 class="la-topic-title">M Series Architecture — SMP & Extreme RAS</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">The M Series is Oracle's flagship <strong>SMP (Symmetric Multiprocessing)</strong> server line — designed for absolute maximum reliability for mission-critical workloads like core banking, Oracle databases, and ERP. The M12 supports up to <strong>32 TB of RAM</strong> and 384 cores.</p>
+
+<div class="tbl-wrap"><table><thead><tr><th>Model</th><th>Processor</th><th>Max Sockets</th><th>Max Cores</th><th>Max RAM</th><th>Max I/O Slots</th><th>Form Factor</th></tr></thead><tbody><tr><td>SPARC M3000</td><td>SPARC64 VII+</td><td>1</td><td>4</td><td>64 GB</td><td>—</td><td>Rack</td></tr><tr><td>SPARC M4000</td><td>SPARC64 VII+</td><td>2</td><td>8</td><td>128 GB</td><td>10 PCIe</td><td>Rack</td></tr><tr><td>SPARC M5000</td><td>SPARC64 VII+</td><td>4</td><td>16</td><td>256 GB</td><td>20 PCIe</td><td>Rack</td></tr><tr><td>SPARC M8000</td><td>SPARC64 VII+</td><td>8</td><td>32</td><td>512 GB</td><td>40 PCIe</td><td>Rack</td></tr><tr><td>SPARC M9000</td><td>SPARC64 VII+</td><td>16/32</td><td>64/128</td><td>2 TB</td><td>160 PCIe</td><td>Cabinet</td></tr><tr><td>SPARC M6-32</td><td>SPARC M6</td><td>32</td><td>384</td><td>32 TB</td><td>—</td><td>Rack</td></tr><tr><td>SPARC M7-8</td><td>SPARC M7</td><td>8</td><td>256</td><td>32 TB</td><td>—</td><td>Rack</td></tr><tr><td>SPARC M8-8</td><td>SPARC M8</td><td>8</td><td>256</td><td>48 TB</td><td>—</td><td>Rack</td></tr><tr><td>SPARC M12-2S</td><td>SPARC M12</td><td>4</td><td>192</td><td>32 TB</td><td>—</td><td>Rack</td></tr></tbody></table></div>
+
+<div class="note"><strong>Key M Series differentiator:</strong> M Series uses <strong>SPARC64</strong> processors (Fujitsu-designed, used in M3000-M9000) or Oracle-designed SPARC M6/M7/M8 processors (M6-32, M7-8, M8-8). The M12 uses Fujitsu SPARC XII. Interviewers may ask you to distinguish these generations.</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-m-ras">
+  <div class="la-topic-header">
+    <span class="la-topic-num">M-02</span>
+    <h3 class="la-topic-title">M Series RAS Features — Dynamic Domains & Memory Protection</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">M Series RAS features go far beyond T Series — designed for five-nines (99.999%) uptime:</p>
+
+<ul class="slow-flags"><li><strong>Dynamic Domains (DR — Dynamic Reconfiguration)</strong> — partition the server into independent logical domains, each with its own OS instance. Add or remove CPUs, memory, and I/O from a domain while it is running.</li><li><strong>Dynamic CPU/Memory Addition</strong> — hot-add CPU boards and memory boards to a running system. No downtime.</li><li><strong>CPU Locking</strong> — lock specific CPU cores to a domain to prevent NUMA migration.</li><li><strong>Mirror Memory Mode</strong> — entire memory is mirrored. A single DIMM failure causes zero data loss — the mirror takes over immediately.</li><li><strong>Memory Scrubbing</strong> — continuous background ECC scrubbing detects and corrects single-bit errors before they accumulate into multi-bit errors.</li><li><strong>XSCF (eXtended System Control Facility)</strong> — M Series management controller (equivalent to ILOM in T Series, but more powerful). Manages hardware partitioning, domains, environmental monitoring.</li><li><strong>Field Replaceable Units (FRUs)</strong> — virtually every component is a FRU: CPU boards, memory boards, I/O boards, fans, PSUs, backplanes — all hot-swappable.</li><li><strong>Predictive Failure Analysis (PFA)</strong> — monitors component health trends and predicts failures before they occur.</li></ul>
+
+<div class="cmd-label">XSCF — eXtended System Control Facility commands (M Series specific)</div>
+<div class="cmd-block"># Login to XSCF (management controller)
+ssh platadm@<XSCF-IP>
+
+# Show system status
+XSCF> showhardconf           # full hardware configuration
+XSCF> showstatus             # environmental status
+XSCF> showboards             # show all boards (CPU, MEM, I/O)
+XSCF> showdomainstatus -a    # status of all domains
+XSCF> showlogs error         # show error logs
+XSCF> showlogs monitor       # monitoring logs
+
+# Domain management
+XSCF> addboard -c assign -d 0 -f MBU_A# add CPU/MEM board to domain 0
+XSCF> deleteboard -c unassign MBU_A    # remove board from domain
+XSCF> poweroff -d 0          # power off domain 0
+XSCF> poweron -d 0           # power on domain 0
+XSCF> reset -d 0             # reset domain 0
+
+# FRU management
+XSCF> replacefru             # guided FRU replacement procedure
+XSCF> showhardconf -M        # show FRU list with location codes
+XSCF> showfru -s             # show FRU serial numbers
+
+# Set XSCF network
+XSCF> setnetwork -i <IP> -m <mask> -g <gateway> lan#0
+XSCF> applynetwork            # apply network changes
+XSCF> showntp                 # show NTP config
+XSCF> setntp -m manual -s <NTP-IP> # set NTP server</div>
+
+<div class="note"><strong>★ PRO TIP:</strong> In interviews, clearly distinguish ILOM (T Series, S Series management) from XSCF (M Series management — M3000 through M9000) from Oracle Hardware Management Pack (unified tool for newer systems). Using the wrong tool name for the wrong series is a red flag.</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-m-dr">
+  <div class="la-topic-header">
+    <span class="la-topic-num">M-03</span>
+    <h3 class="la-topic-title">Dynamic Reconfiguration (DR) — CPU/Memory/IO Hot Operations</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">DR is one of the most interview-tested M Series features. It allows zero-downtime hardware changes on a live production system.</p>
+
+<div class="cmd-label">DR — Solaris OS side (on the domain)</div>
+<div class="cmd-block"># Check DR status
+cfgadm -al               # show all attachment points
+cfgadm -al | grep cpu    # show CPU attachment points
+cfgadm -al | grep mem    # show memory attachment points
+
+# Unconfigure a CPU board (before physical removal)
+cfgadm -c unconfigure SB0    # unconfigure system board 0
+# This migrates all processes off the board, marks CPUs offline
+
+# Configure a new board (after physical insertion)
+cfgadm -c configure SB2      # configure new system board 2
+
+# Memory DR — force a specific memory segment offline
+cfgadm -c unconfigure -o disable-POST mem:0::0      
+
+# Show CPU states
+psrinfo -p               # physical processor info
+psrinfo -s <proc-id>     # check if processor is online/offline
+
+# Offline a specific CPU core for maintenance
+psradm -f <proc-id>      # take CPU offline (fail)
+psradm -n <proc-id>      # bring CPU online (normal)</div>
+
+<div class="cmd-label">XSCF side — before DR operation</div>
+<div class="cmd-block"># Check board status before DR
+XSCF> showboards -a
+XSCF> showdcl -d 0        # show domain component list
+
+# Assign a new board to domain 0 while running
+XSCF> addboard -c assign -d 0 MBU_B
+
+# Verify boards after DR
+XSCF> showboards -a
+XSCF> showdomainstatus -d 0</div>
+
+<div class="warn-box"><strong>DR Pre-checks before removing a board from a live domain:</strong><br>1. Verify board is not running critical processes: <code>cfgadm -al SB0</code><br>2. Check memory usage — ensure remaining memory can absorb workload: <code>prtconf | grep Memory</code><br>3. Check CPU load — ensure remaining CPUs can handle workload: <code>mpstat 1 5</code><br>4. Alert application teams before CPU DR — some JVMs do not handle CPU removal gracefully.</div>
+</div>
+</div><div class="hw-sub" id="sparc-sseries" style="scroll-margin-top:74px"><h3>🟦 S Series — SPARC S7 Superserver</h3></div>
+<div class="la-topic" id="sparc-s-arch">
+  <div class="la-topic-header">
+    <span class="la-topic-num">S-01</span>
+    <h3 class="la-topic-title">SPARC S7-2 & S7-2L Architecture & Features</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">The SPARC S7 (introduced 2016) is Oracle's entry/mid-range SPARC server — designed to bring Software in Silicon to a more cost-effective platform.</p>
+
+<div class="tbl-wrap"><table><thead><tr><th>Specification</th><th>SPARC S7-2</th><th>SPARC S7-2L (Large Memory)</th></tr></thead><tbody><tr><td>Processor</td><td>SPARC S7 (8 cores/socket)</td><td>SPARC S7 (8 cores/socket)</td></tr><tr><td>Sockets</td><td>1 or 2</td><td>1 or 2</td></tr><tr><td>Max Cores</td><td>16</td><td>16</td></tr><tr><td>Threads/Core</td><td>8</td><td>8</td></tr><tr><td>Max Threads</td><td>128</td><td>128</td></tr><tr><td>Clock Speed</td><td>4.27 GHz</td><td>4.27 GHz</td></tr><tr><td>Max RAM</td><td>512 GB</td><td>1 TB</td></tr><tr><td>DIMM Slots</td><td>16</td><td>32 (extended memory board)</td></tr><tr><td>PCIe Slots</td><td>8</td><td>8</td></tr><tr><td>Form Factor</td><td>2U Rack</td><td>2U Rack</td></tr><tr><td>Storage</td><td>8 × 2.5" SAS/SATA/SSD</td><td>8 × 2.5" SAS/SATA/SSD</td></tr><tr><td>Management</td><td>ILOM 3.2+</td><td>ILOM 3.2+</td></tr></tbody></table></div>
+
+<p class="body-text"><strong>Key SPARC S7 Features:</strong></p>
+<ul class="slow-flags"><li><strong>Software in Silicon</strong> — full DAX (Data Analytics Accelerator), cryptographic acceleration, Silicon Secured Memory (SSM), and Query Acceleration from T7/M7 generation, available at entry-level price.</li><li><strong>In-Memory Security</strong> — Silicon Secured Memory (SSM) detects buffer overflows, heap sprays, and use-after-free attacks in hardware. Enabled with a single kernel parameter change.</li><li><strong>Oracle Solaris Zones</strong> — S7 is well-suited for zone-dense deployments due to its thread count. A 2-socket S7-2 with 128 threads can run 20-40 OS zones efficiently.</li><li><strong>Oracle VM for SPARC (LDoms)</strong> — S7 supports LDoms for hardware virtualisation. Create guest domains for OS isolation.</li><li><strong>PCIe 3.0</strong> — high-bandwidth I/O for SAN connectivity, 10/25/40 GbE networking.</li></ul>
+
+<div class="note"><strong>★ PRO TIP:</strong> The S7 is frequently confused with the S Series x86 servers. The SPARC S7 runs Solaris only. If an interviewer asks "can you run Linux on SPARC S7?" — the answer is: Oracle Linux and certain other Linux distributions have limited SPARC support, but the primary and supported OS is Oracle Solaris.</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-s-ssm">
+  <div class="la-topic-header">
+    <span class="la-topic-num">S-02</span>
+    <h3 class="la-topic-title">Silicon Secured Memory (SSM) — Hardware Security Feature</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">SSM is one of the most distinctive SPARC S7/T7/T8/M7/M8 features. It uses hardware memory tagging to detect memory corruption attacks <strong>in the processor itself</strong>, before software-level security can even respond.</p>
+
+<div class="tbl-wrap"><table><thead><tr><th>Attack Type</th><th>Without SSM</th><th>With SSM</th></tr></thead><tbody><tr><td>Buffer overflow</td><td>Exploitable — writes beyond buffer boundary undetected</td><td>Hardware detects the overflow at the instruction boundary, raises fault</td></tr><tr><td>HeartBleed-style</td><td>Application reads beyond allocated memory — leaks data</td><td>Reads outside tagged region generate hardware exception immediately</td></tr><tr><td>Use-after-free</td><td>Freed memory still accessible — dangling pointer</td><td>Freed region's tag invalidated — subsequent access triggers hardware fault</td></tr><tr><td>Return-oriented programming (ROP)</td><td>Stack spray undetected</td><td>Stack region tagged — unexpected execution path triggers detection</td></tr><tr><td>Heap spray</td><td>Heap corruption undetected</td><td>Heap allocations tagged — cross-region access detected in hardware</td></tr></tbody></table></div>
+
+<div class="cmd-label">Enable SSM on Solaris</div>
+<div class="cmd-block"># Check if processor supports SSM
+prtconf -v | grep -i "adi-blk"   # ADI = Adi (Address Integrity) — SSM underlying mechanism
+
+# Enable SSM in Solaris kernel
+echo "hardware-adi:1" >> /etc/system
+# Or via mdb:
+mdb -kw
+> adi_version/W 1
+> :q
+
+# Verify SSM is active
+kstat -m adi | grep enabled
+
+# Test SSM (development use only — triggers intentional fault)
+# A test program writing outside its tagged region will SIGBUS with SSM active</div>
+
+<div class="note"><strong>Interview context:</strong> SSM is often called "ADI" (Application Data Integrity) in lower-level documentation — it is the underlying hardware mechanism. SSM is the marketing/feature name. Understanding both terms shows depth.</div>
+</div>
+</div><div class="hw-sub" id="sparc-vseries" style="scroll-margin-top:74px"><h3>🟩 V Series — Oracle SPARC V & Virtual Platforms</h3></div>
+<div class="la-topic" id="sparc-v-arch">
+  <div class="la-topic-header">
+    <span class="la-topic-num">V-01</span>
+    <h3 class="la-topic-title">Oracle SPARC V Series — Engineered Virtualisation Platforms</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">The V Series covers Oracle's engineered virtualisation and hybrid platforms that combine SPARC hardware with Oracle software stack integration.</p>
+
+<div class="tbl-wrap"><table><thead><tr><th>Platform</th><th>Type</th><th>Key Characteristic</th></tr></thead><tbody><tr><td>SPARC T4-4 (V-scale)</td><td>4-socket T Series</td><td>Virtual-dense — 512 hardware threads for zone/LDom consolidation</td></tr><tr><td>Oracle VM Server for SPARC (LDoms)</td><td>Hypervisor (Type-1)</td><td>Logical Domains — hardware partitioning on SPARC CMT servers</td></tr><tr><td>Oracle Solaris Zones</td><td>OS Virtualisation</td><td>Lightweight namespace containers within a single Solaris instance</td></tr><tr><td>Oracle SuperCluster T8-8</td><td>Engineered System</td><td>SPARC T8 + ZS7-2 storage + InfiniBand — Oracle DB+middleware optimised</td></tr><tr><td>Oracle SuperCluster M8</td><td>Engineered System</td><td>SPARC M8-8 + ZS7-2 + InfiniBand — mission-critical Oracle stack</td></tr></tbody></table></div>
+
+<p class="body-text"><strong>Oracle VM Server for SPARC (LDoms) — Architecture:</strong></p>
+<ul class="slow-flags"><li><strong>Control Domain</strong> — the primary domain that hosts the LDom Manager software. Manages all other domains. Always domain 0.</li><li><strong>Service Domain</strong> — provides virtual I/O services (virtual disk, virtual network) to guest domains. Often combined with the control domain.</li><li><strong>I/O Domain</strong> — a domain that has direct (PCIe passthrough) access to a physical I/O device. Can share that device as a virtual device to other domains.</li><li><strong>Guest Domain</strong> — a virtual machine. Consumes virtual CPUs (vCPUs), virtual memory, and virtual I/O. Can run a full independent Solaris instance.</li><li><strong>vCPU allocation</strong> — LDom vCPUs are allocated as SPARC hardware thread strands. A T8-1 (256 threads) can run 8 guest domains × 32 vCPUs each.</li></ul>
+
+<div class="cmd-label">LDom administration commands</div>
+<div class="cmd-block"># Show all LDom domains
+ldm list               # list all domains with status
+ldm list-domain        # verbose domain list
+ldm list-bindings      # show resource bindings (CPU, mem, devices)
+
+# Create a new guest domain
+ldm add-domain guestA
+ldm set-core 4 guestA          # allocate 4 SPARC cores (32 threads)
+ldm set-memory 8G guestA       # allocate 8GB RAM
+ldm add-vnet vnet0 primary-vsw0 guestA   # add virtual NIC
+ldm add-vdisk vdisk0 vol0@primary-vds0 guestA  # add virtual disk
+
+# Bind and start
+ldm bind guestA
+ldm start guestA
+
+# Stop and unbind
+ldm stop guestA
+ldm unbind guestA
+
+# Live migration (LDOM to LDOM on same or different server)
+ldm migrate-domain -n guestA ldoms@target-server-ilom-ip
+
+# Snapshot (save guest state)
+ldm stop-domain -r guestA      # graceful stop + release resources
+
+# Monitor domain resources
+ldm list-util                  # utilisation of each domain
+ldm list-io                    # I/O device assignments
+
+# Power cap a domain (limit power consumption)
+ldm set-power-cap 100 guestA   # cap at 100 watts</div>
+</div>
+</div><div class="hw-sub" id="sparc-processors" style="scroll-margin-top:74px"><h3>🔬 SPARC Processor Generations — Technical Deep Dive</h3></div>
+<div class="la-topic" id="sparc-proc-gen">
+  <div class="la-topic-header">
+    <span class="la-topic-num">PROC-01</span>
+    <h3 class="la-topic-title">SPARC Processor Generations — Feature Evolution</h3>
+  </div>
+  <div class="la-topic-body">
+<div class="tbl-wrap"><table><thead><tr><th>Generation</th><th>Used In</th><th>Key Innovation</th><th>Notable Feature</th></tr></thead><tbody><tr><td>SPARC64 VI</td><td>M3000–M4000</td><td>Chip-multithreading on M Series</td><td>First M-class CMT</td></tr><tr><td>SPARC64 VII</td><td>M4000–M9000</td><td>4-core, 2-thread HT</td><td>Double floating point throughput</td></tr><tr><td>SPARC64 VII+</td><td>M3000–M9000 refresh</td><td>Higher clock speed</td><td>ECC improvements</td></tr><tr><td>SPARC T3</td><td>T3-x Series</td><td>16-core CMT, 128 threads/socket</td><td>On-chip 10GbE</td></tr><tr><td>SPARC T4</td><td>T4-x, T4-1B</td><td>8-core, 8-thread, superscalar</td><td>Out-of-order execution + CMT (hybrid)</td></tr><tr><td>SPARC T5</td><td>T5-2, T5-4, T5-8</td><td>16-core, 128 threads/socket</td><td>2× T4 in one package</td></tr><tr><td>SPARC M5</td><td>M5-32</td><td>32-core SMP, 512 threads</td><td>First Software in Silicon preview</td></tr><tr><td>SPARC M6</td><td>M6-32</td><td>12-core, 96 threads/chip</td><td>32 sockets = 384 cores</td></tr><tr><td>SPARC M7/T7</td><td>M7-8, T7-2, T7-4</td><td>32-core, 256 threads/socket</td><td>Full Software in Silicon (DAX, SSM, Crypto)</td></tr><tr><td>SPARC M8/T8</td><td>M8-8, T8-2, T8-4</td><td>32-core, 256 threads, 4.5GHz</td><td>30% faster DAX v2, enhanced SSM</td></tr><tr><td>SPARC S7</td><td>S7-2, S7-2L</td><td>8-core, 64 threads/socket</td><td>Software in Silicon at entry-level</td></tr><tr><td>SPARC M12 (Fujitsu SPARC XII)</td><td>M12-2S</td><td>12-core, 4.25GHz</td><td>Designed for in-memory DB (SAP HANA)</td></tr></tbody></table></div>
+
+<div class="note"><strong>Architecture fork note:</strong> SPARC T Series (CMT) and SPARC M Series (SMP) were originally distinct processor families. With the M7/T7 generation, Oracle unified them — the SPARC M7 is the same die used in T7-2 and M7-8, just in different system configurations. The key difference is now the <strong>system architecture</strong> (SMP interconnects, RAS features) rather than the processor itself.</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-proc-numa">
+  <div class="la-topic-header">
+    <span class="la-topic-num">PROC-02</span>
+    <h3 class="la-topic-title">SPARC NUMA Architecture & Memory Topology</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">All modern multi-socket SPARC servers are NUMA (Non-Uniform Memory Access). Understanding NUMA topology is critical for performance tuning.</p>
+
+<ul class="slow-flags"><li><strong>NUMA node</strong> — each socket (processor) has its own local memory bank. Memory attached to Socket 0 is "local" to Socket 0 and "remote" to Socket 1.</li><li><strong>NUMA latency</strong> — local memory access: ~50ns. Remote memory access: 100-200ns. Binding Oracle DB processes to local NUMA nodes reduces latency significantly.</li><li><strong>On-chip interconnect</strong> — SPARC T7/T8 uses on-chip coherent interconnect to link sockets. No separate northbridge chip as in older x86 designs.</li><li><strong>Coherent Interconnect</strong> — cache coherence is maintained across all sockets by the hardware. All sockets see a single unified memory address space.</li></ul>
+
+<div class="cmd-label">NUMA topology commands</div>
+<div class="cmd-block"># Show NUMA topology (Solaris)
+lgrpinfo -a           # locality group info — shows NUMA topology
+lgrpinfo -T           # NUMA topology tree
+kstat -m lgrp         # LGRP (locality group) statistics
+
+# Show memory per NUMA node
+prtconf -vP | grep -A5 memory-controller
+
+# Bind a process to a specific LGRP (NUMA node)
+lgrpinfo -l           # list lgrp IDs
+plgrp <pid>           # show which lgrp a process is running on
+lgrp -l <lgrp-id> command   # start command bound to specific NUMA node
+
+# For Oracle Database NUMA binding — set in init.ora
+# USE_LARGE_PAGES = TRUE
+# MEMORY_TARGET and PGA_AGGREGATE_TARGET respect NUMA
+
+# Show CPU-to-LGRP mapping
+psrinfo -p | head     # show processor sets
+kstat cpu_info | grep -E "chip_id|core_id|lgroup_id"</div>
+</div>
+</div><div class="hw-sub" id="sparc-admin" style="scroll-margin-top:74px"><h3>🔧 Common SPARC Administration Tasks</h3></div>
+<div class="la-topic" id="sparc-boot-admin">
+  <div class="la-topic-header">
+    <span class="la-topic-num">ADM-01</span>
+    <h3 class="la-topic-title">SPARC Boot Management — OBP, Solaris Boot & Troubleshooting</h3>
+  </div>
+  <div class="la-topic-body">
+<div class="cmd-label">OBP Boot sequences</div>
+<div class="cmd-block"># Normal boot
+ok> boot               # boot default device
+ok> boot disk0         # explicit disk
+ok> boot disk0 -s      # single user mode
+ok> boot disk0 -v      # verbose boot (most useful for troubleshooting)
+ok> boot net           # network boot (requires DHCP + TFTP/NFS)
+ok> boot net -v        # verbose network boot — shows JumpStart/AI progress
+ok> boot net -i        # interactive boot (stops at milestones)
+
+# Boot to Solaris failsafe (like Windows Safe Mode)
+ok> boot disk0 -F failsafe
+
+# Boot from alternate BE (Boot Environment)
+ok> boot /dev/dsk/c0t0d0s0   # explicit device path
+# Or from Solaris:
+beadm activate new-BE         # activate boot environment
+init 6                        # reboot into it
+
+# Multi-disk OBP: show available disks
+ok> probe-scsi-all             # scan all SCSI/SAS/SATA devices
+ok> devalias                   # show device aliases (disk0, disk1, cdrom, net)
+ok> nvalias disk0 /pci@/disk@0 # create a device alias</div>
+
+<div class="cmd-label">Solaris boot process (Solaris 11)</div>
+<div class="cmd-block"># Boot phases on Solaris 11:
+# 1. OBP POST
+# 2. OBP loads bootloader (/platform/sun4v/ufsboot or grub2 on x86, bootsys on SPARC)
+# 3. Kernel loaded (genunix, unix)
+# 4. SMF (Service Management Facility) starts services in dependency order
+
+# Monitor SMF boot services
+svcs -x              # show services with issues
+svcs -a | grep maint # services in maintenance state
+svcadm clear <fmri>  # clear maintenance state
+svcs -l <fmri>       # detailed service info with logs
+
+# Boot environment management (Solaris 11)
+beadm list           # list all boot environments
+beadm create new-BE  # create new BE (snapshot of current)
+beadm activate new-BE# set new-BE as active for next boot
+beadm mount new-BE /mnt  # mount a BE for offline repair
+beadm destroy old-BE # delete old boot environment</div>
+
+<div class="note"><strong>Critical interview point:</strong> Solaris uses <strong>SMF</strong> (Service Management Facility) instead of SysV init or systemd. Services have <em>FMRIs</em> (Fault Management Resource Identifiers) like <code>svc:/network/ssh:default</code>. This is a key differentiator from Linux.</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-fma">
+  <div class="la-topic-header">
+    <span class="la-topic-num">ADM-02</span>
+    <h3 class="la-topic-title">Solaris FMA — Fault Management Architecture</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">FMA is Solaris's automated hardware and software fault management framework. It is one of the most L3-tested SPARC topics because it integrates hardware and software fault diagnosis.</p>
+
+<ul class="slow-flags"><li><strong>DE (Diagnosis Engine)</strong> — analyses fault telemetry and produces a structured fault event with UUID, diagnosis, and suggested repair actions.</li><li><strong>FRU (Field Replaceable Unit)</strong> — the specific hardware component implicated in a fault. FMA identifies the exact FRU to replace.</li><li><strong>FMRI</strong> — Fault Management Resource Identifier — uniquely identifies a resource (service, device, or hardware component) in FMA.</li><li><strong>Suspect list</strong> — FMA provides a ranked list of components that may have caused a fault, with percentage certainty.</li><li><strong>Retire</strong> — FMA retires faulty CPU cores, memory pages, or other components to continue system operation while repairs are scheduled.</li></ul>
+
+<div class="cmd-label">FMA commands — essential for L3</div>
+<div class="cmd-block"># Show all active faults
+fmadm faulty                    # list faulty components with UUID
+fmadm faulty -s                 # summary view
+fmadm faulty -a                 # include repaired/resolved
+
+# Detailed fault analysis
+fmdump -ev                      # show fault event log
+fmdump -V -u <UUID>             # full details for a specific fault UUID
+fmdump -V -u <UUID> | head -80  # first 80 lines of fault details
+
+# Show FMA module statistics
+fmstat                          # all diagnosis engine (DE) statistics
+fmstat -m cpumem-diagnosis      # CPU/memory diagnosis engine
+fmstat -m io-retire             # I/O retirement engine
+
+# Show retired resources
+fmadm faulty | grep -i retire
+psrinfo -s <proc-id>            # check if CPU online/offline/spare
+
+# Repair workflow (after replacing hardware)
+fmadm repair <UUID>             # mark fault as repaired (before FRU replacement)
+fmadm repaired <UUID>           # mark fault as repaired (after FRU replacement)
+
+# Clear a fault after hardware repair
+fmadm acquit <UUID>             # acquit all suspects for a fault
+
+# Online a retired CPU after repair
+psradm -n <proc-id>             # bring CPU back online
+
+# Memory page retirement (FMA retires bad memory pages automatically)
+fmadm faulty | grep mem
+# To un-retire pages after DIMM replacement:
+fmadm repair <UUID>
+fmadm repaired <UUID></div>
+
+<div class="warn-box"><strong>Interview scenario:</strong> "A SPARC server reboots overnight with no apparent reason. How do you investigate?" Answer: <code>fmdump -ev | tail -100</code> to check for FMA fault events before the reboot. Then check <code>/var/adm/messages</code>, then <code>ILOM/XSCF event logs</code>. FMA should have generated a UUID for any hardware fault that caused the reboot.</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-zfs-hw">
+  <div class="la-topic-header">
+    <span class="la-topic-num">ADM-03</span>
+    <h3 class="la-topic-title">ZFS on SPARC — Hardware Accelerated Features</h3>
+  </div>
+  <div class="la-topic-body">
+<p class="body-text">ZFS on SPARC servers benefits directly from Software in Silicon — compression and deduplication are hardware-accelerated, not software. This makes ZFS practical where it would impose too much CPU overhead on x86.</p>
+
+<div class="cmd-label">ZFS pool and filesystem management</div>
+<div class="cmd-block"># Create ZFS pool
+zpool create data mirror c0t0d0 c0t1d0    # RAID-1 mirror
+zpool create data raidz2 c0t0d0 c0t1d0 c0t2d0 c0t3d0  # RAIDZ-2
+
+# Pool status and health
+zpool status                  # all pools with health
+zpool status data             # specific pool
+zpool status -v data          # verbose (shows scrub errors per disk)
+zpool list                    # capacity and usage
+
+# Filesystem operations
+zfs list                      # list all datasets
+zfs create data/db            # create a filesystem
+zfs set compression=lz4 data/db   # enable LZ4 compression (hardware-accelerated on SPARC M7+)
+zfs set dedup=on data/db      # enable dedup (hardware-accelerated on SPARC M7+)
+zfs set quota=100G data/db    # set 100GB quota
+
+# Snapshots
+zfs snapshot data/db@backup-20250615    # create snapshot
+zfs list -t snapshot                     # list snapshots
+zfs rollback data/db@backup-20250615    # rollback to snapshot
+zfs clone data/db@backup-20250615 data/db-clone  # create clone
+
+# ZFS send/receive (replication)
+zfs send data/db@snap1 | ssh root@remote zfs recv backup/db
+zfs send -i data/db@snap1 data/db@snap2 | ssh root@remote zfs recv backup/db  # incremental
+
+# Pool scrub (manual integrity check)
+zpool scrub data               # start scrub
+zpool status data              # monitor scrub progress
+
+# Replace a failed disk
+zpool replace data c0t0d0 c0t5d0   # replace failed disk with new one
+zpool status data                   # monitor resilvering progress</div>
+
+<div class="note"><strong>SPARC M7/T7+ advantage:</strong> ZFS deduplication on x86 typically causes 30-50% CPU overhead — often making it impractical. On SPARC M7+ with hardware dedup acceleration, the overhead is near zero. This is a genuine architectural advantage and a strong interview talking point.</div>
+</div>
+</div><div class="hw-sub" id="sparc-interview" style="scroll-margin-top:74px"><h3>🎯 SPARC Interview Q&A — L3 Level Questions</h3></div>
+<div class="la-topic" id="sparc-qa-arch">
+  <div class="la-topic-header">
+    <span class="la-topic-num">IQ-01</span>
+    <h3 class="la-topic-title">Architecture & Comparison Questions</h3>
+  </div>
+  <div class="la-topic-body">
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">What is the fundamental difference between SPARC T Series and M Series? When would you recommend each?</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>T Series (CMT)</strong> is designed for <em>throughput</em> — it maximises hardware threads (256 per socket on T8). Ideal when you have many concurrent lightweight workloads: web application servers, Java EE containers, REST API services. It trades single-thread performance for massive parallelism.<br><br><strong>M Series (SMP)</strong> is designed for <em>mission-critical reliability</em> and very large workloads — up to 32TB RAM, Dynamic Reconfiguration, memory mirroring, and XSCF hardware management. Ideal for core banking systems, Oracle Database instances requiring 10TB+ memory, ERP systems that cannot afford downtime. Price is significantly higher.<br><br><strong>Recommendation framework:</strong> If the workload is multi-threaded and I can afford some single-thread latency → T Series. If the workload requires maximum RAS, huge memory, and I need hardware-level DR → M Series. If budget is limited but I need Software in Silicon → S Series.</div>
+</div>
+
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">What is Software in Silicon and why does it matter compared to x86?</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span>Software in Silicon refers to hardware-accelerated implementations of common software operations built directly into the SPARC processor die — not as a coprocessor, but as native processor instructions. This means: (1) <strong>Zero CPU overhead</strong> — AES encryption, ZFS compression, Oracle DB scanning all run without consuming CPU cycles from applications. (2) <strong>Deterministic performance</strong> — hardware acceleration doesn't vary based on load. (3) <strong>Security in silicon</strong> — SSM detects memory attacks before software can respond.<br><br>On x86, AES-NI provides hardware encryption, but ZFS compression is purely software, and there is no equivalent to SSM or DAX. The gap is most visible in Oracle Database workloads where DAX accelerates SQL column store scanning by offloading filter/scan operations to the processor itself.</div>
+</div>
+
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">Explain ILOM vs XSCF — which SPARC systems use each?</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>ILOM</strong> (Integrated Lights Out Manager): Used on T Series (T4, T5, T7, T8), S Series (S7), and blade servers. It is Oracle's equivalent of HP iLO or Dell iDRAC — provides per-server management: power control, virtual console (KVM), BIOS/OBP configuration, sensor monitoring, firmware updates. Access via SSH or HTTPS web UI.<br><br><strong>XSCF</strong> (eXtended System Control Facility): Used on M Series (M3000 through M9000 with SPARC64 processors). It is more powerful than ILOM because it manages hardware domains, dynamic reconfiguration, and FRU management at the chassis level. Commands like <code>showboards</code>, <code>addboard</code>, <code>showdomainstatus</code> are XSCF-only.<br><br>M7-8 and M8-8 use a newer management architecture combining ILOM-style interfaces with domain management — interviewers may probe on this distinction.</div>
+</div>
+
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">How do Oracle Solaris Zones differ from LDoms? When would you use each?</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>LDoms (Logical Domains)</strong> are hardware virtualisation — each domain gets dedicated vCPUs (hardware thread strands), a dedicated memory partition, and virtual or passthrough I/O. Each domain boots its own Solaris kernel independently. A fault in one domain does not affect other domains. CPU and memory are hard-partitioned — a domain cannot use resources beyond what was allocated.<br><br><strong>Zones</strong> are OS-level virtualisation — all zones share the same Solaris kernel. They provide namespace isolation (process space, network stack, filesystem view) but not kernel isolation. More lightweight (200+ zones on a T8-2 are feasible). Zones can access host resources dynamically (capped CPU, fair share scheduling).<br><br><strong>Use case guidance:</strong> LDoms when you need kernel isolation, different Solaris versions per domain, or when a domain needs direct PCIe passthrough. Zones when you need lightweight multi-tenancy, application isolation, and very fast provisioning (a zone creates in seconds).</div>
+</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-qa-ops">
+  <div class="la-topic-header">
+    <span class="la-topic-num">IQ-02</span>
+    <h3 class="la-topic-title">Operational & Troubleshooting Questions</h3>
+  </div>
+  <div class="la-topic-body">
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">A SPARC T8-2 server reboots unexpectedly in the middle of the night. Walk me through your investigation.</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span>Step 1 — <strong>ILOM logs first</strong>: <code>ssh root@&lt;ILOM-IP&gt; → show /SP/logs/event/list</code>. Look for hardware alerts (temperature, power, memory) logged before the reboot.<br>Step 2 — <strong>FMA events</strong>: <code>fmdump -ev | tail -200</code> on Solaris. Look for fault UUIDs generated before the reboot. <code>fmadm faulty</code> to see if any component is currently flagged.<br>Step 3 — <strong>Solaris system log</strong>: <code>tail -500 /var/adm/messages</code>. Look for panic messages, kernel errors, or driver faults immediately before the timestamp of the reboot.<br>Step 4 — <strong>Crash dump</strong>: Check if a crash dump was generated: <code>ls -la /var/crash/$(uname -n)/</code>. If yes: <code>mdb -k /var/crash/$(uname -n)/unix.0 /var/crash/$(uname -n)/vmcore.0</code> → <code>::stack</code> to see the panic stack trace.<br>Step 5 — <strong>Power/Thermal</strong>: If ILOM shows temperature or power alerts, investigate the physical environment (DC cooling, PSU failure).<br>Step 6 — <strong>SMF services</strong>: <code>svcs -x</code> after reboot to see if any services failed to start and may indicate a software cause.</div>
+</div>
+
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">How do you add a new disk to a SPARC server and expand a ZFS pool online?</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Step 1 — Physical insertion</strong>: insert the hot-plug disk into an empty bay. SPARC servers with SAS backplanes support hot-plug.<br><strong>Step 2 — Verify Solaris detects the disk</strong>: <code>cfgadm -al</code> to see attachment points, or <code>format</code> to list disks, or <code>devfsadm</code> to trigger device rescan → <code>format</code>.<br><strong>Step 3 — Identify new disk path</strong>: <code>ls /dev/dsk/ | sort</code> to find new device node (e.g., c1t5d0).<br><strong>Step 4 — ZFS pool expansion</strong>:<br>• To add a new mirror vdev to a raidz/mirror pool: <code>zpool add data mirror c1t5d0 c1t6d0</code><br>• To replace a failed disk in an existing mirror: <code>zpool replace data c1t0d0 c1t5d0</code><br>• To expand pool by adding a spare: <code>zpool add data spare c1t5d0</code><br><strong>Step 5 — Monitor</strong>: <code>zpool status data</code> — watch resilvering progress for replace operations.<br><strong>Step 6 — After resilvering</strong>: <code>zpool status data</code> should show ONLINE for all vdevs.</div>
+</div>
+
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">What is "core retirement" in SPARC and how does the system continue operating?</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span>Core retirement is Solaris FMA's self-healing mechanism. When a SPARC core develops a hardware fault (ECC error on L2 cache, intermittent execution error, overtemperature), FMA's diagnosis engine identifies the faulty core and automatically takes it offline (retires it).<br><br>The process: (1) The SPARC core generates a hardware error trap. (2) FMA's cpumem-diagnosis engine analyses the error, determines severity, and generates a fault UUID. (3) If the core is unreliable, FMA calls <code>psradm -f &lt;cpu-id&gt;</code> to take all hardware threads on that core offline. (4) The OS migrates all threads off the retired core transparently. (5) The system continues running with reduced CPU capacity. (6) <code>fmadm faulty</code> shows the retired core with fault UUID. (7) After hardware repair (typically replacing the CPU board/module), <code>fmadm repaired &lt;UUID&gt;</code> and <code>psradm -n &lt;cpu-id&gt;</code> bring it back online.<br><br>This is fundamentally different from x86 — a faulty x86 core typically causes a system panic. SPARC continues running.</div>
+</div>
+
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">How do you perform a live firmware update on a SPARC T8-2 without downtime?</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span>On T Series, ILOM firmware can be updated without rebooting the host OS. BIOS/OBP firmware typically requires a reboot. Procedure:<br><br><strong>Step 1 — Download firmware</strong>: obtain the latest firmware bundle from My Oracle Support (MOS) or Oracle Software Delivery Cloud. Firmware is delivered as a .pkg file or .zip.<br><strong>Step 2 — Upload to ILOM</strong>: ILOM web UI → Administration → Firmware Upgrade → upload .pkg file. Or via ILOM CLI: <code>→ load -source tftp://&lt;server&gt;/firmware.pkg /SP/firmware</code><br><strong>Step 3 — ILOM-only update</strong>: select "Preserve existing configuration" and "Delay BIOS update" options. ILOM firmware updates immediately; host BIOS update is deferred to next reboot.<br><strong>Step 4 — Verify</strong>: <code>→ show /SP/firmware_version</code><br><strong>Step 5 — Schedule BIOS update</strong>: plan a maintenance window for the host reboot to apply deferred BIOS/OBP firmware.</div>
+</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-qa-scenarios">
+  <div class="la-topic-header">
+    <span class="la-topic-num">IQ-03</span>
+    <h3 class="la-topic-title">Real-World Scenario Questions</h3>
+  </div>
+  <div class="la-topic-body">
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">A production SPARC M7-8 running Oracle Database reports a hardware memory error. fmadm shows a DIMM fault. The database is live. Walk me through the remediation.</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Step 1 — Assess severity</strong>: <code>fmadm faulty -s</code> → check if fault is correctable (CE — Correctable Error) or uncorrectable (UE). CE can be tolerated temporarily; UE requires immediate action.<br><strong>Step 2 — Identify affected DIMM</strong>: <code>fmdump -V -u &lt;UUID&gt;</code> → look for the FRU location code (e.g., <code>/SYS/MB/MEM_GRP0/DIMM0</code>).<br><strong>Step 3 — Check if page retirement is active</strong>: FMA may have already retired the faulty memory page and the database is running on remaining memory.<br><strong>Step 4 — Plan DR (Dynamic Reconfiguration)</strong>: M7-8 supports hot-memory operations. Check if the DIMM can be taken offline without rebooting: <code>cfgadm -al | grep mem</code> → check if the memory board (not just DIMM) can be unconfigured.<br><strong>Step 5 — If CE and page retired</strong>: schedule memory board replacement during the next maintenance window. Monitor with <code>fmstat -m cpumem-diagnosis</code> for increasing error rate.<br><strong>Step 6 — If UE or escalating</strong>: arrange emergency Oracle Support visit for hot DIMM replacement (M7-8 supports hot-add memory boards). Coordinate with DBA to migrate database instance to a RAC node during hardware service.<br><strong>Step 7 — After replacement</strong>: <code>fmadm repaired &lt;UUID&gt;</code> → verify with <code>fmadm faulty</code> (should show empty or resolved).</div>
+</div>
+
+
+<div class="phc-qa">
+  <div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">You are asked to migrate a production LDom (Oracle VM) from one SPARC T7-2 to another T7-2 during peak hours for a hardware upgrade. How do you do this?</span></div>
+  <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Pre-migration checks</strong>: (1) Target server has sufficient vCPUs and RAM available: <code>ldm list-util</code> on target. (2) Network connectivity between source and target ILOM. (3) Both servers running same or compatible LDom Manager version: <code>ldm --version</code>. (4) Verify live migration is supported (both servers must have same SPARC generation).<br><br><strong>Migration command</strong>: <code>ldm migrate-domain -n guestA ldoms@&lt;target-ILOM-IP&gt;</code><br>The <code>-n</code> flag means non-interactive (no OS suspend) — this is a live migration with the guest OS running.<br><br><strong>Migration process</strong>: LDom Manager iteratively copies memory pages from source to target while the guest keeps running. Remaining dirty pages are copied. At the final moment, the guest is suspended for a few milliseconds (typically &lt;1 second), final state is transferred, and it resumes on the target. Guest OS and applications see no interruption (TCP connections remain established).<br><br><strong>Monitor migration</strong>: <code>ldm list</code> on both servers — the guest shows "migrating" state.<br><br><strong>Post-migration</strong>: <code>ldm list</code> on target — guest shows "active". Verify application health. Remove guest definition from source: it is automatically removed on successful migration.</div>
+</div>
+</div>
+</div>
+<div class="la-topic" id="sparc-quickref">
+  <div class="la-topic-header">
+    <span class="la-topic-num">REF-01</span>
+    <h3 class="la-topic-title">SPARC Quick Reference — Key Commands Cheat Sheet</h3>
+  </div>
+  <div class="la-topic-body">
+<div class="tbl-wrap"><table><thead><tr><th>Task</th><th>Command / Location</th></tr></thead><tbody><tr><td>Access ILOM CLI</td><td><code>ssh root@&lt;ILOM-IP&gt;</code></td></tr><tr><td>Access XSCF CLI (M Series)</td><td><code>ssh platadm@&lt;XSCF-IP&gt;</code></td></tr><tr><td>Show system health (ILOM)</td><td><code>→ show /System</code></td></tr><tr><td>Show faults (ILOM)</td><td><code>→ show -level all /SP/faultmgmt/shell</code></td></tr><tr><td>Show hardware config (XSCF)</td><td><code>XSCF&gt; showhardconf</code></td></tr><tr><td>Show domain status (XSCF)</td><td><code>XSCF&gt; showdomainstatus -a</code></td></tr><tr><td>OBP boot verbose</td><td><code>ok&gt; boot disk0 -v</code></td></tr><tr><td>OBP scan SCSI devices</td><td><code>ok&gt; probe-scsi-all</code></td></tr><tr><td>OBP single user mode</td><td><code>ok&gt; boot disk0 -s</code></td></tr><tr><td>Show CPU topology</td><td><code>psrinfo -pv</code></td></tr><tr><td>Show memory config</td><td><code>prtconf | grep Memory</code></td></tr><tr><td>Show full hardware</td><td><code>prtdiag -v</code></td></tr><tr><td>Show FRU serials</td><td><code>prtfru</code></td></tr><tr><td>Show active faults</td><td><code>fmadm faulty</code></td></tr><tr><td>Fault detail</td><td><code>fmdump -V -u &lt;UUID&gt;</code></td></tr><tr><td>FMA statistics</td><td><code>fmstat</code></td></tr><tr><td>Mark fault repaired</td><td><code>fmadm repaired &lt;UUID&gt;</code></td></tr><tr><td>Retire a CPU core</td><td><code>psradm -f &lt;cpu-id&gt;</code></td></tr><tr><td>Bring CPU back online</td><td><code>psradm -n &lt;cpu-id&gt;</code></td></tr><tr><td>DR — show boards</td><td><code>cfgadm -al</code></td></tr><tr><td>DR — unconfigure board</td><td><code>cfgadm -c unconfigure SB0</code></td></tr><tr><td>DR — configure new board</td><td><code>cfgadm -c configure SB2</code></td></tr><tr><td>Show NUMA topology</td><td><code>lgrpinfo -T</code></td></tr><tr><td>Show LDom list</td><td><code>ldm list</code></td></tr><tr><td>LDom live migrate</td><td><code>ldm migrate-domain -n guestA ldoms@&lt;target&gt;</code></td></tr><tr><td>LDom resource utilisation</td><td><code>ldm list-util</code></td></tr><tr><td>ZFS pool status</td><td><code>zpool status</code></td></tr><tr><td>ZFS pool scrub</td><td><code>zpool scrub &lt;pool&gt;</code></td></tr><tr><td>Solaris boot environments</td><td><code>beadm list</code></td></tr><tr><td>SMF service status</td><td><code>svcs -x</code></td></tr></tbody></table></div>
+</div>
+</div>
+</div>
+<!-- end Oracle SPARC section -->
+
+</main>
 
   <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#hw-raid" class="toc-link">💽 HP Smart Array & IBM MegaRAID</a><a href="#hw1" class="toc-link h3">01 HP HPSSACLI / HPACUCLI — Smart Array Commands</a><a href="#hw2" class="toc-link h3">02 IBM MegaRAID storcli & MegaCli Commands</a><a href="#hw3" class="toc-link h3">03 HP ILO — Out-of-Band Management</a><a href="#hw-c7000" class="toc-link">🔷 HP BladeSystem C7000 & BL Series</a><a href="#hw-c7000-arch" class="toc-link h3">HP BladeSystem c7000 Chassis Architecture</a><a href="#hw-oa" class="toc-link h3">Onboard Administrator (OA) — Capabilities & Limits</a><a href="#hw-vc" class="toc-link h3">Virtual Connect (VC) Module</a><a href="#hw-ilo-deep" class="toc-link h3">HP iLO vs OA — Deep Dive</a><a href="#hw-blade-recovery" class="toc-link h3">Remote Recovery — Hung Kernel Blade</a><a href="#hw-firmware" class="toc-link h3">Firmware Updates — iLO, BIOS, Smart Array</a><a href="#hw-dell" class="toc-link">🔶 Dell PowerEdge — iDRAC, PERC & Lifecycle Controller</a><a href="#hw-idrac-compare" class="toc-link h3">HP iLO vs Dell iDRAC — Comparison</a><a href="#hw-racadm" class="toc-link h3">racadm CLI — Key Commands</a><a href="#hw-lc" class="toc-link h3">Dell Lifecycle Controller</a><a href="#hw-perc" class="toc-link h3">Dell PERC RAID — Health, Replace, Expand</a><a href="#hw-scenarios" class="toc-link">🔴 Hardware Troubleshooting Scenarios</a><a href="#sc-c7000-power" class="toc-link h3">HP C7000 Full Enclosure Power Loss</a><a href="#sc-blade-post" class="toc-link h3">HP BL460c Blade Fails to POST</a><a href="#sc-vc-network" class="toc-link h3">C7000 VC Module — 8 Blades Lose Network</a><a href="#sc-idrac-unreachable" class="toc-link h3">Dell iDRAC Unreachable After OS Patch</a><a href="#sc-dell-temp" class="toc-link h3">Dell R640 Critical Temperature Alert</a><a href="#hw-ref" class="toc-link">📋 Command Reference Cheat Sheet</a></nav>
 </div>
