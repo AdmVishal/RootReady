@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podman Containers Deep Dive — RootReady</title>
+<link rel="stylesheet" href="studyhub.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{--topbar-h:58px;--sidebar-w:240px}
+body{display:flex;flex-direction:column;min-height:100vh}
+#site-topbar{position:fixed;top:0;left:0;right:0;z-index:9000;height:var(--topbar-h);background:var(--navy);display:flex;align-items:center;padding:0 20px;gap:14px;border-bottom:2px solid var(--blue);box-shadow:0 2px 20px rgba(0,0,0,.5)}
+.logo{font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none;letter-spacing:.04em;flex-shrink:0}
+.logo span{color:var(--accent)}
+.page-title-bar{font-size:.72rem;color:var(--text3);font-weight:300}
+.topbar-spacer{flex:1}
+#menu-btn{display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;padding:6px 10px;cursor:pointer;font-size:1rem}
+#prog{position:fixed;top:var(--topbar-h);left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--accent),var(--sky));z-index:8999;transition:width .08s linear;pointer-events:none}
+#btt{position:fixed;bottom:24px;right:20px;width:42px;height:42px;background:var(--blue);color:#fff;border:none;border-radius:50%;font-size:1.1rem;cursor:pointer;z-index:8998;opacity:0;pointer-events:none;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(27,79,138,.45);transition:opacity .2s,transform .2s}
+#btt.vis{opacity:1;pointer-events:auto}
+#btt:hover{background:var(--mid);transform:translateY(-2px)}
+.site-body{display:flex;margin-top:var(--topbar-h);flex:1;min-height:calc(100vh - var(--topbar-h))}
+#site-nav{width:var(--sidebar-w);flex-shrink:0;position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow-y:auto;background:var(--surface);border-right:1px solid var(--border);padding:16px 0}
+.nav-sec{padding:10px 16px 2px;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);font-family:var(--font-mono)}
+.nav-link{display:flex;align-items:center;gap:8px;padding:9px 16px;color:var(--text2);text-decoration:none;font-size:.84rem;border-left:3px solid transparent;transition:all .12s}
+.nav-link:hover{background:rgba(255,255,255,.05);color:var(--text);border-left-color:var(--border2)}
+.nav-link.active{background:rgba(240,165,0,.09);color:var(--accent);border-left-color:var(--accent);font-weight:600}
+#toc-nav{width:220px;flex-shrink:0;position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow-y:auto;padding:16px 0;display:flex;flex-direction:column}
+.toc-head{padding:0 16px 8px;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);font-family:var(--font-mono);border-bottom:1px solid var(--border);margin-bottom:4px}
+.toc-link{display:block;padding:6px 16px;color:var(--text3);text-decoration:none;font-size:.78rem;line-height:1.35;transition:color .12s;border-left:2px solid transparent}
+.toc-link:hover{color:var(--sky);border-left-color:var(--sky)}
+.toc-link.h3{padding-left:26px;font-size:.72rem}
+#main-content{flex:1;padding:32px 40px;overflow-x:hidden;min-width:0}
+.page-hero{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.page-hero h1{margin-bottom:6px}
+.page-hero p{color:var(--text2);font-size:.95rem;margin:0}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.badge{padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:600;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em}
+.badge-blue{background:rgba(74,159,213,.15);color:var(--sky);border:1px solid rgba(74,159,213,.25)}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.badge-gold{background:rgba(240,165,0,.15);color:var(--accent);border:1px solid rgba(240,165,0,.25)}
+.badge-purple{background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.25)}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:12px 0 16px}
+code{font-family:var(--font-mono);font-size:.82rem;color:var(--code-fg)}
+pre code{color:var(--code-fg)}
+:not(pre)>code{background:rgba(121,192,255,.1);color:var(--code-fg);padding:2px 6px;border-radius:4px;font-size:.8em}
+table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:.875rem}
+th{background:rgba(27,79,138,.35);color:var(--sky);padding:9px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border2);font-size:.78rem}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+tr:hover td{background:rgba(255,255,255,.025)}
+#site-footer{background:var(--surface);border-top:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:var(--text3)}
+#mob-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8800}
+#mob-ov.on{display:block}
+@media(max-width:1100px){#toc-nav{display:none}}
+@media(max-width:768px){#site-nav{position:fixed;left:0;top:var(--topbar-h);bottom:0;transform:translateX(-100%);z-index:8900;transition:transform .25s cubic-bezier(.4,0,.2,1)}#site-nav.open{transform:translateX(0)}#menu-btn{display:block}#main-content{padding:20px 16px}}
+
+.la-section{margin-bottom:52px;scroll-margin-top:74px}
+.la-section-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid var(--border)}
+.la-section-icon{width:48px;height:48px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.la-section-title{margin:0 0 4px!important;font-size:1.25rem!important;color:var(--sky)!important}
+.la-section-desc{margin:0!important;font-size:.83rem;color:var(--text3)}
+.la-topic{margin-bottom:24px;padding:20px 22px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:10px;scroll-margin-top:74px}
+.la-topic-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.la-topic-num{font-family:var(--font-mono);font-size:.66rem;font-weight:700;color:var(--accent);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);padding:2px 8px;border-radius:4px;flex-shrink:0}
+.la-topic-title{font-size:1rem!important;font-weight:700!important;color:var(--text)!important;margin:0!important}
+.note,.info-box{background:rgba(74,159,213,.07);border:1px solid rgba(74,159,213,.2);border-left:3px solid var(--sky);border-radius:8px;padding:.85rem 1rem;margin:.7rem 0 1.2rem;font-size:14px;color:var(--text2)}
+.warn-box{background:rgba(240,165,0,.07);border:1px solid rgba(240,165,0,.2);border-left:3px solid var(--accent);border-radius:8px;padding:.85rem 1rem;margin:.7rem 0 1.2rem;font-size:14px;color:var(--text2)}
+.note strong{color:var(--sky)}.warn-box strong{color:var(--accent)}
+.cmd-block{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--sky);border-radius:8px;padding:1rem 1.1rem;font-family:var(--font-mono);font-size:13px;color:var(--code-fg);overflow-x:auto;line-height:1.6;margin:.7rem 0 1.2rem;white-space:pre;display:block!important}
+.cmd-label{font-family:var(--font-mono);font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;margin-top:14px;display:block!important}
+.card-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin:1rem 0}
+@media(max-width:900px){.card-grid{grid-template-columns:1fr!important}}
+.body-text{color:var(--text2);font-size:.92rem;line-height:1.75;margin-bottom:.75rem}
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border);margin:12px 0 16px}
+.tbl-wrap table{margin:0;border:none;width:100%;border-collapse:collapse}
+.tbl-wrap th{background:rgba(27,79,138,.35);color:var(--sky);padding:9px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border2);font-size:.78rem}
+.tbl-wrap td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;font-size:.875rem}
+.slow-flags{list-style:none;padding:0;margin:6px 0 0}
+.slow-flags li{font-size:.83rem;color:var(--text2);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.4}
+.slow-flags li:last-child{border-bottom:none}
+.slow-flags li::before{content:"• ";color:var(--green)}
+.phc-qa{border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.phc-q{display:flex;gap:12px;align-items:flex-start;padding:14px 18px;background:rgba(27,79,138,.22)}
+.phc-badge{font-family:var(--font-mono);font-size:.65rem;font-weight:700;background:rgba(74,159,213,.15);color:var(--sky);border:1px solid rgba(74,159,213,.25);padding:2px 7px;border-radius:3px;flex-shrink:0;margin-top:2px}
+.phc-qtext{font-family:var(--font-head);font-weight:600;color:var(--text);font-size:.95rem;line-height:1.45}
+.phc-a{padding:14px 18px 16px;border-top:1px solid var(--border);font-size:.875rem;color:var(--text2);line-height:1.75}
+.phc-abadge{display:block;font-family:var(--font-mono);font-size:.65rem;font-weight:700;color:var(--accent);margin-bottom:8px}
+.phc-scenario{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--red,#ef4444);border-radius:10px;margin-bottom:14px;overflow:hidden;scroll-margin-top:74px}
+.phc-scenario-header{padding:12px 18px;background:rgba(239,68,68,.08);font-family:var(--font-head);font-weight:700;font-size:.96rem;color:var(--text);border-bottom:1px solid var(--border)}
+.phc-scenario-body{padding:14px 18px;font-size:.875rem;color:var(--text2);line-height:1.7}
+.phc-scenario-desc{font-style:italic;color:var(--text3);background:rgba(255,255,255,.03);border-left:2px solid var(--border2);padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:12px}
+
+</style>
+</head>
+<body>
+<div id="site-topbar">
+  <a href="index.html" class="logo">Root<span>Ready</span></a>
+  <span class="page-title-bar">RHCSA RHEL 10 · Containers · Volumes · Rootless · Pods</span>
+  <div class="topbar-spacer"></div>
+  <button id="menu-btn">☰</button>
+</div>
+<div id="prog"></div>
+<div id="mob-ov"></div>
+<div class="site-body">
+  <nav id="site-nav">
+    <div class="nav-sec">Navigation</div>
+    <a href="index.html" class="nav-link ">🏠 Home</a>
+<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
+<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
+<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
+<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
+<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
+<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
+<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
+<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
+<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
+<a href="phc.html" class="nav-link ">🛡️ PHC Guide</a>
+<a href="server-hardware.html" class="nav-link ">🖥️ Server Hardware</a>
+<a href="podman.html" class="nav-link active">🦭 Podman</a>
+
+  </nav>
+  <main id="main-content"><div class="page-hero">
+  <h1>🦭 Podman Containers Deep Dive</h1>
+  <p>RHCSA RHEL 10 — Images · Containers · Volumes · Rootless · Pods · Registry · Production</p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">Daemonless</span><span class="badge badge-green">Rootless</span>
+    <span class="badge badge-gold">OCI Compliant</span><span class="badge badge-purple">Docker Compatible</span>
+    <span class="badge badge-blue">19 Topics · L1→L3</span>
+  </div>
+</div><div class="content-section la-section" id="pod-s1"><div class="la-section-header"><div class="la-section-icon">🦭</div><div><h2 class="la-section-title">1. Podman Overview (L1)</h2><p class="la-section-desc">Daemonless · Rootless · OCI · Docker-compatible container engine for RHEL 8/9/10</p></div></div><div class="la-topic" id="pod-ov1"><div class="la-topic-header"><span class="la-topic-num">L1-01</span><h3 class="la-topic-title">What is Podman? Architecture vs Docker</h3></div><div class="la-topic-body">
+<p class="body-text"><strong>Podman (Pod Manager)</strong> is a daemonless, rootless, OCI-compliant container engine — the default on RHEL 8/9/10.</p>
+<div class="tbl-wrap"><table><thead><tr><th>Feature</th><th>Docker</th><th>Podman</th></tr></thead><tbody><tr><td>Architecture</td><td>Client-server — dockerd daemon required</td><td>Daemonless — fork/exec per command via conmon</td></tr><tr><td>Root requirement</td><td>Root or docker group required</td><td>Fully rootless — user namespace mapping</td></tr><tr><td>Security</td><td>Single root daemon = single attack point</td><td>No persistent daemon — no root process to exploit</td></tr><tr><td>CLI</td><td>docker CLI</td><td>podman CLI — drop-in compatible</td></tr><tr><td>Pods</td><td>Compose only</td><td>Native pod support (Kubernetes-compatible)</td></tr><tr><td>Systemd</td><td>Limited</td><td>Native — Quadlet unit files on RHEL 10</td></tr><tr><td>K8s migration</td><td>docker-compose limited</td><td>podman generate kube → valid K8s YAML</td></tr><tr><td>OCI</td><td>Yes</td><td>Yes — OCI native</td></tr></tbody></table></div>
+<div class="note"><strong>Daemonless means:</strong> if <code>podman</code> CLI crashes, running containers are NOT affected — no parent daemon to kill them. Docker containers die if dockerd crashes.</div>
+<div class="cmd-label">Core commands</div>
+<div class="cmd-block">podman --version                    # version check
+podman info                         # full system info (storage, registries, cgroup)
+podman info | grep -i rootless      # confirm rootless capability
+podman info | grep cgroupVersion    # must be v2 for rootless resource limits</div>
+</div></div></div><div class="content-section la-section" id="pod-s2"><div class="la-section-header"><div class="la-section-icon">📦</div><div><h2 class="la-section-title">2. Image Management (L1)</h2><p class="la-section-desc">Pull · Build · List · Search · Tag · Remove · Containerfile</p></div></div><div class="la-topic" id="pod-img1"><div class="la-topic-header"><span class="la-topic-num">L1-02</span><h3 class="la-topic-title">Image Management — Pull, Build, List, Remove</h3></div><div class="la-topic-body">
+<div class="cmd-label">Pull Images</div>
+<div class="cmd-block">podman pull nginx:latest
+podman pull docker.io/library/httpd:2.4
+podman pull registry.redhat.io/ubi9/ubi:latest    # Red Hat UBI
+podman pull quay.io/prometheus/prometheus:latest   # Quay.io</div>
+<div class="cmd-label">List Images</div>
+<div class="cmd-block">podman images
+podman images -a                                   # include intermediate layers
+podman images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
+podman images --filter dangling=true               # untagged images</div>
+<div class="cmd-label">Search Images</div>
+<div class="cmd-block">podman search nginx
+podman search --limit 5 nginx
+podman search registry.redhat.io/</div>
+<div class="cmd-label">Remove Images</div>
+<div class="cmd-block">podman rmi nginx:latest
+podman rmi -f nginx:latest                         # force (even if containers use it)
+podman image prune                                 # remove dangling images
+podman image prune -a                              # remove ALL unused images</div>
+<div class="cmd-label">Build Images (Containerfile)</div>
+<div class="cmd-block"># Containerfile
+FROM registry.redhat.io/ubi9/ubi-minimal:latest
+RUN microdnf install -y nginx && microdnf clean all
+COPY html/ /usr/share/nginx/html/
+EXPOSE 80
+USER nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+podman build -t myapp:v1 .
+podman build --no-cache -t myapp:v1 .             # fresh build
+podman build --squash -t myapp:v1 .               # squash all layers</div>
+<div class="note"><strong>★ PRO TIP:</strong> Use <code>ubi9-minimal</code> as base on RHEL — Red Hat supported, smaller than full RHEL, freely redistributable. Use <code>ubi-init</code> when systemd inside the container is needed.</div>
+</div></div></div><div class="content-section la-section" id="pod-s3"><div class="la-section-header"><div class="la-section-icon">♻️</div><div><h2 class="la-section-title">3. Container Lifecycle (L1)</h2><p class="la-section-desc">run · start · stop · restart · kill · rm — full lifecycle with all key options</p></div></div><div class="la-topic" id="pod-lc1"><div class="la-topic-header"><span class="la-topic-num">L1-03</span><h3 class="la-topic-title">Container Lifecycle — Full Reference</h3></div><div class="la-topic-body">
+<div class="cmd-label">Run Container</div>
+<div class="cmd-block">podman run nginx                            # foreground
+podman run -d nginx                        # detached (background)
+podman run -d --name web nginx             # named container
+podman run -it --name shell ubi9 /bin/bash # interactive terminal
+podman run --rm nginx                      # auto-remove on exit
+podman run -d -e MYSQL_ROOT_PASSWORD=secret mariadb
+podman run -d --memory 512m --cpus 1.5 nginx       # resource limits
+podman run -d --restart=always --name web nginx    # auto-restart</div>
+<div class="cmd-label">List / Start / Stop / Remove</div>
+<div class="cmd-block">podman ps                                   # running containers
+podman ps -a                               # all (including stopped)
+podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+podman start web && podman stop web && podman restart web
+podman kill -s SIGHUP web                  # send signal (e.g. nginx reload)
+podman rm web && podman rm -f web          # remove (force)
+podman container prune                     # remove all stopped</div>
+<div class="tbl-wrap"><table><thead><tr><th>Option</th><th>Description</th><th>Example</th></tr></thead><tbody><tr><td>-d</td><td>Detached mode</td><td><code>-d</code></td></tr><tr><td>-it</td><td>Interactive terminal</td><td><code>-it ubi9 bash</code></td></tr><tr><td>--name</td><td>Name the container</td><td><code>--name webserver</code></td></tr><tr><td>-p</td><td>Port mapping host:container</td><td><code>-p 8080:80</code></td></tr><tr><td>-v</td><td>Volume / bind mount</td><td><code>-v mydata:/app/data</code></td></tr><tr><td>-e</td><td>Environment variable</td><td><code>-e DB_HOST=localhost</code></td></tr><tr><td>--rm</td><td>Auto-remove on exit</td><td><code>--rm</code></td></tr><tr><td>--read-only</td><td>Read-only root filesystem</td><td><code>--read-only</code></td></tr><tr><td>--cap-drop</td><td>Drop Linux capabilities</td><td><code>--cap-drop ALL</code></td></tr><tr><td>--security-opt</td><td>Security options</td><td><code>--security-opt no-new-privileges</code></td></tr><tr><td>--restart</td><td>Restart policy</td><td><code>--restart always</code></td></tr></tbody></table></div>
+</div></div></div><div class="content-section la-section" id="pod-s4"><div class="la-section-header"><div class="la-section-icon">🔗</div><div><h2 class="la-section-title">4. Container Interaction (L1)</h2><p class="la-section-desc">exec · logs · inspect · top · stats · cp — interact with running containers</p></div></div><div class="la-topic" id="pod-int1"><div class="la-topic-header"><span class="la-topic-num">L1-04</span><h3 class="la-topic-title">Container Interaction — exec, logs, inspect, stats</h3></div><div class="la-topic-body">
+<div class="cmd-label">Exec into Container</div>
+<div class="cmd-block">podman exec -it web /bin/bash             # interactive shell
+podman exec web cat /etc/nginx/nginx.conf  # single command
+podman exec -u root web ps aux            # as specific user</div>
+<div class="cmd-label">Logs</div>
+<div class="cmd-block">podman logs web                           # all logs
+podman logs -f web                        # follow (tail -f)
+podman logs --tail 50 web                 # last 50 lines
+podman logs --since 1h web                # last 1 hour
+podman logs --timestamps web              # with timestamps</div>
+<div class="cmd-label">Inspect</div>
+<div class="cmd-block">podman inspect web                        # full JSON metadata
+podman inspect --format "{{.State.Status}}" web
+podman inspect --format "{{.NetworkSettings.IPAddress}}" web
+podman inspect --format "{{.HostConfig.Binds}}" web
+podman inspect --format "{{.Config.Env}}" web</div>
+<div class="cmd-label">Stats & Top</div>
+<div class="cmd-block">podman top web                            # processes in container
+podman stats web                          # live CPU/mem/IO
+podman stats --no-stream                  # one-shot snapshot</div>
+<div class="cmd-label">Copy Files</div>
+<div class="cmd-block">podman cp web:/etc/nginx/nginx.conf ./    # FROM container
+podman cp ./config.conf web:/etc/nginx/   # TO container</div>
+</div></div></div><div class="content-section la-section" id="pod-s5"><div class="la-section-header"><div class="la-section-icon">🌐</div><div><h2 class="la-section-title">5. Container Ports & Networking (L1)</h2><p class="la-section-desc">Port mapping · Network create · Container DNS · Custom networks</p></div></div><div class="la-topic" id="pod-net1"><div class="la-topic-header"><span class="la-topic-num">L1-05</span><h3 class="la-topic-title">Container Ports & Networking</h3></div><div class="la-topic-body">
+<div class="cmd-label">Port Mapping</div>
+<div class="cmd-block">podman run -d --name web -p 8080:80 nginx          # host:container
+podman run -d --name web -p 127.0.0.1:8080:80 nginx # bind to specific IP
+podman run -d -P nginx                               # auto-map all EXPOSE ports
+podman port web                                      # show mappings</div>
+<div class="cmd-label">Network Management</div>
+<div class="cmd-block">podman network ls                                   # list networks
+podman network create mynet                          # create bridge network
+podman network create --subnet 192.168.100.0/24 mynet
+podman network inspect mynet
+podman network connect mynet web                     # connect running container
+podman network disconnect mynet web
+podman network rm mynet && podman network prune</div>
+<div class="cmd-label">Run Container in Network</div>
+<div class="cmd-block">podman run -d --name app --network mynet nginx
+
+# Containers in same custom network resolve each other by name
+podman run -d --name db --network appnet postgres:15
+podman run -d --name app --network appnet myapp
+# Inside app: curl http://db:5432 resolves automatically</div>
+<div class="note"><strong>DNS resolution:</strong> containers on the default bridge CANNOT resolve each other by name. Create a custom network (<code>podman network create mynet</code>) for container-to-container DNS.</div>
+</div></div></div><div class="content-section la-section" id="pod-s6"><div class="la-section-header"><div class="la-section-icon">💾</div><div><h2 class="la-section-title">6. Volumes Management (L1)</h2><p class="la-section-desc">Named volumes · Create · Inspect · Mount · Backup · Restore</p></div></div><div class="la-topic" id="pod-vol1"><div class="la-topic-header"><span class="la-topic-num">L1-06</span><h3 class="la-topic-title">Volumes Management</h3></div><div class="la-topic-body">
+<div class="cmd-label">Create & Use Named Volumes</div>
+<div class="cmd-block">podman volume create mydata
+podman volume ls
+podman volume inspect mydata               # find host mount path
+podman run -d --name db -v mydata:/var/lib/mysql docker.io/mariadb:latest
+podman run -d --name db -v mydata:/var/lib/mysql:ro nginx   # read-only
+podman volume rm mydata && podman volume prune               # cleanup</div>
+<div class="tbl-wrap"><table><thead><tr><th>Aspect</th><th>Named Volume</th><th>Bind Mount</th></tr></thead><tbody><tr><td>Managed by</td><td>Podman</td><td>User (host filesystem)</td></tr><tr><td>Location</td><td>Container storage dir</td><td>Any host path</td></tr><tr><td>SELinux</td><td>Auto-labelled</td><td>Needs :Z or :z suffix</td></tr><tr><td>Use case</td><td>Database data, persistent state</td><td>Config files, source code</td></tr><tr><td>Syntax</td><td><code>-v volname:/path</code></td><td><code>-v /host/path:/path</code></td></tr></tbody></table></div>
+<div class="cmd-label">Volume Backup & Restore</div>
+<div class="cmd-block">podman volume export mydata -o mydata.tar
+podman volume import mydata mydata.tar</div>
+</div></div></div><div class="content-section la-section" id="pod-s7"><div class="la-section-header"><div class="la-section-icon">📂</div><div><h2 class="la-section-title">7. Bind Mounts (L1)</h2><p class="la-section-desc">Host path mounting · SELinux :Z :z labels · Read-only mounts · RHEL SELinux context</p></div></div><div class="la-topic" id="pod-bind1"><div class="la-topic-header"><span class="la-topic-num">L1-07</span><h3 class="la-topic-title">Bind Mounts & SELinux Labels</h3></div><div class="la-topic-body">
+<div class="cmd-label">Bind Mount Syntax</div>
+<div class="cmd-block">podman run -d --name app \
+  -v /opt/appdata:/usr/share/nginx/html:Z nginx
+
+podman run -d --name app \
+  -v /etc/hosts:/mnt/hosts:ro alpine</div>
+<div class="tbl-wrap"><table><thead><tr><th>Label</th><th>Meaning</th><th>When to Use</th></tr></thead><tbody><tr><td>:Z</td><td>Private — relabel for this container ONLY</td><td>Single container accessing the path</td></tr><tr><td>:z</td><td>Shared — relabel for multiple containers</td><td>Multiple containers sharing same host path</td></tr><tr><td>:ro</td><td>Read-only</td><td>Container must not modify host files</td></tr><tr><td>:Z,ro</td><td>Private + read-only</td><td>Config files for single container</td></tr></tbody></table></div>
+<div class="warn-box"><strong>Always add :Z on RHEL with SELinux enforcing.</strong> Without it, even if filesystem permissions are correct, the container gets Permission denied because SELinux blocks the access. Check: <code>ausearch -m avc -ts recent</code></div>
+</div></div></div><div class="content-section la-section" id="pod-s8"><div class="la-section-header"><div class="la-section-icon">🫛</div><div><h2 class="la-section-title">8. Pods (L2)</h2><p class="la-section-desc">Create pods · Add containers · K8s YAML export · Infra container</p></div></div><div class="la-topic" id="pod-pod1"><div class="la-topic-header"><span class="la-topic-num">L2-08</span><h3 class="la-topic-title">Pods — Kubernetes-style Container Groups</h3></div><div class="la-topic-body">
+<p class="body-text">A <strong>Pod</strong> groups containers sharing the same network namespace, IPC, and optionally PID namespace — identical to Kubernetes pods. Port mappings go on the pod, not containers.</p>
+<div class="cmd-label">Pod Lifecycle</div>
+<div class="cmd-block">podman pod create --name mypod -p 8080:80
+podman pod ps
+podman pod inspect mypod
+podman pod start mypod && podman pod stop mypod && podman pod restart mypod
+podman pod kill mypod && podman pod rm -f mypod</div>
+<div class="cmd-label">Add Containers to Pod</div>
+<div class="cmd-block">podman run -d --pod mypod --name c1 nginx
+podman run -d --pod mypod --name c2 busybox sleep 3600
+podman ps --pod                          # show pod column</div>
+<div class="cmd-label">Kubernetes YAML — migrate to K8s</div>
+<div class="cmd-block">podman generate kube mypod > mypod.yaml
+podman generate kube mypod --service > mypod-svc.yaml
+
+# Re-create from YAML (on another Podman host)
+podman play kube mypod.yaml
+podman play kube --down mypod.yaml       # tear down</div>
+<div class="note"><strong>Infra container:</strong> every pod has a hidden <code>pause</code> infra container that holds the network namespace. Inspect: <code>podman ps -a --pod | grep infra</code></div>
+</div></div></div><div class="content-section la-section" id="pod-s9"><div class="la-section-header"><div class="la-section-icon">🔐</div><div><h2 class="la-section-title">9. Rootless Containers (L2)</h2><p class="la-section-desc">User namespaces · subuid/subgid · Systemd integration · Quadlet (RHEL 10)</p></div></div><div class="la-topic" id="pod-root1"><div class="la-topic-header"><span class="la-topic-num">L2-09</span><h3 class="la-topic-title">Rootless Containers — Architecture & Setup</h3></div><div class="la-topic-body">
+<ul class="slow-flags"><li><strong>No root process</strong> — container UID 0 maps to your unprivileged host UID via user namespaces</li><li><strong>No persistent daemon</strong> — completely eliminates the dockerd root attack surface</li><li><strong>CI/CD safety</strong> — build/run containers in pipelines without giving root to CI agents</li><li><strong>Multi-user</strong> — each user has isolated, invisible container namespaces</li></ul>
+<div class="cmd-label">Setup & Verify Rootless</div>
+<div class="cmd-block">cat /etc/subuid           # username:100000:65536 (required for user namespaces)
+cat /etc/subgid
+
+# If missing, configure:
+usermod --add-subuids 100000-165535 username
+usermod --add-subgids 100000-165535 username
+podman system migrate
+
+# Run rootless — no sudo!
+podman run -d --name rootless-nginx nginx
+podman info | grep -i rootless</div>
+<div class="cmd-label">Rootless + Systemd (auto-start on login)</div>
+<div class="cmd-block">podman generate systemd --name rootless-nginx > ~/.config/systemd/user/container-nginx.service
+systemctl --user daemon-reload
+systemctl --user enable --now container-nginx
+loginctl enable-linger $USER        # keep running after logout
+systemctl --user status container-nginx</div>
+<div class="cmd-label">Quadlet — RHEL 10 native systemd approach</div>
+<div class="cmd-block"># Create: ~/.config/containers/systemd/web.container
+[Unit]
+Description=Nginx Web Container
+
+[Container]
+Image=nginx:latest
+PublishPort=8080:80
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
+
+systemctl --user daemon-reload
+systemctl --user start web</div>
+</div></div></div><div class="content-section la-section" id="pod-s10"><div class="la-section-header"><div class="la-section-icon">🏪</div><div><h2 class="la-section-title">10. Registry Operations (L2)</h2><p class="la-section-desc">Login · Push · Pull · Logout · Registry config · Skopeo</p></div></div><div class="la-topic" id="pod-reg1"><div class="la-topic-header"><span class="la-topic-num">L2-10</span><h3 class="la-topic-title">Registry Operations</h3></div><div class="la-topic-body">
+<div class="cmd-label">Login / Push / Pull / Logout</div>
+<div class="cmd-block">podman login registry.redhat.io
+podman login -u user -p pass registry.example.com
+podman login --authfile /tmp/auth.json registry.example.com   # non-interactive CI
+
+podman tag myapp:latest registry.example.com/myimage:latest
+podman push registry.example.com/myimage:latest
+podman pull registry.example.com/myimage:latest
+
+podman logout registry.redhat.io
+podman logout --all</div>
+<div class="cmd-label">Registry config — /etc/containers/registries.conf</div>
+<div class="cmd-block">[registries.search]
+registries = ['registry.redhat.io', 'quay.io', 'docker.io']
+
+[registries.insecure]
+registries = ['internal.example.com:5000']</div>
+<div class="cmd-label">Skopeo — inspect/copy without pulling</div>
+<div class="cmd-block">skopeo inspect docker://nginx:latest | jq .Labels
+skopeo copy docker://nginx:latest docker://registry.example.com/nginx:latest</div>
+</div></div></div><div class="content-section la-section" id="pod-s11"><div class="la-section-header"><div class="la-section-icon">💿</div><div><h2 class="la-section-title">11. Container Commit & Export (L2)</h2><p class="la-section-desc">commit · save · load · export · import — image portability and backup</p></div></div><div class="la-topic" id="pod-cmt1"><div class="la-topic-header"><span class="la-topic-num">L2-11</span><h3 class="la-topic-title">Container Commit & Export</h3></div><div class="la-topic-body">
+<div class="cmd-label">Commit Container → Image</div>
+<div class="cmd-block">podman commit web myweb:latest
+podman commit --message "Config added" web myweb:v2</div>
+<div class="cmd-label">Save & Load (image tar — preferred for offline transfer)</div>
+<div class="cmd-block">podman save -o myweb.tar myweb:latest
+podman load -i myweb.tar</div>
+<div class="cmd-label">Export & Import (filesystem only — no image metadata)</div>
+<div class="cmd-block">podman export web -o web-fs.tar
+podman import web-fs.tar myweb:imported</div>
+<div class="tbl-wrap"><table><thead><tr><th>Operation</th><th>Includes</th><th>Use Case</th></tr></thead><tbody><tr><td><code>podman save</code></td><td>Image layers + metadata</td><td>Offline image transfer between hosts</td></tr><tr><td><code>podman export</code></td><td>Container filesystem only (flat)</td><td>Snapshot container filesystem</td></tr><tr><td><code>podman commit</code></td><td>Running container → new image</td><td>Capture configured container</td></tr><tr><td><code>podman push</code></td><td>Push to registry</td><td>Best practice for image sharing</td></tr></tbody></table></div>
+</div></div></div><div class="content-section la-section" id="pod-s12"><div class="la-section-header"><div class="la-section-icon">🐋</div><div><h2 class="la-section-title">12. Docker Compatibility (L2)</h2><p class="la-section-desc">Alias · Socket emulation · podman-compose · Docker → Podman migration</p></div></div><div class="la-topic" id="pod-dck1"><div class="la-topic-header"><span class="la-topic-num">L2-12</span><h3 class="la-topic-title">Docker Compatibility</h3></div><div class="la-topic-body">
+<div class="cmd-block">alias docker=podman                         # in ~/.bashrc
+sudo ln -s $(which podman) /usr/local/bin/docker  # system-wide symlink
+
+# Verify — these now run podman
+docker ps && docker images && docker run -d nginx</div>
+<div class="cmd-label">Docker Socket emulation (for apps needing docker.sock)</div>
+<div class="cmd-block">dnf install podman-docker
+systemctl --user start podman.socket
+systemctl --user enable podman.socket
+DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock docker ps</div>
+<div class="tbl-wrap"><table><thead><tr><th>Docker</th><th>Podman</th><th>Notes</th></tr></thead><tbody><tr><td>docker run</td><td>podman run</td><td>Identical syntax</td></tr><tr><td>docker-compose up</td><td>podman-compose up</td><td>Requires podman-compose</td></tr><tr><td>docker swarm</td><td>podman play kube</td><td>Use Kubernetes for orchestration</td></tr><tr><td>docker build</td><td>podman build</td><td>Containerfile or Dockerfile</td></tr></tbody></table></div>
+</div></div></div><div class="content-section la-section" id="pod-s13"><div class="la-section-header"><div class="la-section-icon">🔧</div><div><h2 class="la-section-title">13. Troubleshooting (L2)</h2><p class="la-section-desc">Common issues · Diagnosis commands · SELinux · Rootless · Storage</p></div></div><div class="la-topic" id="pod-trb1"><div class="la-topic-header"><span class="la-topic-num">L2-13</span><h3 class="la-topic-title">Troubleshooting — Issues, Diagnosis & Solutions</h3></div><div class="la-topic-body">
+<div class="tbl-wrap"><table><thead><tr><th>Issue</th><th>Diagnosis</th><th>Solution</th></tr></thead><tbody><tr><td>Container not starting</td><td><code>podman logs &lt;c&gt;</code><br><code>podman inspect &lt;c&gt;</code></td><td>Check exit code + logs. Verify CMD exists in image.</td></tr><tr><td>Port already in use</td><td><code>ss -tulnp | grep &lt;port&gt;</code></td><td>Kill conflicting process or use different host port.</td></tr><tr><td>Image pull failed</td><td><code>podman pull &lt;image&gt; 2>&amp;1</code></td><td>Check internet/DNS, verify registry login.</td></tr><tr><td>Permission denied (rootless)</td><td><code>cat /etc/subuid</code></td><td>Add subuid/subgid entries + <code>podman system migrate</code></td></tr><tr><td>Storage full</td><td><code>podman system df</code></td><td><code>podman system prune -a</code></td></tr><tr><td>Container exits immediately</td><td><code>podman ps -a</code><br><code>podman logs &lt;id&gt;</code></td><td>PID1 must not exit. Debug: <code>podman run --entrypoint bash myimage</code></td></tr><tr><td>SELinux permission denied</td><td><code>ausearch -m avc -ts recent</code></td><td>Add :Z to mount: <code>-v /path:/cpath:Z</code></td></tr><tr><td>DNS not resolving</td><td><code>podman exec web cat /etc/resolv.conf</code></td><td>Create custom network: <code>podman network create</code></td></tr><tr><td>Volume mount empty</td><td><code>podman inspect web | grep Mounts</code></td><td>Check host path exists, SELinux label, volume name.</td></tr><tr><td>OCI runtime error</td><td><code>podman run ... 2>&amp;1</code></td><td>Check crun: <code>rpm -q crun</code></td></tr></tbody></table></div>
+<div class="cmd-label">Advanced diagnostics</div>
+<div class="cmd-block">podman events --since 1h               # all events last hour
+podman --log-level debug run nginx 2>&1 # verbose debug output
+podman system df                        # disk usage breakdown
+podman system reset                     # nuclear option — removes everything</div>
+</div></div></div><div class="content-section la-section" id="pod-s14"><div class="la-section-header"><div class="la-section-icon">⚙️</div><div><h2 class="la-section-title">14. System Management (L2)</h2><p class="la-section-desc">prune · stats · info · version · systemd units · Quadlet (RHEL 10)</p></div></div><div class="la-topic" id="pod-sys1"><div class="la-topic-header"><span class="la-topic-num">L2-14</span><h3 class="la-topic-title">System Management</h3></div><div class="la-topic-body">
+<div class="cmd-label">Disk Usage & Prune</div>
+<div class="cmd-block">podman system df                    # disk usage by category
+podman system df -v                 # verbose breakdown
+podman system prune                 # stopped containers + dangling images
+podman system prune -a              # + all unused images
+podman system prune --volumes       # + unused volumes (careful!)
+podman container prune              # stopped containers only
+podman image prune -a               # unused images only
+podman volume prune                 # unused volumes only</div>
+<div class="cmd-label">System Info & Version</div>
+<div class="cmd-block">podman info                         # full system config
+podman info | grep -A5 "store"      # storage config
+podman info | grep cgroupVersion    # cgroup v1 or v2
+podman --version && podman version  # version details</div>
+</div></div></div><div class="content-section la-section" id="pod-s15"><div class="la-section-header"><div class="la-section-icon">🏭</div><div><h2 class="la-section-title">15. Real Production Scenarios (L3)</h2><p class="la-section-desc">Application isolation · CI/CD pipelines · Security hardening · Disaster recovery</p></div></div><div class="phc-scenario" id="sc-pod-isolation"><div class="phc-scenario-header">🔴 Scenario: Application Isolation — Multi-tier App</div><div class="phc-scenario-body"><p class="phc-scenario-desc">Deploy frontend (Nginx), backend API (Flask), and database (PostgreSQL) on RHEL 10. Each tier isolated, only frontend port exposed externally.</p><div class="cmd-label">Probe Questions</div><ul class="slow-flags" style="margin-bottom:12px"><li>How do you design the network topology?</li><li>How do you handle DB persistence?</li><li>How do you auto-restart on failure?</li></ul><div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div><ul class="slow-flags"><li>Creates frontend-net (nginx+api) and backend-net (api+db). Only API connects to both — database has no external port mapping.</li><li>Named volume for PostgreSQL: <code>podman volume create pgdata</code></li><li>Systemd unit files or Quadlet for auto-restart. Uses <code>--restart=always</code>.</li><li>Generates K8s YAML with <code>podman generate kube</code> for documentation.</li></ul></div></div><div class="phc-scenario" id="sc-pod-cicd"><div class="phc-scenario-header">🔴 Scenario: CI/CD Pipeline — Rootless Build & Push</div><div class="phc-scenario-body"><p class="phc-scenario-desc">Jenkins/GitLab CI runner on shared RHEL 10 — build images, test in containers, push to registry — no root access on runner.</p><div class="cmd-label">Probe Questions</div><ul class="slow-flags" style="margin-bottom:12px"><li>How do you configure rootless Podman in CI?</li><li>How do you authenticate non-interactively?</li><li>How do you cache layers between runs?</li></ul><div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div><ul class="slow-flags"><li>Rootless Podman: no sudo, no docker group, no root daemon.</li><li>Auth via file: <code>podman login --authfile /tmp/auth.json registry.example.com</code>. Credentials as CI secret.</li><li>Build args from env: <code>podman build --build-arg VERSION=$CI_SHA -t myapp .</code></li><li>Pre-pull base image to seed layer cache: <code>podman pull myapp:latest</code> before build.</li></ul></div></div><div class="phc-scenario" id="sc-pod-security"><div class="phc-scenario-header">🔴 Scenario: Security Hardening — Minimal Attack Surface</div><div class="phc-scenario-body"><p class="phc-scenario-desc">Production nginx container: no new privileges, read-only filesystem, dropped capabilities, non-root user, SELinux enforcing.</p><div class="cmd-label">Probe Questions</div><ul class="slow-flags" style="margin-bottom:12px"><li>What flags enforce these requirements?</li><li>How does nginx write pid/tmp files if root filesystem is read-only?</li></ul><div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div><ul class="slow-flags"><li><code>podman run -d --read-only --security-opt no-new-privileges --cap-drop ALL --cap-add NET_BIND_SERVICE --user 1001:1001 nginx</code></li><li>Tmpfs for required write paths: <code>--tmpfs /var/run --tmpfs /var/cache/nginx --tmpfs /tmp</code></li><li>Verify: <code>podman inspect --format "{{.HostConfig.ReadonlyRootfs}}" web</code></li><li>Verify user: <code>podman exec web id</code> — should show UID 1001, NOT root.</li></ul></div></div><div class="phc-scenario" id="sc-pod-dr"><div class="phc-scenario-header">🔴 Scenario: Disaster Recovery — Air-gapped Image Migration</div><div class="phc-scenario-body"><p class="phc-scenario-desc">6 production containers on RHEL 10 must migrate to new hardware. No registry available (air-gapped environment). Minimal downtime.</p><div class="cmd-label">Probe Questions</div><ul class="slow-flags" style="margin-bottom:12px"><li>How do you capture container configurations?</li><li>How do you transfer images without a registry?</li><li>How do you preserve volume data?</li></ul><div class="cmd-label" style="color:var(--green)">Strong Candidate Demonstrates</div><ul class="slow-flags"><li>Save all images: <code>for img in $(podman images -q); do podman save -o images/$img.tar $img; done</code></li><li>Export volumes: <code>podman volume export volname -o volname.tar</code></li><li>Transfer via SCP/rsync. Import on new host: <code>podman load -i image.tar</code>, <code>podman volume import volname volname.tar</code></li><li>Verify: <code>podman ps</code>, <code>podman stats --no-stream</code>, application health checks.</li></ul></div></div></div><div class="content-section la-section" id="pod-s16"><div class="la-section-header"><div class="la-section-icon">📊</div><div><h2 class="la-section-title">L1 → L3 Responsibility Matrix</h2><p class="la-section-desc">Competency breakdown: Basic · Intermediate · Advanced</p></div></div><div class="la-topic" id="pod-mtx1"><div class="la-topic-header"><span class="la-topic-num">MATRIX</span><h3 class="la-topic-title">L1 → L3 Responsibility Matrix</h3></div><div class="la-topic-body">
+<div class="tbl-wrap"><table><thead><tr><th>Level</th><th>Focus</th><th>Responsibilities</th><th>Key Commands</th></tr></thead><tbody><tr><td>L1 Basic</td><td>Container Basics</td><td>Run containers, manage images, volumes & basic troubleshooting</td><td><code>run, ps, images, rmi, logs, exec</code></td></tr><tr><td>L2 Intermediate</td><td>Container Management</td><td>Networks, volumes, pods, registry, rootless, commit/export</td><td><code>network, volume, pod, commit, login, info</code></td></tr><tr><td>L3 Advanced</td><td>Production Admin</td><td>Design, secure, optimise, troubleshoot & automate</td><td><code>inspect, system df, prune, generate kube, events</code></td></tr></tbody></table></div>
+<div class="card-grid">
+  <div class="note"><strong>L1 Must Know</strong><ul class="slow-flags"><li>Run named container detached</li><li>List/start/stop/remove containers</li><li>Pull and remove images</li><li>View logs</li><li>Map ports</li><li>Create/mount named volumes</li><li>Bind mounts with :Z</li></ul></div>
+  <div class="note"><strong>L2 Must Know</strong><ul class="slow-flags"><li>Custom networks + DNS</li><li>Build from Containerfile</li><li>Rootless configuration</li><li>Registry login/push</li><li>Create and manage pods</li><li>Generate systemd units</li><li>Commit containers to images</li></ul></div>
+  <div class="note"><strong>L3 Must Know</strong><ul class="slow-flags"><li>Multi-tier container architecture</li><li>Security hardening flags</li><li>K8s YAML generation</li><li>CI/CD rootless integration</li><li>Disaster recovery image save/load</li><li>Quadlet systemd (RHEL 10)</li><li>Performance tune + resource limits</li></ul></div>
+</div>
+</div></div></div><div class="content-section la-section" id="pod-s17"><div class="la-section-header"><div class="la-section-icon">🎯</div><div><h2 class="la-section-title">Interview Questions — L2/L3</h2><p class="la-section-desc">8 core interview questions with comprehensive model answers</p></div></div><div class="la-topic" id="pod-iq1"><div class="la-topic-header"><span class="la-topic-num">IQ-01</span><h3 class="la-topic-title">Interview Q&A — 8 Core Questions with Model Answers</h3></div><div class="la-topic-body">
+<div class="phc-qa"><div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">1. What is Podman and how is it different from Docker?</span></div><div class="phc-a"><span class="phc-abadge">▸ ANSWER</span>Podman is a <strong>daemonless, rootless, OCI-compliant</strong> container engine. Key differences: (1) No persistent daemon — Docker requires dockerd as root; Podman uses fork/exec with conmon per container. (2) Rootless by default — user namespace maps container root to unprivileged host UID. (3) No single point of failure — containers survive if podman CLI crashes. (4) Native pod support matching Kubernetes semantics. (5) Generates valid K8s YAML natively.</div></div>
+<div class="phc-qa"><div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">2. How do you run a container in detached mode?</span></div><div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><code>podman run -d --name web nginx</code> — <code>-d</code> detaches from terminal. Container runs in background. View output: <code>podman logs web</code>. Attach: <code>podman attach web</code>. Container's PID 1 must be a long-running process — if it exits, the container stops.</div></div>
+<div class="phc-qa"><div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">3. How do you map a host port to a container port?</span></div><div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><code>podman run -d -p 8080:80 nginx</code> — format: <code>-p HOST_PORT:CONTAINER_PORT</code>. Traffic to <code>localhost:8080</code> → container port 80. Bind to specific IP: <code>-p 127.0.0.1:8080:80</code>. Rootless: ports below 1024 need <code>net.ipv4.ip_unprivileged_port_start</code> sysctl.</div></div>
+<div class="phc-qa"><div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">4. What is a pod in Podman?</span></div><div class="phc-a"><span class="phc-abadge">▸ ANSWER</span>A pod groups containers sharing the same <strong>network namespace, IPC namespace</strong> — identical to Kubernetes pods. All containers share one IP, communicate via localhost. Port mappings are at pod level. Create: <code>podman pod create --name mypod -p 8080:80</code>. Add containers: <code>podman run -d --pod mypod --name c1 nginx</code>. Export to K8s: <code>podman generate kube mypod</code>.</div></div>
+<div class="phc-qa"><div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">5. How do you create and use volumes?</span></div><div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><code>podman volume create mydata</code> — Podman-managed storage. Mount: <code>podman run -d -v mydata:/var/lib/mysql mariadb</code>. Persists beyond container removal. Inspect mount path: <code>podman volume inspect mydata</code>. Backup: <code>podman volume export mydata -o backup.tar</code>. Rootless storage: <code>$HOME/.local/share/containers/storage/volumes/</code>.</div></div>
+<div class="phc-qa"><div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">6. How do rootless containers work?</span></div><div class="phc-a"><span class="phc-abadge">▸ ANSWER</span>Uses <strong>Linux user namespaces</strong> — UID 0 inside container maps to your unprivileged host UID. Configured via <code>/etc/subuid</code> and <code>/etc/subgid</code>. Networking uses <code>slirp4netns</code> or <code>pasta</code> (RHEL 10) — userspace TCP/IP, no iptables root required. Cgroup v2 required for resource limits. Verify: <code>podman info | grep rootless</code>.</div></div>
+<div class="phc-qa"><div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">7. How do you troubleshoot a failed container?</span></div><div class="phc-a"><span class="phc-abadge">▸ ANSWER</span>Step 1: <code>podman ps -a</code> — find exited container, note exit code. Step 2: <code>podman logs &lt;container&gt;</code> — read application error. Step 3: <code>podman inspect &lt;container&gt;</code> — check config, mounts, network. Step 4: <code>podman events --since 1h</code> — runtime events. Step 5: SELinux check: <code>ausearch -m avc</code> + add <code>:Z</code>. Step 6: Debug interactively: <code>podman run --entrypoint /bin/sh myimage</code>.</div></div>
+<div class="phc-qa"><div class="phc-q"><span class="phc-badge">Q</span><span class="phc-qtext">8. How do you save and load a container image?</span></div><div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Save:</strong> <code>podman save -o myimage.tar myimage:latest</code> — exports all layers + metadata. <strong>Load:</strong> <code>podman load -i myimage.tar</code>. Air-gap workflow: save → SCP → load on target host. Alternative: <code>podman export</code>/<code>import</code> for filesystem-only snapshot (no image metadata). Best practice: use a registry with <code>push</code>/<code>pull</code> when possible.</div></div>
+</div></div></div><div class="content-section la-section" id="pod-s18"><div class="la-section-header"><div class="la-section-icon">🔬</div><div><h2 class="la-section-title">Deep-Dive Topics</h2><p class="la-section-desc">cgroups v2 · Linux namespaces · Image layers · Storage drivers · Optimisation</p></div></div><div class="la-topic" id="pod-dd1"><div class="la-topic-header"><span class="la-topic-num">DD-01</span><h3 class="la-topic-title">Deep Dive — cgroups v2, Namespaces & Layers</h3></div><div class="la-topic-body">
+<div class="cmd-label">cgroups v2 — Resource enforcement</div>
+<div class="cmd-block">podman run -d --cpus 1.5 nginx             # 1.5 CPU limit
+podman run -d --memory 512m nginx          # 512 MB RAM
+podman run -d --memory-swap 1g nginx       # RAM + swap = 1GB
+podman run -d --cpuset-cpus 0,1 nginx      # pin to cores 0 and 1
+podman stats --no-stream --format json    # resource snapshot</div>
+<div class="tbl-wrap"><table><thead><tr><th>Namespace</th><th>Isolates</th><th>Podman Usage</th></tr></thead><tbody><tr><td>PID</td><td>Process tree starting at PID 1</td><td>Each container gets own PID namespace</td></tr><tr><td>Network</td><td>Interfaces, routing</td><td>Each container gets veth pair + bridge</td></tr><tr><td>Mount</td><td>Filesystem view</td><td>Container / = image layers (overlay)</td></tr><tr><td>IPC</td><td>SysV IPC, message queues</td><td>Isolated by default; shared in pods</td></tr><tr><td>UTS</td><td>Hostname</td><td>Container has own hostname</td></tr><tr><td>User</td><td>UID/GID mapping</td><td>Rootless maps UID 0 → host UID</td></tr><tr><td>Cgroup</td><td>Cgroup tree visibility</td><td>Container sees only its cgroup slice</td></tr></tbody></table></div>
+<div class="cmd-label">Image layer inspection</div>
+<div class="cmd-block">podman history nginx:latest          # show all layers + sizes
+podman history --no-trunc nginx:latest  # full commands
+podman info | grep graphDriver          # storage driver (overlay on RHEL)
+
+# Layer cache optimisation in Containerfile:
+# BAD — invalidates cache every build:
+COPY . /app
+RUN pip install -r /app/requirements.txt
+
+# GOOD — stable layer first:
+COPY requirements.txt /app/
+RUN pip install -r /app/requirements.txt   # cached
+COPY . /app                                # only rebuilds when src changes</div>
+</div></div></div><div class="content-section la-section" id="pod-s19"><div class="la-section-header"><div class="la-section-icon">📋</div><div><h2 class="la-section-title">Quick Reference Cheat Sheet</h2><p class="la-section-desc">40 essential Podman commands organised by category — L1 to L3</p></div></div><div class="la-topic" id="pod-qr1"><div class="la-topic-header"><span class="la-topic-num">REF</span><h3 class="la-topic-title">Quick Reference Cheat Sheet — All Essential Commands</h3></div><div class="la-topic-body">
+<div class="tbl-wrap"><table><thead><tr><th>Category</th><th>Command</th><th>Description</th></tr></thead><tbody><tr><td>Container</td><td><code>podman run -d --name web nginx</code></td><td>Run detached named container</td></tr><tr><td>Container</td><td><code>podman run -it ubi9 bash</code></td><td>Interactive shell</td></tr><tr><td>Container</td><td><code>podman run --rm alpine date</code></td><td>Run & auto-remove</td></tr><tr><td>Container</td><td><code>podman ps -a</code></td><td>List all containers</td></tr><tr><td>Container</td><td><code>podman stop/start/restart web</code></td><td>Lifecycle control</td></tr><tr><td>Container</td><td><code>podman rm -f web</code></td><td>Force remove</td></tr><tr><td>Container</td><td><code>podman container prune</code></td><td>Remove all stopped</td></tr><tr><td>Image</td><td><code>podman pull nginx:latest</code></td><td>Pull image</td></tr><tr><td>Image</td><td><code>podman images</code></td><td>List images</td></tr><tr><td>Image</td><td><code>podman rmi nginx:latest</code></td><td>Remove image</td></tr><tr><td>Image</td><td><code>podman image prune -a</code></td><td>Remove all unused</td></tr><tr><td>Image</td><td><code>podman build -t myapp:v1 .</code></td><td>Build from Containerfile</td></tr><tr><td>Image</td><td><code>podman save -o img.tar myapp:v1</code></td><td>Export to tar</td></tr><tr><td>Image</td><td><code>podman load -i img.tar</code></td><td>Import from tar</td></tr><tr><td>Interact</td><td><code>podman exec -it web bash</code></td><td>Shell into container</td></tr><tr><td>Interact</td><td><code>podman logs -f web</code></td><td>Follow logs</td></tr><tr><td>Interact</td><td><code>podman inspect web</code></td><td>Full metadata JSON</td></tr><tr><td>Interact</td><td><code>podman stats</code></td><td>Live resource usage</td></tr><tr><td>Interact</td><td><code>podman cp web:/etc/nginx.conf .</code></td><td>Copy from container</td></tr><tr><td>Network</td><td><code>podman network create mynet</code></td><td>Create bridge network</td></tr><tr><td>Network</td><td><code>podman network ls</code></td><td>List networks</td></tr><tr><td>Network</td><td><code>podman port web</code></td><td>Show port mappings</td></tr><tr><td>Volume</td><td><code>podman volume create mydata</code></td><td>Create volume</td></tr><tr><td>Volume</td><td><code>podman volume ls/inspect/rm</code></td><td>Manage volumes</td></tr><tr><td>Volume</td><td><code>podman volume export/import</code></td><td>Backup/restore</td></tr><tr><td>Pod</td><td><code>podman pod create --name mypod -p 8080:80</code></td><td>Create pod</td></tr><tr><td>Pod</td><td><code>podman pod ps</code></td><td>List pods</td></tr><tr><td>Pod</td><td><code>podman generate kube mypod</code></td><td>Export to K8s YAML</td></tr><tr><td>Pod</td><td><code>podman play kube mypod.yaml</code></td><td>Create from K8s YAML</td></tr><tr><td>Registry</td><td><code>podman login registry.redhat.io</code></td><td>Login to registry</td></tr><tr><td>Registry</td><td><code>podman push myapp:v1 registry.example.com/myapp:v1</code></td><td>Push image</td></tr><tr><td>System</td><td><code>podman system df</code></td><td>Disk usage</td></tr><tr><td>System</td><td><code>podman system prune -a</code></td><td>Remove all unused</td></tr><tr><td>System</td><td><code>podman info</code></td><td>System config</td></tr><tr><td>System</td><td><code>podman events --since 1h</code></td><td>Recent events</td></tr><tr><td>Security</td><td><code>podman run --read-only --security-opt no-new-privileges --cap-drop ALL</code></td><td>Hardened run</td></tr><tr><td>Rootless</td><td><code>cat /etc/subuid && cat /etc/subgid</code></td><td>Check user namespace config</td></tr><tr><td>Rootless</td><td><code>podman system migrate</code></td><td>Apply rootless configuration</td></tr><tr><td>Systemd</td><td><code>podman generate systemd --name web</code></td><td>Generate unit file</td></tr><tr><td>Docker</td><td><code>alias docker=podman</code></td><td>Docker compatibility alias</td></tr></tbody></table></div>
+</div></div></div></main>
+  <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#pod-s1" class="toc-link">🦭 1. Podman Overview</a><a href="#pod-s2" class="toc-link">📦 2. Image Management</a><a href="#pod-s3" class="toc-link">♻️ 3. Container Lifecycle</a><a href="#pod-s4" class="toc-link">🔗 4. Container Interaction</a><a href="#pod-s5" class="toc-link">🌐 5. Ports & Networking</a><a href="#pod-s6" class="toc-link">💾 6. Volumes Management</a><a href="#pod-s7" class="toc-link">📂 7. Bind Mounts</a><a href="#pod-s8" class="toc-link">🫛 8. Pods</a><a href="#pod-s9" class="toc-link">🔐 9. Rootless Containers</a><a href="#pod-s10" class="toc-link">🏪 10. Registry Operations</a><a href="#pod-s11" class="toc-link">💿 11. Commit & Export</a><a href="#pod-s12" class="toc-link">🐋 12. Docker Compatibility</a><a href="#pod-s13" class="toc-link">🔧 13. Troubleshooting</a><a href="#pod-s14" class="toc-link">⚙️ 14. System Management</a><a href="#pod-s15" class="toc-link">🏭 15. Production Scenarios</a><a href="#pod-s16" class="toc-link">📊 L1→L3 Matrix</a><a href="#pod-s17" class="toc-link">🎯 Interview Q&A</a><a href="#pod-s18" class="toc-link">🔬 Deep-Dive Topics</a><a href="#pod-s19" class="toc-link">📋 Quick Reference</a></nav>
+</div>
+<button id="btt">↑</button>
+<footer id="site-footer">
+  <span>RootReady — Technical Reference Library</span>
+  <span>L3 SysAdmin Interview Prep</span>
+</footer>
+<script>
+const pr=document.getElementById('prog'),bt=document.getElementById('btt');
+addEventListener('scroll',function(){const h=document.documentElement,s=h.scrollTop||document.body.scrollTop,m=(h.scrollHeight||document.body.scrollHeight)-h.clientHeight;if(pr)pr.style.width=(m>0?Math.min(s/m*100,100):0)+'%';if(bt)bt.classList.toggle('vis',s>280);},{passive:true});
+function toggleNav(){const n=document.getElementById('site-nav'),o=document.getElementById('mob-ov');n.classList.toggle('open');o.classList.toggle('on');}
+
+</script>
+</body>
+</html>
