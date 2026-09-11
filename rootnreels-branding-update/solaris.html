@@ -3,7 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oracle Solaris — RootReady</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
+<meta name="theme-color" content="#12161c">
+<meta name="description" content="Oracle Solaris — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Oracle Solaris — root_n_reels">
+<meta property="og:description" content="Oracle Solaris — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
+<meta property="og:image" content="https://www.rootnreels.in/assets/logo-lockup.png">
+<meta property="og:url" content="https://www.rootnreels.in/solaris.html">
+<meta name="twitter:card" content="summary_large_image">
+<title>Oracle Solaris — root_n_reels</title>
 <link rel="stylesheet" href="studyhub.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
@@ -20,9 +31,10 @@ body { display:flex; flex-direction:column; min-height:100vh; }
   border-bottom:2px solid var(--blue);
   box-shadow:0 2px 20px rgba(20,30,50,.18);
 }
-.logo { font-family:var(--font-head); font-weight:800; font-size:1.1rem;
-  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0; }
+.logo{font-family:var(--font-head); font-weight:800; font-size:1.1rem;
+  color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0;display:inline-flex;align-items:center}
 .logo span { color:var(--accent); }
+.logo-img{height:28px;width:28px;border-radius:7px;vertical-align:middle;margin-right:9px;flex-shrink:0}
 .page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
 .topbar-spacer { flex:1; }
 #menu-btn { display:none; background:rgba(20,30,50,.1); border:1px solid rgba(20,30,50,.15);
@@ -237,7 +249,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <body>
 
 <div id="site-topbar">
-  <a href="index.html" class="logo">Root<span>Ready</span></a>
+  <a href="index.html" class="logo"><img src="assets/logo-icon.png" alt="root_n_reels" class="logo-img">root<span>_n_</span>reels</a>
   <span class="page-title-bar">Oracle Solaris Administration</span>
   <div class="topbar-spacer"></div>
   <button id="menu-btn">☰</button>
@@ -267,6 +279,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 
 <a href="ansible.html" class="nav-link">🤖 Ansible AAP</a>
 <a href="devops-bible.html" class="nav-link">♾️ DevOps Bible</a>
+<a href="index.html#contact" class="nav-link ">✉️ Contact</a>
 </nav>
 
   <main id="main-content">
@@ -1995,8 +2008,10 @@ dmesg</div>
 <button id="btt">↑</button>
 
 <footer id="site-footer">
-  <span>RootReady — Technical Reference Library</span>
+  <span>root_n_reels — Technical Reference Library</span>
   <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
+  <span>Vishal Sharma · <a href="mailto:admvishal24@gmail.com">admvishal24@gmail.com</a> · <a href="https://www.rootnreels.in">www.rootnreels.in</a></span>
+  <span><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram</a> · <a href="https://youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube</a></span>
 </footer>
 
 <script>
