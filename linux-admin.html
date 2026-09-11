@@ -35,9 +35,9 @@ body { display:flex; flex-direction:column; min-height:100vh; }
   color:#fff; text-decoration:none; letter-spacing:.04em; flex-shrink:0;display:inline-flex;align-items:center}
 .logo span { color:var(--accent); }
 .logo-img{height:28px;width:28px;border-radius:7px;vertical-align:middle;margin-right:9px;flex-shrink:0}
-.page-title-bar { font-size:.72rem; color:var(--text3); font-weight:300; }
+.page-title-bar{font-size:.72rem;color:var(--text3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
 .topbar-spacer { flex:1; }
-#menu-btn { display:none; background:rgba(20,30,50,.1); border:1px solid rgba(20,30,50,.15);
+#menu-btn{display:none;margin-left:auto;flex-shrink:0;background:rgba(20,30,50,.1);border:1px solid rgba(20,30,50,.15);
   border-radius:8px; color:#fff; padding:6px 10px; cursor:pointer; font-size:1rem; }
 
 /* progress bar */
@@ -195,6 +195,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
     transition:transform .25s cubic-bezier(.4,0,.2,1); }
   #site-nav.open { transform:translateX(0); }
   #menu-btn { display:block; }
+  .page-title-bar { display:none; }
   #main-content { padding:20px 16px; }
   #site-footer { padding:16px; flex-direction:column; gap:6px; text-align:center; }
 }
@@ -251,7 +252,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
   <a href="index.html" class="logo"><img src="assets/logo-icon.png" alt="root_n_reels" class="logo-img">root<span>_n_</span>reels</a>
   <span class="page-title-bar">Linux & Unix SysAdmin Reference</span>
   <div class="topbar-spacer"></div>
-  <button id="menu-btn">☰</button>
+  <button id="menu-btn" onclick="toggleNav()">☰</button>
 </div>
 <div id="prog"></div>
 <div id="mob-ov"></div>
