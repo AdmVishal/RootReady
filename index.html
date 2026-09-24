@@ -211,6 +211,10 @@ tr:hover td { background:rgba(20,30,50,.025); }
 .rr-linux-guide-button{display:inline-block;background:var(--teal);color:#071b1a!important;padding:11px 18px;border-radius:8px;font-weight:700;text-decoration:none;transition:transform .15s,filter .15s}
 .rr-linux-guide-button:hover{transform:translateY(-2px);filter:brightness(1.08)}
 
+
+/* Phase 1 professional homepage enhancements */
+.rr-hero-panel{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:24px;align-items:stretch;margin:0 0 34px;padding:30px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(135deg,rgba(27,79,138,.20),rgba(20,184,166,.08))}
+.rr-hero-panel h2{font-size:clamp(1.45rem,3vw,2.25rem);line-height:1.12;margin:0 0 12px}.rr-hero-panel p{font-size:1rem;line-height:1.75;color:var(--text2);margin:0 0 18px;max-width:680px}.rr-hero-actions{display:flex;flex-wrap:wrap;gap:10px}.rr-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:9px;text-decoration:none!important;font-weight:700;font-size:.82rem;transition:transform .15s,filter .15s}.rr-btn:hover{transform:translateY(-2px);filter:brightness(1.08)}.rr-btn-primary{background:var(--accent);color:#17120a!important}.rr-btn-secondary{background:var(--blue);color:#fff!important}.rr-hero-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.rr-stat{padding:16px;border:1px solid var(--border);border-radius:11px;background:rgba(255,255,255,.035)}.rr-stat strong{display:block;font-family:var(--font-head);font-size:1.35rem;color:var(--text)}.rr-stat span{display:block;color:var(--text3);font-size:.72rem;margin-top:4px}.rr-section-heading{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:0 0 16px}.rr-section-heading h2{margin:0}.rr-section-heading p{margin:0;color:var(--text3);font-size:.8rem}.rr-path-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:34px}.rr-path-card{display:block;padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--surface);text-decoration:none!important;transition:transform .15s,border-color .15s,box-shadow .15s}.rr-path-card:hover{transform:translateY(-3px);border-color:var(--sky);box-shadow:0 8px 24px rgba(0,0,0,.08)}.rr-path-icon{font-size:1.8rem;margin-bottom:10px}.rr-path-card h3{margin:0 0 7px;font-size:1rem;color:var(--text)}.rr-path-card p{margin:0;color:var(--text2);font-size:.82rem;line-height:1.6}.rr-path-link{display:inline-block;margin-top:12px;color:var(--sky);font-size:.76rem;font-weight:700}.rr-updated-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:34px}.rr-updated-item{display:flex;gap:12px;align-items:flex-start;padding:15px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}.rr-updated-icon{font-size:1.25rem}.rr-updated-item strong{display:block;font-size:.86rem;color:var(--text)}.rr-updated-item span{display:block;font-size:.74rem;color:var(--text3);margin-top:4px}@media(max-width:760px){.rr-hero-panel{grid-template-columns:1fr;padding:22px}.rr-hero-stats{grid-template-columns:repeat(4,minmax(0,1fr))}.rr-stat{padding:10px 8px}.rr-stat strong{font-size:1rem}.rr-stat span{font-size:.62rem}}@media(max-width:480px){.rr-hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -228,6 +232,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
   <nav id="site-nav">
     <div class="nav-sec">Navigation</div>
     <a href="index.html" class="nav-link active">🏠 Home</a>
+<a href="start-here.html" class="nav-link">🚀 Start Here</a>
 <a href="rhel.html" class="nav-link ">🐧 RHEL</a>
 <a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
 <a href="linux-guide/index.html" class="nav-link ">📘 Linux Guide</a>
@@ -241,6 +246,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <a href="podman.html" class="nav-link ">🦭 Podman</a>
 <a href="ansible.html" class="nav-link ">🤖 Ansible AAP</a>
 <a href="devops-bible.html" class="nav-link">♾️ DevOps Bible</a>
+<a href="about.html" class="nav-link">ℹ️ About</a>
 <a href="index.html#contact" class="nav-link ">✉️ Contact</a>
 
 
@@ -257,6 +263,8 @@ tr:hover td { background:rgba(20,30,50,.025); }
     <span class="badge badge-gold">RHEL · Solaris · Ansible AAP · DevOps · Nutanix</span>
  </div>
 </div>
+
+<section class="rr-hero-panel" aria-labelledby="rr-home-hero-title"><div><div class="badge badge-green" style="display:inline-block;margin-bottom:12px">TECHNICAL LEARNING HUB</div><h2 id="rr-home-hero-title">Practical knowledge for Linux, UNIX &amp; modern infrastructure.</h2><p>Explore hands-on administration guides, interview preparation, troubleshooting references, and infrastructure learning resources — organized for engineers who want clear explanations and useful commands.</p><div class="rr-hero-actions"><a class="rr-btn rr-btn-primary" href="linux-guide/index.html">📘 Explore Linux Guide</a><a class="rr-btn rr-btn-secondary" href="#resources">Browse Resources ↓</a><a class="rr-btn" style="border:1px solid var(--border);color:var(--text)" href="https://youtube.com/@root_n_reels" target="_blank" rel="noopener">▶️ YouTube Channel</a></div></div><div class="rr-hero-stats"><div class="rr-stat"><strong>15+</strong><span>Technical Topics</span></div><div class="rr-stat"><strong>500+</strong><span>Interview Q&amp;As</span></div><div class="rr-stat"><strong>L1 → L3</strong><span>Learning Depth</span></div><div class="rr-stat"><strong>Free</strong><span>Open Reference</span></div></div></section><section aria-labelledby="rr-paths-title"><div class="rr-section-heading"><div><h2 id="rr-paths-title">🧭 Learning Paths</h2><p>Choose a direction and start learning.</p></div></div><div class="rr-path-grid"><a class="rr-path-card" href="linux-guide/index.html"><div class="rr-path-icon">🐧</div><h3>Linux Administrator</h3><p>Linux fundamentals, storage, networking, security, performance and troubleshooting.</p><span class="rr-path-link">Start Linux path →</span></a><a class="rr-path-card" href="solaris.html"><div class="rr-path-icon">☀️</div><h3>UNIX Administrator</h3><p>Solaris, HP-UX, enterprise UNIX operations, filesystems and platform-specific tools.</p><span class="rr-path-link">Explore UNIX resources →</span></a><a class="rr-path-card" href="devops-bible.html"><div class="rr-path-icon">⚙️</div><h3>DevOps Engineer</h3><p>Git, containers, Ansible, CI/CD, cloud concepts, automation and operational practices.</p><span class="rr-path-link">Explore DevOps →</span></a><a class="rr-path-card" href="network-ref.html"><div class="rr-path-icon">🌐</div><h3>Infrastructure Engineer</h3><p>Networking, HCI, server hardware, virtualization and enterprise infrastructure references.</p><span class="rr-path-link">Explore infrastructure →</span></a><a class="rr-path-card" href="os-interview.html"><div class="rr-path-icon">🎯</div><h3>Interview Preparation</h3><p>Scenario-based questions and L3-level preparation across operating systems and operations.</p><span class="rr-path-link">Prepare for interviews →</span></a></div></section><section aria-labelledby="rr-featured-title"><div class="rr-section-heading"><div><h2 id="rr-featured-title">✨ Featured Resources</h2><p>Useful starting points from the library.</p></div></div><div class="rr-updated-list"><a class="rr-updated-item" style="text-decoration:none" href="linux-guide/index.html"><div class="rr-updated-icon">📘</div><div><strong>Complete Linux Administration Guide</strong><span>28 detailed chapters · Beginner to advanced</span></div></a><a class="rr-updated-item" style="text-decoration:none" href="podman.html"><div class="rr-updated-icon">🦭</div><div><strong>Podman Containers Deep Dive</strong><span>Rootless containers · RHEL 10 · Practical labs</span></div></a><a class="rr-updated-item" style="text-decoration:none" href="ansible.html"><div class="rr-updated-icon">🤖</div><div><strong>Ansible Automation Platform Lab</strong><span>Controller · Workflows · RBAC · REST API</span></div></a></div></section><div id="resources"></div>
 
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:40px">
 
@@ -420,6 +428,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 
 
+
   <a href="devops-bible.html" style="text-decoration:none">
     <div class="section-card" style="border-top:3px solid #6366f1;cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderTopColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderTopColor='#6366f1';this.style.transform=''">
       <div style="font-size:2rem;margin-bottom:10px">♾️</div>
@@ -497,7 +506,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <footer id="site-footer">
-  <span>root_n_reels — Technical Reference Library</span>
+  <span>root_n_reels — Technical Reference Library · <a href="about.html">About</a> · <a href="start-here.html">Start Here</a></span>
   <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
   <span>Vishal Sharma · <a href="mailto:admvishal24@gmail.com">admvishal24@gmail.com</a> · <a href="https://www.rootnreels.in">www.rootnreels.in</a></span>
   <span><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram</a> · <a href="https://youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube</a></span>
