@@ -1,0 +1,10 @@
+{
+  "name": "root_n_reels \u2014 Technical Learning Hub",
+  "short_name": "root_n_reels",
+  "description": "Practical Linux, UNIX, DevOps, networking and infrastructure learning resources.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": []
+}
