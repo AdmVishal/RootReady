@@ -1,0 +1,6 @@
+{
+  "filesystem-read-only": {"instagram": "", "youtube": ""},
+  "disk-full": {"instagram": "", "youtube": ""},
+  "high-load": {"instagram": "", "youtube": ""},
+  "service-wont-start": {"instagram": "", "youtube": ""}
+}

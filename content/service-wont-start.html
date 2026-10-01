@@ -1,0 +1,67 @@
+<div class="rr-callout quick"><div><span class="t">Quick answer</span>
+<p>Run <code>systemctl status SERVICE -l --no-pager</code> and <code>journalctl -xeu SERVICE --no-pager</code>. The exit status and the last log lines usually name the cause: bad configuration, a missing binary or user, a port already in use, permissions or SELinux, or an unmet dependency.</p></div></div>
+
+<h2>Step 1: read what systemd tells you</h2>
+<pre>$ systemctl status httpd -l --no-pager
+$ journalctl -xeu httpd --no-pager | tail -40
+$ systemctl cat httpd                  # the unit as systemd sees it, including drop-ins</pre>
+<pre class="output">httpd.service - The Apache HTTP Server
+   Active: failed (Result: exit-code) since Tue 2026-10-01 02:14:09 IST
+  Process: 2210 ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND (code=exited, status=1/FAILURE)
+ Main PID: 2210 (code=exited, status=1/FAILURE)
+httpd[2210]: AH00072: make_sock: could not bind to address [::]:80</pre>
+
+<h2>Step 2: match the symptom</h2>
+<table>
+<tr><th>What you see</th><th>Likely cause</th><th>Check</th></tr>
+<tr><td><code>status=1/FAILURE</code> and an application error in the log</td><td>Configuration error</td><td>Test the config: <code>httpd -t</code>, <code>nginx -t</code>, <code>sshd -t</code>, <code>named-checkconf</code></td></tr>
+<tr><td>“could not bind”, “Address already in use”</td><td>Port taken by another process</td><td><code>ss -ltnp | grep :80</code></td></tr>
+<tr><td><code>status=203/EXEC</code></td><td>ExecStart binary missing, wrong path or not executable</td><td><code>ls -l</code> the path, check <code>systemctl cat</code></td></tr>
+<tr><td><code>status=217/USER</code> or <code>216/GROUP</code></td><td>User or group in the unit does not exist</td><td><code>id USER</code></td></tr>
+<tr><td><code>status=200/CHDIR</code></td><td>WorkingDirectory missing</td><td>Create it or fix the unit</td></tr>
+<tr><td>“Permission denied” but modes look right</td><td>SELinux</td><td><code>ausearch -m avc -ts recent</code></td></tr>
+<tr><td><code>Result: timeout</code></td><td>Slow start or Type mismatch (<code>Type=notify</code> vs <code>simple</code>)</td><td>Raise <code>TimeoutStartSec</code>, check the unit type</td></tr>
+<tr><td><code>Result: start-limit-hit</code></td><td>Restarted too often too fast</td><td>Fix the cause, then <code>systemctl reset-failed SERVICE</code></td></tr>
+<tr><td>“Dependency failed”</td><td>A required unit or mount is down</td><td><code>systemctl list-dependencies SERVICE</code></td></tr>
+</table>
+
+<h2>Step 3: fix and verify</h2>
+<pre># after editing a unit file or drop-in
+$ sudo systemctl daemon-reload
+$ sudo systemctl reset-failed SERVICE
+$ sudo systemctl start SERVICE
+$ systemctl is-active SERVICE; systemctl is-enabled SERVICE
+# make it start at boot and now
+$ sudo systemctl enable --now SERVICE</pre>
+<p>If the cause is an SELinux label, restore it instead of disabling SELinux:</p>
+<pre>$ ls -lZ /path/to/file
+$ sudo restorecon -Rv /path/to/dir
+$ sudo semanage port -l | grep http        # non-standard port? add it with semanage port -a</pre>
+<div class="rr-callout warn"><div><span class="t">Diagnosis only</span>
+<p><code>setenforce 0</code> switches SELinux to permissive until reboot. It is useful for a quick test to see whether SELinux is the cause, but do not leave it that way: fix the label or boolean and switch back with <code>setenforce 1</code>.</p></div></div>
+
+<h2>Starts by hand but not at boot</h2>
+<ul>
+<li>It is not enabled: <code>systemctl enable SERVICE</code>.</li>
+<li>It starts before something it needs (network, a mount, a database). Add <code>After=</code> and <code>Requires=</code> or <code>network-online.target</code>.</li>
+<li>A mount in <code>/etc/fstab</code> is slow or failing. Check <code>systemctl --failed</code> and <code>findmnt --verify</code>.</li>
+</ul>
+
+<h2>Common mistakes</h2>
+<ul>
+<li>Looking only at <code>systemctl status</code> and not at the journal.</li>
+<li>Editing <code>/usr/lib/systemd/system/*.service</code> directly; use <code>systemctl edit SERVICE</code> (drop-ins survive updates).</li>
+<li>Forgetting <code>daemon-reload</code> after changing a unit.</li>
+<li>Disabling SELinux or the firewall to “make it work”.</li>
+</ul>
+
+<h2>Production considerations</h2>
+<div class="rr-callout prod"><div><span class="t">Production</span>
+<p>Validate configuration before restarting a live service (<code>-t</code> options), keep a copy of the working config, and test changes on one node of a load-balanced pool first. Record the root cause so the next on-call engineer does not repeat the search.</p></div></div>
+
+<h2>Interview questions</h2>
+<details class="rr-d"><summary>A service fails after reboot but starts manually. Why?</summary><div>
+<p>Typical causes: not enabled, ordering or dependency problems (network or mounts not ready), a failing fstab mount, or an environment difference between your shell and systemd. Check <code>journalctl -b -u SERVICE</code> and <code>systemctl list-dependencies</code>.</p></div></details>
+<details class="rr-d"><summary>What does status=203/EXEC mean?</summary><div>
+<p>systemd could not execute the <code>ExecStart</code> command: wrong path, missing file, or no execute permission (or an SELinux denial).</p></div></details>
+<p>More: <a href="/rhel.html#rhel-managing-services-daemons">Managing services and daemons</a> · <a href="/linux-guide/#systemd-services-start-stop-and-boot">systemd chapter</a> · <a href="/rhel.html#troubleshooting-selinux-denials">Troubleshooting SELinux denials</a>.</p>

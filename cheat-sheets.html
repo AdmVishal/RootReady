@@ -1,1 +1,378 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Linux Cheat Sheets | root_n_reels</title><link rel="stylesheet" href="studyhub.css"><style>main{max-width:1100px;margin:90px auto;padding:24px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:12px;border:1px solid var(--border);text-align:left}code{font-family:var(--font-mono)}.btn{padding:10px 14px;border:0;border-radius:8px;cursor:pointer}</style></head><body><main><p><a href="index.html">← Home</a> · <a href="youtube.html">📺 YouTube Tutorials</a></p><h1>Linux Cheat Sheets</h1><p>Quick command references for daily administration and interview preparation.</p><button class="btn" onclick="print()">Print / Save PDF</button><table><tr><th>Task</th><th>Command</th></tr><tr><td>System identity</td><td><code>uname -a</code></td></tr><tr><td>Memory usage</td><td><code>free -h</code></td></tr><tr><td>Disk usage</td><td><code>df -h</code></td></tr><tr><td>Directory size</td><td><code>du -sh /path</code></td></tr><tr><td>Processes</td><td><code>ps -ef</code></td></tr><tr><td>Live process view</td><td><code>top</code></td></tr><tr><td>Network sockets</td><td><code>ss -tulnp</code></td></tr><tr><td>Recent logs</td><td><code>journalctl -xe</code></td></tr><tr><td>Service status</td><td><code>systemctl status SERVICE</code></td></tr><tr><td>Find files</td><td><code>find / -name filename</code></td></tr></table><footer id="site-footer">root_n_reels · <a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a> · <a href="https://youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube</a></footer></main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linux Cheat Sheet: Commands, LVM, systemd, Networking, Performance, Podman, Git | root_n_reels</title>
+<!--rr:head-->
+<meta name="description" content="Printable Linux command cheat sheets for daily administration: filesystems, LVM, systemd, networking, processes, performance, SELinux, Solaris, Podman, Ansible and Git.">
+<link rel="canonical" href="https://www.rootnreels.in/cheat-sheets.html">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="Linux Cheat Sheet: Commands, LVM, systemd, Networking, Performance, Podman, Git | root_n_reels"><meta property="og:description" content="Printable Linux command cheat sheets for daily administration: filesystems, LVM, systemd, networking, processes, performance, SELinux, Solaris, Podman, Ansible and Git.">
+<meta property="og:url" content="https://www.rootnreels.in/cheat-sheets.html"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Linux Cheat Sheet: Commands, LVM, systemd, Networking, Performance, Podman, Git | root_n_reels"><meta name="twitter:description" content="Printable Linux command cheat sheets for daily administration: filesystems, LVM, systemd, networking, processes, performance, SELinux, Solaris, Podman, Ansible and Git."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"Linux & Unix Cheat Sheets","item":"https://www.rootnreels.in/cheat-sheets.html"}]},{"@type":"TechArticle","headline":"Linux & Unix Cheat Sheets","description":"Printable Linux command cheat sheets for daily administration: filesystems, LVM, systemd, networking, processes, performance, SELinux, Solaris, Podman, Ansible and Git.","url":"https://www.rootnreels.in/cheat-sheets.html","mainEntityOfPage":"https://www.rootnreels.in/cheat-sheets.html","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-10-01","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Beginner"}]}</script>
+<!--/rr:head-->
+</head>
+<body class="rr rr-new" data-rr-new data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/">Linux</a><a href="/unix/">Unix</a><a href="/networking/">Networking</a><a href="/devops/">DevOps</a><a href="/troubleshooting/">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html" aria-current="page">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header-->
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+<div class="site-body">
+<!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
+<main id="main-content">
+<nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Linux &amp; Unix Cheat Sheets</li></ol></nav><header class="rr-page-head"><h1>Linux &amp; Unix Cheat Sheets</h1><p class="rr-lead">Printable Linux command cheat sheets for daily administration: filesystems, LVM, systemd, networking, processes, performance, SELinux, Solaris, Podman, Ansible and Git.</p></header><div class="rr-meta"><span class="chip">L1–L3</span><span class="chip">Cheat sheet</span><span>6 min read</span> <span>Updated <time datetime="2026-10-01">2026-10-01</time></span> <span>by Vishal Sharma</span><span class="acts"><button type="button" class="rr-act" data-rr-save aria-pressed="false"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Save</span></button><button type="button" class="rr-act" data-rr-share><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span class="lbl">Share</span></button><button type="button" class="rr-act" data-rr-print><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">Print</span></button></span></div><div class="rr-prose" id="article"><p class="rr-lead">Copy-ready commands grouped by task. Run as root or with <code>sudo</code> where needed, and test in a lab before production. Press <kbd>/</kbd> to search the whole site.</p>
+<div data-rr-widget="cheats">
+<label class="sr-only" for="cs-filter">Filter commands</label>
+<input id="cs-filter" class="rr-cs-filter" type="search" placeholder="Filter this page (e.g. lvm, systemctl, tar)…" autocomplete="off">
+<p id="cs-count" class="rr-empty" aria-live="polite"></p>
+<nav class="rr-cs-nav" aria-label="Cheat sheet sections">
+<a class="rr-chip" href="#cs-filesystem">Files &amp; filesystems</a><a class="rr-chip" href="#cs-storage">Disks</a><a class="rr-chip" href="#cs-lvm">LVM &amp; multipath</a>
+<a class="rr-chip" href="#cs-systemd">systemd</a><a class="rr-chip" href="#cs-logs">Logs</a><a class="rr-chip" href="#cs-process">Processes</a><a class="rr-chip" href="#cs-perf">Performance</a>
+<a class="rr-chip" href="#cs-network">Networking</a><a class="rr-chip" href="#cs-selinux">SELinux</a><a class="rr-chip" href="#cs-users">Users &amp; sudo</a><a class="rr-chip" href="#cs-text">Text tools</a>
+<a class="rr-chip" href="#cs-packages">Packages</a><a class="rr-chip" href="#cs-solaris">Solaris</a><a class="rr-chip" href="#cs-podman">Podman</a><a class="rr-chip" href="#cs-ansible">Ansible</a><a class="rr-chip" href="#cs-git">Git</a>
+</nav>
+
+<section class="rr-cs" id="cs-filesystem"><h2 id="files-filesystems">Files &amp; filesystems</h2>
+<pre><span class="cmt"># usage and type</span>
+df -hT
+df -i                                   # inodes
+du -xh --max-depth=1 /var | sort -h     # biggest directories, one filesystem
+find / -xdev -type f -size +500M        # big files
+lsof +L1                                # deleted files still open
+findmnt                                 # mount tree
+findmnt --verify                        # validate /etc/fstab
+mount -o remount,rw /mountpoint         # remount read-write
+<span class="cmt"># permissions</span>
+ls -lZ file                             # mode, owner and SELinux context
+chmod 640 file; chmod -R g+rX dir
+chown user:group file
+setfacl -m u:alice:rwx dir; getfacl dir
+<span class="cmt"># archives and copy</span>
+tar -czf out.tgz dir/; tar -xzf out.tgz -C /dest; tar -tzf out.tgz | head
+rsync -avh --progress src/ dst/         # add -n for a dry run</pre></section>
+
+<section class="rr-cs" id="cs-storage"><h2 id="disks-partitions">Disks &amp; partitions</h2>
+<pre><span class="cmt"># inspect (safe)</span>
+lsblk -f
+blkid
+fdisk -l
+parted -l
+smartctl -H /dev/sdX                     # smartmontools
+<span class="cmt"># make a filesystem (destructive: check the device twice)</span>
+mkfs.xfs /dev/sdb1
+mkfs.ext4 /dev/sdb1
+<span class="cmt"># mount permanently: add a UUID line to /etc/fstab, then test</span>
+mount -a
+<span class="cmt"># grow a filesystem</span>
+xfs_growfs /mountpoint                   # XFS (mounted)
+resize2fs /dev/mapper/vg-lv              # ext4
+<span class="cmt"># repair (unmounted only)</span>
+xfs_repair -n /dev/sdb1                  # dry run first
+fsck -f /dev/sdb1
+<span class="cmt"># rescan for new SCSI/SAN disks</span>
+echo "- - -" | tee /sys/class/scsi_host/host*/scan</pre></section>
+
+<section class="rr-cs" id="cs-lvm"><h2 id="lvm-multipath">LVM &amp; multipath</h2>
+<pre><span class="cmt"># overview</span>
+pvs; vgs; lvs
+lvs -o +devices
+<span class="cmt"># create</span>
+pvcreate /dev/sdb
+vgcreate vg01 /dev/sdb
+lvcreate -n lv_data -L 20G vg01
+mkfs.xfs /dev/vg01/lv_data
+<span class="cmt"># extend (online); -r also grows the filesystem</span>
+vgextend vg01 /dev/sdc
+lvextend -r -L +5G /dev/vg01/lv_data
+lvextend -r -l +100%FREE /dev/vg01/lv_data
+<span class="cmt"># snapshot</span>
+lvcreate -s -n snap1 -L 2G /dev/vg01/lv_data
+<span class="cmt"># remove (destructive)</span>
+lvremove /dev/vg01/snap1
+<span class="cmt"># multipath</span>
+multipath -ll
+multipathd show paths
+multipath -r                              # reload maps</pre></section>
+
+<section class="rr-cs" id="cs-systemd"><h2 id="systemd">systemd</h2>
+<pre>systemctl status SERVICE -l --no-pager
+systemctl start|stop|restart|reload SERVICE
+systemctl enable --now SERVICE
+systemctl disable --now SERVICE
+systemctl is-active SERVICE; systemctl is-enabled SERVICE
+systemctl --failed
+systemctl list-units --type=service --state=running
+systemctl cat SERVICE                     # unit file plus drop-ins
+systemctl edit SERVICE                    # create a drop-in override
+systemctl daemon-reload                   # after changing unit files
+systemctl reset-failed SERVICE
+systemctl list-dependencies SERVICE
+systemctl get-default; systemctl set-default multi-user.target
+systemctl rescue                          # single-user maintenance (disruptive)
+systemd-analyze blame; systemd-analyze critical-chain</pre></section>
+
+<section class="rr-cs" id="cs-logs"><h2 id="logs">Logs</h2>
+<pre>journalctl -xe
+journalctl -u SERVICE --since "1 hour ago" --no-pager
+journalctl -p err -b
+journalctl -k                             # kernel messages
+journalctl -f                             # follow
+journalctl --disk-usage; journalctl --vacuum-size=200M
+dmesg -T | tail -50
+dmesg -T --level=err,warn
+tail -f /var/log/messages                 # /var/log/syslog on Debian family
+tail -f /var/log/secure                   # auth log on RHEL
+last -x | head; lastb | head
+ausearch -m avc -ts recent               # SELinux denials</pre></section>
+
+<section class="rr-cs" id="cs-process"><h2 id="processes">Processes</h2>
+<pre>ps -ef --forest
+ps -eo pid,ppid,stat,%cpu,%mem,cmd --sort=-%cpu | head
+top                                       # 1 per-core, P sort CPU, M sort memory, k kill
+pgrep -a nginx; pidof sshd
+kill PID; kill -9 PID                     # -9 is a last resort
+pkill -f pattern
+nice -n 10 cmd; renice -n 5 -p PID
+lsof -p PID; lsof -i :80
+ss -ltnp | grep PID
+cat /proc/PID/limits; cat /proc/PID/status
+strace -c -p PID                          # syscall summary (Ctrl-C to stop)
+ps -eo pid,ppid,stat,cmd | awk '$3 ~ /^[ZD]/'   # zombie and D-state
+fuser -vm /mountpoint                     # who is using a mount</pre></section>
+
+<section class="rr-cs" id="cs-perf"><h2 id="performance">Performance</h2>
+<pre>uptime; nproc                             # load vs CPU count
+free -h                                   # read "available"
+vmstat 1 5                                # r b si so us sy id wa st
+iostat -xz 1 5                            # await, %util (sysstat)
+pidstat -u 1 5; pidstat -d 1 5; pidstat -r 1 5
+mpstat -P ALL 1 3
+sar -u 1 5; sar -q; sar -r; sar -d
+sar -u -f /var/log/sa/sa01                # history
+top -b -n1 | head -20 > /tmp/top.txt      # capture evidence
+dmesg -T | grep -i -E 'out of memory|oom'
+ulimit -a</pre></section>
+
+<section class="rr-cs" id="cs-network"><h2 id="networking">Networking</h2>
+<pre>ip -br addr; ip -br link; ip route
+ip route get 8.8.8.8
+ip -s link show eth0                      # errors and drops
+nmcli device status; nmcli connection show
+nmcli connection modify "eth0" ipv4.addresses 10.0.0.10/24 ipv4.gateway 10.0.0.1 ipv4.method manual
+nmcli connection up "eth0"
+ss -tulpn                                 # listening sockets
+ss -s
+ping -c3 HOST; traceroute HOST; mtr -rw HOST
+dig example.com; dig +short -x 8.8.8.8; getent hosts example.com
+curl -I https://example.com
+tcpdump -ni eth0 port 53 -c 20
+firewall-cmd --list-all
+firewall-cmd --permanent --add-service=http && firewall-cmd --reload
+sshd -t                                   # test sshd config before restart
+chronyc tracking; chronyc sources -v
+hostnamectl; timedatectl</pre></section>
+
+<section class="rr-cs" id="cs-selinux"><h2 id="selinux">SELinux</h2>
+<pre>getenforce; sestatus
+setenforce 0|1                            # runtime only; for diagnosis, then set back to 1
+ls -lZ /path; ps -eZ | grep SERVICE
+restorecon -Rv /path                      # reset to policy default
+semanage fcontext -a -t httpd_sys_content_t "/web(/.*)?"; restorecon -Rv /web
+semanage port -l | grep http; semanage port -a -t http_port_t -p tcp 8081
+getsebool -a | grep httpd; setsebool -P httpd_can_network_connect on
+ausearch -m avc -ts recent | audit2why
+sealert -a /var/log/audit/audit.log      # setroubleshoot-server</pre></section>
+
+<section class="rr-cs" id="cs-users"><h2 id="users-groups-sudo">Users, groups &amp; sudo</h2>
+<pre>id user; groups user
+useradd -m -s /bin/bash -G wheel alice
+passwd alice; chage -l alice; chage -M 90 alice
+usermod -aG docker alice; usermod -L alice     # add to group; lock
+userdel -r alice                               # removes the home directory
+visudo; visudo -c                              # edit and syntax-check sudoers
+sudo -l -U alice
+who; w; last | head
+getent passwd alice
+umask; umask 027</pre></section>
+
+<section class="rr-cs" id="cs-text"><h2 id="text-tools">Text tools</h2>
+<pre>grep -rn "pattern" /etc/ --include="*.conf"
+grep -E "a|b" file; grep -v "^#" file | grep -v "^$"
+awk '{print $1, $NF}' file
+awk -F: '$3 >= 1000 {print $1}' /etc/passwd
+sed -n '10,20p' file
+sed -i.bak 's/old/new/g' file                 # keeps file.bak
+cut -d: -f1 /etc/passwd
+sort file | uniq -c | sort -nr | head
+xargs -n1 -P4 cmd < list.txt
+tee -a file
+column -t file
+diff -u a b; cmp a b
+wc -l file; head -n 20 file; tail -n 20 file</pre></section>
+
+<section class="rr-cs" id="cs-packages"><h2 id="packages-rhel-family">Packages (RHEL family)</h2>
+<pre>dnf search NAME; dnf info NAME
+dnf install NAME; dnf remove NAME
+dnf check-update; dnf update --security
+dnf history; dnf history undo ID
+dnf provides /path/to/file
+dnf repolist; dnf clean all
+rpm -qa | grep NAME; rpm -qi NAME; rpm -ql NAME; rpm -qf /path
+rpm -V NAME                                    # verify files
+yum ...                                        # RHEL 7: same verbs as dnf
+subscription-manager status; subscription-manager repos --list-enabled
+needs-restarting -r                            # reboot required?</pre></section>
+
+<section class="rr-cs" id="cs-solaris"><h2 id="solaris">Solaris</h2>
+<pre><span class="cmt"># services (SMF)</span>
+svcs -a; svcs -xv
+svcadm enable|disable|restart FMRI
+svcs -l FMRI
+<span class="cmt"># ZFS</span>
+zpool status -x; zpool list
+zfs list; zfs list -t snapshot
+zfs snapshot rpool/data@pre-change
+zfs rollback rpool/data@pre-change             # discards later changes
+zpool scrub tank
+<span class="cmt"># zones and LDOMs</span>
+zoneadm list -cv; zlogin ZONE
+ldm list; ldm list-bindings
+<span class="cmt"># system</span>
+prtconf | head; prtdiag -v | head
+iostat -xn 1 5; mpstat 1 5; vmstat 1 5; prstat -a 5 1
+ifconfig -a; dladm show-link; ipadm show-addr
+pkg update; pkg list; pkg info NAME            # Solaris 11 IPS</pre></section>
+
+<section class="rr-cs" id="cs-podman"><h2 id="podman">Podman</h2>
+<pre>podman pull registry.access.redhat.com/ubi9/ubi
+podman images; podman ps -a
+podman run -d --name web -p 8080:80 docker.io/library/nginx
+podman exec -it web sh
+podman logs -f web
+podman stop web; podman rm web; podman rmi IMAGE
+podman volume create data; podman run -v data:/var/lib/app:Z IMAGE   # :Z relabels for SELinux
+podman system df; podman system prune                    # prune deletes unused data
+podman generate systemd --new --files --name web        # or use Quadlet (.container files)
+loginctl enable-linger $USER                             # rootless services after logout
+podman pod create --name mypod -p 8080:80</pre></section>
+
+<section class="rr-cs" id="cs-ansible"><h2 id="ansible">Ansible</h2>
+<pre>ansible all -i inventory -m ping
+ansible webservers -i inventory -b -m dnf -a "name=httpd state=present"
+ansible-playbook -i inventory site.yml --check --diff     # dry run
+ansible-playbook -i inventory site.yml -l web01 -t config -vv
+ansible-inventory -i inventory --graph
+ansible-doc -l | grep dnf; ansible-doc ansible.builtin.dnf
+ansible-vault create secrets.yml; ansible-vault edit secrets.yml
+ansible-galaxy collection install community.general
+ansible-lint site.yml</pre></section>
+
+<section class="rr-cs" id="cs-git"><h2 id="git">Git</h2>
+<pre>git status -sb; git log --oneline --graph -15
+git diff; git diff --staged
+git add -p; git commit -m "message"
+git switch -c feature/x; git switch main
+git pull --rebase; git push -u origin HEAD
+git stash; git stash pop
+git restore file                                # discard working-tree changes to file
+git revert COMMIT                               # safe undo (new commit)
+git reset --hard COMMIT                         # destructive: loses uncommitted work
+git blame file; git log -p -- file
+git remote -v; git fetch --all --prune</pre></section>
+</div>
+</div><aside class="rr-related" aria-labelledby="rr-rel-h"><h2 id="rr-rel-h">Related</h2><div class="rr-related-grid"><a class="rr-card" href="/linux-guide/" style="--cat:#2F80ED"><h3>Linux Administration Guide</h3><p>A structured, hands-on Linux administration course: commands, users, systemd, storage, networking, security, performance…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/linux-admin.html" style="--cat:#2F80ED"><h3>Linux Admin Interview Guide</h3><p>Practical Linux administration commands and real-world Q&amp;As: LVM, SAN and multipath, scripting, networking, security and…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/troubleshooting/" style="--cat:#B45309"><h3>Troubleshooting by Symptom</h3><p>Start from the symptom: disk full, read-only filesystem, high load, high memory, I/O wait, service will not start, netwo…</p><div class="meta"><span><span class="dot"></span>root_n_reels</span></div></a></div></aside>
+</main>
+</div>
+<button id="btt" type="button" aria-label="Back to top" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
+</footer>
+<!--/rr:footer-->
+</body>
+</html>

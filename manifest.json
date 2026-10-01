@@ -1,10 +1,36 @@
 {
-  "name": "root_n_reels \u2014 Technical Learning Hub",
+  "name": "root_n_reels \u2014 Linux & Unix Knowledge Base",
   "short_name": "root_n_reels",
-  "description": "Practical Linux, UNIX, DevOps, networking and infrastructure learning resources.",
-  "start_url": "./index.html",
+  "description": "Practical knowledge for people who run servers.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0b1220",
-  "theme_color": "#0b1220",
-  "icons": []
+  "background_color": "#0B1220",
+  "theme_color": "#14315C",
+  "icons": [
+    {
+      "src": "/assets/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search",
+      "url": "/search/"
+    },
+    {
+      "name": "Troubleshoot",
+      "url": "/troubleshooting/"
+    },
+    {
+      "name": "Interview prep",
+      "url": "/interview/"
+    }
+  ]
 }

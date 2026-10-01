@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linux “Read-only file system” Error: Causes, Diagnosis and Fix | root_n_reels</title>
+<!--rr:head-->
+<meta name="description" content="The kernel remounted a filesystem read-only. Learn how to confirm it, find the cause (I/O errors, ext4/XFS errors, SAN/multipath) and recover safely.">
+<link rel="canonical" href="https://www.rootnreels.in/linux/filesystem-read-only/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="Linux “Read-only file system” Error: Causes, Diagnosis and Fix | root_n_reels"><meta property="og:description" content="The kernel remounted a filesystem read-only. Learn how to confirm it, find the cause (I/O errors, ext4/XFS errors, SAN/multipath) and recover safely.">
+<meta property="og:url" content="https://www.rootnreels.in/linux/filesystem-read-only/"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Linux “Read-only file system” Error: Causes, Diagnosis and Fix | root_n_reels"><meta name="twitter:description" content="The kernel remounted a filesystem read-only. Learn how to confirm it, find the cause (I/O errors, ext4/XFS errors, SAN/multipath) and recover safely."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"Linux & RHEL","item":"https://www.rootnreels.in/linux/"},{"@type":"ListItem","position":3,"name":"Why Linux says “Read-only file system” and how to fix it","item":"https://www.rootnreels.in/linux/filesystem-read-only/"}]},{"@type":"TechArticle","headline":"Why Linux says “Read-only file system” and how to fix it","description":"The kernel remounted a filesystem read-only. Learn how to confirm it, find the cause (I/O errors, ext4/XFS errors, SAN/multipath) and recover safely.","url":"https://www.rootnreels.in/linux/filesystem-read-only/","mainEntityOfPage":"https://www.rootnreels.in/linux/filesystem-read-only/","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-10-01","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Expert","dependencies":"RHEL 7 / 8 / 9 (ext4, XFS)"}]}</script>
+<!--/rr:head-->
+</head>
+<body class="rr rr-new" data-rr-new data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/" aria-current="page">Linux</a><a href="/unix/">Unix</a><a href="/networking/">Networking</a><a href="/devops/">DevOps</a><a href="/troubleshooting/">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header-->
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+<div class="site-body">
+<!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
+<main id="main-content">
+<nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/linux/">Linux &amp; RHEL</a></li><li aria-current="page">Why Linux says “Read-only file system” and how to fix it</li></ol></nav><header class="rr-page-head"><h1>Why Linux says “Read-only file system” and how to fix it</h1><p class="rr-lead">The kernel remounted a filesystem read-only. Learn how to confirm it, find the cause (I/O errors, ext4/XFS errors, SAN/multipath) and recover safely.</p></header><div class="rr-meta"><span class="chip" style="--cat:#2F80ED"><span class="dot"></span>Linux &amp; RHEL</span><span class="chip">L2</span><span class="chip">Troubleshooting</span><span class="chip" title="Versions this page covers">Covers: RHEL 7 / 8 / 9 (ext4, XFS)</span><span>4 min read</span> <span>Updated <time datetime="2026-10-01">2026-10-01</time></span> <span>by Vishal Sharma</span><span class="acts"><button type="button" class="rr-act" data-rr-save aria-pressed="false"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Save</span></button><button type="button" class="rr-act" data-rr-share><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span class="lbl">Share</span></button><button type="button" class="rr-act" data-rr-print><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">Print</span></button></span></div><p class="rr-note-reel"><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">▶ Watch the 60-second version on Instagram</a></p><p class="rr-note-ib">Tip: you are in an in-app browser. Open this page in Chrome or Safari to keep your saved items.</p><div class="rr-prose" id="article"><div class="rr-callout quick"><div><span class="t">Quick answer</span>
+<p>The kernel (or the mount options) put the filesystem in read-only mode. Confirm it with <code>findmnt</code>, read <code>dmesg -T</code> for I/O or filesystem errors, fix the underlying storage problem first, then repair the filesystem while it is unmounted and remount it read-write. Remounting without fixing the cause usually just flips back.</p></div></div>
+
+<h2 id="symptoms">Symptoms</h2>
+<ul>
+<li><code>touch: cannot touch 'file': Read-only file system</code></li>
+<li><code>cp: cannot create regular file '...': Read-only file system</code></li>
+<li><code>bash: cannot create temp file for here-document: Read-only file system</code></li>
+<li>Services fail to start because they cannot write a PID file, socket or log.</li>
+</ul>
+
+<h2 id="why-it-happens">Why it happens</h2>
+<ul>
+<li><strong>ext4 hit an error</strong> and the filesystem is set to <code>errors=remount-ro</code> (check with <code>tune2fs -l DEVICE | grep -i behavior</code>). The kernel remounts it read-only to avoid more damage.</li>
+<li><strong>XFS shut down</strong> after a metadata or log error. XFS does not remount read-only; further access usually returns <code>Input/output error</code> or <code>Structure needs cleaning</code>.</li>
+<li><strong>The storage failed underneath</strong>: a SAN LUN lost all paths, a disk or controller is failing, or a VM datastore went read-only.</li>
+<li><strong>It was mounted <code>ro</code> on purpose or by mistake</strong>: an <code>ro</code> option in <code>/etc/fstab</code>, a read-only export (NFS), a snapshot, an ISO or squashfs image, or a read-only block device.</li>
+</ul>
+
+<h2 id="diagnose">Diagnose</h2>
+<p>Run these read-only checks first. Use root or <code>sudo</code>.</p>
+<pre>$ findmnt -no TARGET,SOURCE,FSTYPE,OPTIONS /data
+$ grep -E ' ro[ ,]' /proc/mounts
+$ lsblk -o NAME,SIZE,RO,TYPE,MOUNTPOINT
+$ dmesg -T | grep -i -E 'remount|I/O error|EXT4-fs|XFS|Buffer I/O|blk_update_request'
+$ journalctl -k -p err -b --no-pager | tail -50</pre>
+<p>Expected output when ext4 remounted itself read-only:</p>
+<pre class="output">/data /dev/mapper/vg01-lv_data ext4 ro,relatime,seclabel
+[Tue Oct  1 02:14:09 2026] EXT4-fs error (device dm-3): ext4_find_entry:1455: inode #2: comm app: reading directory lblock 0
+[Tue Oct  1 02:14:09 2026] EXT4-fs (dm-3): Remounting filesystem read-only</pre>
+<p>If the block device itself shows <code>RO 1</code> in <code>lsblk</code>, the problem is below the filesystem. On a SAN host, also check the paths:</p>
+<pre>$ multipath -ll
+$ multipathd show paths
+$ smartctl -H /dev/sdX      # local disks (smartmontools)</pre>
+
+<h2 id="fix">Fix</h2>
+<h3 id="case-1-no-errors-in-dmesg-the-mount-is-simply-ro">Case 1: no errors in dmesg, the mount is simply <code>ro</code></h3>
+<pre>$ sudo mount -o remount,rw /data
+<span class="cmt"># make it permanent: remove "ro" from the line in /etc/fstab</span>
+$ findmnt --verify</pre>
+
+<h3 id="case-2-errors-in-dmesg-storage-or-filesystem-damage">Case 2: errors in dmesg (storage or filesystem damage)</h3>
+<ol>
+<li><strong>Stop writers.</strong> Stop the application and anything else using the mount (<code>fuser -vm /data</code>).</li>
+<li><strong>Fix the storage first.</strong> Restore SAN paths, replace the failing disk, or ask the storage team. Take an LVM or array snapshot or a backup if you can.</li>
+<li><strong>Unmount and repair.</strong></li>
+</ol>
+<pre><span class="cmt"># ext4</span>
+$ sudo umount /data
+$ sudo fsck -f /dev/mapper/vg01-lv_data
+
+<span class="cmt"># XFS: dry run first, then repair</span>
+$ sudo umount /data
+$ sudo xfs_repair -n /dev/mapper/vg01-lv_data
+$ sudo xfs_repair /dev/mapper/vg01-lv_data</pre>
+<div class="rr-callout danger"><div><span class="t">Destructive: last resort</span>
+<p><code>xfs_repair -L</code> zeroes the XFS log and can lose recent changes. Use it only if a normal repair refuses to run and the data is backed up. Never run <code>fsck</code> or <code>xfs_repair</code> on a mounted filesystem.</p></div></div>
+<p>For the root filesystem you cannot unmount it while running. Boot into rescue mode (or add <code>fsck.mode=force</code> to the kernel command line for ext4), repair, then reboot.</p>
+<pre>$ sudo mount /data              # or: mount -o remount,rw /
+$ touch /data/.rw-test && rm /data/.rw-test
+$ sudo systemctl start APPLICATION</pre>
+
+<h2 id="common-mistakes">Common mistakes</h2>
+<ul>
+<li>Running <code>mount -o remount,rw</code> repeatedly while the disk is still failing.</li>
+<li>Using <code>fsck -y</code> blindly on production data without a backup or snapshot.</li>
+<li>Checking only the filesystem and forgetting multipath or HBA errors higher up the log.</li>
+<li>Repairing a mounted filesystem.</li>
+</ul>
+
+<h2 id="production-considerations">Production considerations</h2>
+<div class="rr-callout prod"><div><span class="t">Production</span>
+<p>Treat this as an incident: capture <code>dmesg</code>, <code>journalctl -k</code> and <code>multipath -ll</code> before you change anything, tell the application owner, and plan the repair in a window. In a cluster, fail the service over first. Afterwards find out <em>why</em> it happened (failing disk, path flap, array event) and close the problem record.</p></div></div>
+
+<details class="rr-d"><summary>Advanced: choose how ext4 reacts to errors</summary><div>
+<pre>$ tune2fs -l /dev/mapper/vg01-lv_data | grep -i 'errors behavior'
+$ sudo tune2fs -e remount-ro /dev/mapper/vg01-lv_data   # continue | remount-ro | panic
+<span class="cmt"># or per mount:  mount -o errors=remount-ro ...</span></pre>
+<p>On databases and clusters some teams prefer <code>panic</code> so the node fails fast and another takes over.</p></div></details>
+
+<h2 id="interview-questions">Interview questions</h2>
+<details class="rr-d"><summary>A production filesystem suddenly became read-only. What do you do?</summary><div>
+<p>Confirm with <code>findmnt</code>; read <code>dmesg</code>/<code>journalctl -k</code> for the cause; check the storage layer (multipath, disk health); stop writers; back up or snapshot; unmount and run <code>fsck</code> or <code>xfs_repair</code>; remount, test with a write, restart services, then do root-cause analysis.</p></div></details>
+<details class="rr-d"><summary>Why does an XFS filesystem not go read-only like ext4 does?</summary><div>
+<p>XFS responds to serious metadata or log errors by shutting the filesystem down. Operations then fail with I/O or “structure needs cleaning” errors until you unmount and run <code>xfs_repair</code>.</p></div></details>
+<details class="rr-d"><summary>How can you tell whether the mount or the block device is read-only?</summary><div>
+<p>The mount options show <code>ro</code> in <code>findmnt</code> or <code>/proc/mounts</code>; the device flag is the <code>RO</code> column of <code>lsblk</code> (or <code>blockdev --getro</code>).</p></div></details>
+<p>More: <a href="/rhel.html#fsck-file-system-check">fsck in the RHEL guide</a> · <a href="/linux-admin.html#san-multipath-storage">SAN and multipath</a> · <a href="/os-interview.html#q-filesystem-shows-space-free-but-no-new-files-can-be-crea">Space free but cannot create files</a>.</p>
+</div><aside class="rr-related" aria-labelledby="rr-rel-h"><h2 id="rr-rel-h">Related</h2><div class="rr-related-grid"><a class="rr-card" href="/linux/disk-full/" style="--cat:#2F80ED"><h3>Filesystem 100% full: find what is eating the disk</h3><p>How to find what filled a Linux filesystem: df and du, deleted-but-open files, inode exhaustion, logs and journal, and s…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/linux-admin.html" style="--cat:#2F80ED"><h3>Linux Admin Interview Guide</h3><p>Practical Linux administration commands and real-world Q&amp;As: LVM, SAN and multipath, scripting, networking, security and…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/rhel.html" style="--cat:#2F80ED"><h3>RHEL Study Guide</h3><p>Complete Red Hat Enterprise Linux administration reference for RHEL 6, 7, 8 and 9: users, LVM and RAID, SELinux, network…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/os-interview.html" style="--cat:#059669"><h3>OS Admin L3 Interview Prep</h3><p>150+ L3 operating-system administration interview questions with answers: patching, boot, LVM, security, performance, ne…</p><div class="meta"><span><span class="dot"></span>root_n_reels</span></div></a></div><a class="rr-next" href="/linux/disk-full/"><small>Next topic →</small><strong>Filesystem 100% full: find what is eating the disk</strong></a></aside>
+</main>
+</div>
+<button id="btt" type="button" aria-label="Back to top" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
+</footer>
+<!--/rr:footer-->
+</body>
+</html>

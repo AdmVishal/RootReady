@@ -1,0 +1,88 @@
+<div class="rr-callout quick"><div><span class="t">Quick answer</span>
+<p>The kernel (or the mount options) put the filesystem in read-only mode. Confirm it with <code>findmnt</code>, read <code>dmesg -T</code> for I/O or filesystem errors, fix the underlying storage problem first, then repair the filesystem while it is unmounted and remount it read-write. Remounting without fixing the cause usually just flips back.</p></div></div>
+
+<h2>Symptoms</h2>
+<ul>
+<li><code>touch: cannot touch 'file': Read-only file system</code></li>
+<li><code>cp: cannot create regular file '...': Read-only file system</code></li>
+<li><code>bash: cannot create temp file for here-document: Read-only file system</code></li>
+<li>Services fail to start because they cannot write a PID file, socket or log.</li>
+</ul>
+
+<h2>Why it happens</h2>
+<ul>
+<li><strong>ext4 hit an error</strong> and the filesystem is set to <code>errors=remount-ro</code> (check with <code>tune2fs -l DEVICE | grep -i behavior</code>). The kernel remounts it read-only to avoid more damage.</li>
+<li><strong>XFS shut down</strong> after a metadata or log error. XFS does not remount read-only; further access usually returns <code>Input/output error</code> or <code>Structure needs cleaning</code>.</li>
+<li><strong>The storage failed underneath</strong>: a SAN LUN lost all paths, a disk or controller is failing, or a VM datastore went read-only.</li>
+<li><strong>It was mounted <code>ro</code> on purpose or by mistake</strong>: an <code>ro</code> option in <code>/etc/fstab</code>, a read-only export (NFS), a snapshot, an ISO or squashfs image, or a read-only block device.</li>
+</ul>
+
+<h2>Diagnose</h2>
+<p>Run these read-only checks first. Use root or <code>sudo</code>.</p>
+<pre>$ findmnt -no TARGET,SOURCE,FSTYPE,OPTIONS /data
+$ grep -E ' ro[ ,]' /proc/mounts
+$ lsblk -o NAME,SIZE,RO,TYPE,MOUNTPOINT
+$ dmesg -T | grep -i -E 'remount|I/O error|EXT4-fs|XFS|Buffer I/O|blk_update_request'
+$ journalctl -k -p err -b --no-pager | tail -50</pre>
+<p>Expected output when ext4 remounted itself read-only:</p>
+<pre class="output">/data /dev/mapper/vg01-lv_data ext4 ro,relatime,seclabel
+[Tue Oct  1 02:14:09 2026] EXT4-fs error (device dm-3): ext4_find_entry:1455: inode #2: comm app: reading directory lblock 0
+[Tue Oct  1 02:14:09 2026] EXT4-fs (dm-3): Remounting filesystem read-only</pre>
+<p>If the block device itself shows <code>RO 1</code> in <code>lsblk</code>, the problem is below the filesystem. On a SAN host, also check the paths:</p>
+<pre>$ multipath -ll
+$ multipathd show paths
+$ smartctl -H /dev/sdX      # local disks (smartmontools)</pre>
+
+<h2>Fix</h2>
+<h3>Case 1: no errors in dmesg, the mount is simply <code>ro</code></h3>
+<pre>$ sudo mount -o remount,rw /data
+# make it permanent: remove "ro" from the line in /etc/fstab
+$ findmnt --verify</pre>
+
+<h3>Case 2: errors in dmesg (storage or filesystem damage)</h3>
+<ol>
+<li><strong>Stop writers.</strong> Stop the application and anything else using the mount (<code>fuser -vm /data</code>).</li>
+<li><strong>Fix the storage first.</strong> Restore SAN paths, replace the failing disk, or ask the storage team. Take an LVM or array snapshot or a backup if you can.</li>
+<li><strong>Unmount and repair.</strong></li>
+</ol>
+<pre># ext4
+$ sudo umount /data
+$ sudo fsck -f /dev/mapper/vg01-lv_data
+
+# XFS: dry run first, then repair
+$ sudo umount /data
+$ sudo xfs_repair -n /dev/mapper/vg01-lv_data
+$ sudo xfs_repair /dev/mapper/vg01-lv_data</pre>
+<div class="rr-callout danger"><div><span class="t">Destructive: last resort</span>
+<p><code>xfs_repair -L</code> zeroes the XFS log and can lose recent changes. Use it only if a normal repair refuses to run and the data is backed up. Never run <code>fsck</code> or <code>xfs_repair</code> on a mounted filesystem.</p></div></div>
+<p>For the root filesystem you cannot unmount it while running. Boot into rescue mode (or add <code>fsck.mode=force</code> to the kernel command line for ext4), repair, then reboot.</p>
+<pre>$ sudo mount /data              # or: mount -o remount,rw /
+$ touch /data/.rw-test && rm /data/.rw-test
+$ sudo systemctl start APPLICATION</pre>
+
+<h2>Common mistakes</h2>
+<ul>
+<li>Running <code>mount -o remount,rw</code> repeatedly while the disk is still failing.</li>
+<li>Using <code>fsck -y</code> blindly on production data without a backup or snapshot.</li>
+<li>Checking only the filesystem and forgetting multipath or HBA errors higher up the log.</li>
+<li>Repairing a mounted filesystem.</li>
+</ul>
+
+<h2>Production considerations</h2>
+<div class="rr-callout prod"><div><span class="t">Production</span>
+<p>Treat this as an incident: capture <code>dmesg</code>, <code>journalctl -k</code> and <code>multipath -ll</code> before you change anything, tell the application owner, and plan the repair in a window. In a cluster, fail the service over first. Afterwards find out <em>why</em> it happened (failing disk, path flap, array event) and close the problem record.</p></div></div>
+
+<details class="rr-d"><summary>Advanced: choose how ext4 reacts to errors</summary><div>
+<pre>$ tune2fs -l /dev/mapper/vg01-lv_data | grep -i 'errors behavior'
+$ sudo tune2fs -e remount-ro /dev/mapper/vg01-lv_data   # continue | remount-ro | panic
+# or per mount:  mount -o errors=remount-ro ...</pre>
+<p>On databases and clusters some teams prefer <code>panic</code> so the node fails fast and another takes over.</p></div></details>
+
+<h2>Interview questions</h2>
+<details class="rr-d"><summary>A production filesystem suddenly became read-only. What do you do?</summary><div>
+<p>Confirm with <code>findmnt</code>; read <code>dmesg</code>/<code>journalctl -k</code> for the cause; check the storage layer (multipath, disk health); stop writers; back up or snapshot; unmount and run <code>fsck</code> or <code>xfs_repair</code>; remount, test with a write, restart services, then do root-cause analysis.</p></div></details>
+<details class="rr-d"><summary>Why does an XFS filesystem not go read-only like ext4 does?</summary><div>
+<p>XFS responds to serious metadata or log errors by shutting the filesystem down. Operations then fail with I/O or “structure needs cleaning” errors until you unmount and run <code>xfs_repair</code>.</p></div></details>
+<details class="rr-d"><summary>How can you tell whether the mount or the block device is read-only?</summary><div>
+<p>The mount options show <code>ro</code> in <code>findmnt</code> or <code>/proc/mounts</code>; the device flag is the <code>RO</code> column of <code>lsblk</code> (or <code>blockdev --getro</code>).</p></div></details>
+<p>More: <a href="/rhel.html#fsck-file-system-check">fsck in the RHEL guide</a> · <a href="/linux-admin.html#san-multipath-storage">SAN and multipath</a> · <a href="/os-interview.html#q-filesystem-shows-space-free-but-no-new-files-can-be-crea">Space free but cannot create files</a>.</p>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linux Troubleshooting by Symptom: Disk Full, Read-Only, High Load, Boot, Network | root_n_reels</title>
+<!--rr:head-->
+<meta name="description" content="Start from the symptom: disk full, read-only filesystem, high load, high memory, I/O wait, service will not start, network down, multipath, LVM and boot failures.">
+<link rel="canonical" href="https://www.rootnreels.in/troubleshooting/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="Linux Troubleshooting by Symptom: Disk Full, Read-Only, High Load, Boot, Network | root_n_reels"><meta property="og:description" content="Start from the symptom: disk full, read-only filesystem, high load, high memory, I/O wait, service will not start, network down, multipath, LVM and boot failures.">
+<meta property="og:url" content="https://www.rootnreels.in/troubleshooting/"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Linux Troubleshooting by Symptom: Disk Full, Read-Only, High Load, Boot, Network | root_n_reels"><meta name="twitter:description" content="Start from the symptom: disk full, read-only filesystem, high load, high memory, I/O wait, service will not start, network down, multipath, LVM and boot failures."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"Troubleshooting by Symptom","item":"https://www.rootnreels.in/troubleshooting/"}]},{"@type":"TechArticle","headline":"Troubleshooting by Symptom","description":"Start from the symptom: disk full, read-only filesystem, high load, high memory, I/O wait, service will not start, network down, multipath, LVM and boot failures.","url":"https://www.rootnreels.in/troubleshooting/","mainEntityOfPage":"https://www.rootnreels.in/troubleshooting/","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-10-01","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Beginner"}]}</script>
+<!--/rr:head-->
+</head>
+<body class="rr rr-new" data-rr-new data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/">Linux</a><a href="/unix/">Unix</a><a href="/networking/">Networking</a><a href="/devops/">DevOps</a><a href="/troubleshooting/" aria-current="page">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header-->
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+<div class="site-body">
+<!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
+<main id="main-content">
+<nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Troubleshooting by Symptom</li></ol></nav><header class="rr-page-head"><h1>Troubleshooting by Symptom</h1><p>Start from the symptom: disk full, read-only filesystem, high load, high memory, I/O wait, service will not start, network down, multipath, LVM and boot failures.</p></header><div class="rr-callout warn"><div><span class="t">Production safety</span><p>Read-only checks first. Never run a destructive command until you have confirmed the device, filesystem or host. When in doubt, take a snapshot or backup and open a change.</p></div></div><div class="rr-sym" style="margin:16px 0 28px"><a href="#disk-full"><span aria-hidden="true">💾</span> Disk full</a><a href="#read-only"><span aria-hidden="true">🔒</span> Filesystem read-only</a><a href="#high-load"><span aria-hidden="true">📈</span> High load</a><a href="#high-memory"><span aria-hidden="true">🧠</span> High memory / OOM</a><a href="#high-iowait"><span aria-hidden="true">⏳</span> High I/O wait</a><a href="#service-wont-start"><span aria-hidden="true">⚙️</span> Service won’t start</a><a href="#network-down"><span aria-hidden="true">🌐</span> Network not working</a><a href="#ssh-refused"><span aria-hidden="true">🔑</span> SSH connection refused</a><a href="#multipath"><span aria-hidden="true">🔀</span> Multipath / SAN path failure</a><a href="#lvm-issue"><span aria-hidden="true">🗂️</span> LVM won’t extend / missing</a><a href="#boot-failure"><span aria-hidden="true">🚫</span> Boot failure / rescue mode</a><a href="#selinux-denied"><span aria-hidden="true">🛡️</span> SELinux denied</a><a href="#zombie-d-state"><span aria-hidden="true">🧟</span> Zombie / D-state processes</a></div><section class="rr-scn" id="disk-full"><h3><span aria-hidden="true">💾</span> Disk full</h3><p>“No space left on device”, a filesystem at 100%, or applications failing to write.</p><div class="rr-code"><pre><code>df -hT
+du -xh --max-depth=1 /var | sort -h | tail
+df -i                # inodes
+lsof +L1             # deleted files still held open</code></pre></div><p><strong>Why it happens:</strong> Large or runaway logs, deleted-but-open files, inode exhaustion, snapshots or thin pools filling up.</p><div class="links"><a class="rr-btn primary" href="/linux/disk-full/">Full step-by-step →</a><a class="rr-chip" href="/os-interview.html#q-no-space-left-on-device-related-to-inodes">Inodes Q&amp;A</a><a class="rr-chip" href="/os-interview.html#q-filesystem-shows-space-free-but-no-new-files-can-be-crea">Space free but cannot create files</a><a class="rr-chip" href="/rhel.html#extending-lvm">Extending LVM</a></div></section><section class="rr-scn" id="read-only"><h3><span aria-hidden="true">🔒</span> Filesystem read-only</h3><p>“Read-only file system” when writing, or a mount that flipped to ro.</p><div class="rr-code"><pre><code>findmnt -no TARGET,OPTIONS /path
+dmesg -T | grep -i -E &#x27;remount|I/O error|EXT4-fs|XFS&#x27;
+lsblk -o NAME,RO,MOUNTPOINT
+multipath -ll       # SAN: all paths down?</code></pre></div><p><strong>Why it happens:</strong> The kernel remounted ext4 read-only after I/O or metadata errors, the XFS log shut down, a SAN path/LUN failed, or the mount was ro by configuration.</p><div class="links"><a class="rr-btn primary" href="/linux/filesystem-read-only/">Full step-by-step →</a><a class="rr-chip" href="/rhel.html#fsck-file-system-check">fsck</a><a class="rr-chip" href="/linux-admin.html#san-multipath-storage">SAN &amp; multipath</a></div></section><section class="rr-scn" id="high-load"><h3><span aria-hidden="true">📈</span> High load</h3><p>Load average far above the CPU count; the server feels slow.</p><div class="rr-code"><pre><code>uptime; nproc
+vmstat 1 5
+top -b -n1 | head -20
+iostat -xz 1 3</code></pre></div><p><strong>Why it happens:</strong> Load counts runnable and uninterruptible (D-state) tasks, so CPU saturation, I/O waits and memory pressure can all raise it.</p><div class="links"><a class="rr-btn primary" href="/linux/high-load/">Full step-by-step →</a><a class="rr-chip" href="/linux-admin.html#performance-monitoring-sar">SAR &amp; performance</a><a class="rr-chip" href="/linux-admin.html#q-perf1b">Top CPU/memory processes</a></div></section><section class="rr-scn" id="high-memory"><h3><span aria-hidden="true">🧠</span> High memory / OOM</h3><p>Free memory near zero, heavy swapping, or processes killed by the OOM killer.</p><div class="rr-code"><pre><code>free -h
+ps -eo pid,user,%mem,rss,cmd --sort=-%mem | head
+vmstat 1 5          # si/so = swap in/out
+dmesg -T | grep -i -E &#x27;out of memory|oom-killer&#x27;</code></pre></div><p><strong>Why it happens:</strong> A leaking or oversized process, too little RAM or swap for the workload, or cgroup limits. Check the “available” column, not “free”.</p><div class="links"><a class="rr-chip" href="/rhel.html#rhel-memory-management-swap">Memory &amp; swap</a><a class="rr-chip" href="/linux-admin.html#q-perf1b">Find top memory processes</a></div></section><section class="rr-scn" id="high-iowait"><h3><span aria-hidden="true">⏳</span> High I/O wait</h3><p>CPU is mostly idle but the system is slow; %wa is high in top or vmstat.</p><div class="rr-code"><pre><code>vmstat 1 5          # wa and b columns
+iostat -xz 1 5       # await, %util, aqu-sz
+pidstat -d 1 5       # per-process disk I/O
+ps -eo state,pid,wchan:20,cmd | awk &#x27;$1==&quot;D&quot;&#x27;</code></pre></div><p><strong>Why it happens:</strong> Slow or saturated storage (disk, SAN path, NFS server), a backup or scan hammering the disk, or failing hardware.</p><div class="links"><a class="rr-chip" href="/os-interview.html#q-how-do-you-fix-disk-i-o-bottleneck-issues">Fix disk I/O bottlenecks</a><a class="rr-chip" href="/linux-admin.html#q-perf1c">iostat explained</a></div></section><section class="rr-scn" id="service-wont-start"><h3><span aria-hidden="true">⚙️</span> Service won’t start</h3><p>systemctl start fails, or the service is “failed” or flapping after a reboot.</p><div class="rr-code"><pre><code>systemctl status SERVICE -l --no-pager
+journalctl -xeu SERVICE --no-pager | tail -40
+systemctl cat SERVICE
+ss -ltnp             # port already in use?</code></pre></div><p><strong>Why it happens:</strong> Bad configuration, a missing ExecStart binary or user, a port conflict, permissions or SELinux, or an unmet dependency.</p><div class="links"><a class="rr-btn primary" href="/linux/service-wont-start/">Full step-by-step →</a><a class="rr-chip" href="/rhel.html#rhel-managing-services-daemons">Managing services</a><a class="rr-chip" href="/linux-guide/#systemd-services-start-stop-and-boot">systemd chapter</a></div></section><section class="rr-scn" id="network-down"><h3><span aria-hidden="true">🌐</span> Network not working</h3><p>No connectivity, wrong IP, or names not resolving.</p><div class="rr-code"><pre><code>ip -br addr; ip route
+nmcli device status
+ping -c3 GATEWAY; ping -c3 8.8.8.8
+getent hosts example.com</code></pre></div><p><strong>Why it happens:</strong> Interface down or misconfigured, wrong gateway or VLAN, DNS failure, firewall rules or a duplicate IP.</p><div class="links"><a class="rr-chip" href="/rhel.html#rhel-network-configuration-troubleshooting">Network configuration &amp; troubleshooting</a><a class="rr-chip" href="/solaris.html#q-how-do-you-troubleshoot-network-latency">Network latency (Solaris Q&amp;A)</a></div></section><section class="rr-scn" id="ssh-refused"><h3><span aria-hidden="true">🔑</span> SSH connection refused</h3><p>“Connection refused”, a timeout, or a login that is rejected.</p><div class="rr-code"><pre><code>systemctl status sshd
+ss -ltnp | grep &#x27;:22&#x27;
+firewall-cmd --list-all
+sshd -t; journalctl -u sshd -e --no-pager | tail</code></pre></div><p><strong>Why it happens:</strong> sshd not running or listening elsewhere, a firewall or security group, a bad sshd_config, SELinux port labels, or key/permission problems. Refused means a reply came back; a timeout usually means a firewall drop.</p><div class="links"><a class="rr-chip" href="/rhel.html#rhel-ssh-remote-administration">SSH &amp; remote administration</a><a class="rr-chip" href="/rhel.html#rhel-firewall-iptables">Firewall</a></div></section><section class="rr-scn" id="multipath"><h3><span aria-hidden="true">🔀</span> Multipath / SAN path failure</h3><p>Paths shown as failed or faulty, a missing LUN, or I/O errors from SAN storage.</p><div class="rr-code"><pre><code>multipath -ll
+multipathd show paths
+lsscsi; ls /sys/class/fc_host/
+dmesg -T | grep -i -E &#x27;multipath|scsi|fail|I/O error&#x27; | tail</code></pre></div><p><strong>Why it happens:</strong> A failed HBA, cable, switch port or controller; zoning or masking changes; or stale paths after a LUN was removed.</p><div class="links"><a class="rr-chip" href="/linux-admin.html#q-san1a">Multipath explained</a><a class="rr-chip" href="/linux-admin.html#q-san1b">Orphan paths</a><a class="rr-chip" href="/linux-admin.html#san-multipath-storage">SAN &amp; multipath</a></div></section><section class="rr-scn" id="lvm-issue"><h3><span aria-hidden="true">🗂️</span> LVM won’t extend / missing</h3><p>“Insufficient free space”, a VG or PV that is missing, or a filesystem that did not grow.</p><div class="rr-code"><pre><code>pvs; vgs; lvs
+vgs -o +vg_free_count,vg_free
+lsblk
+lvextend -r -L +5G /dev/VG/LV   # after checking free space</code></pre></div><p><strong>Why it happens:</strong> No free extents in the VG, a new disk not yet added with pvcreate and vgextend, or lvextend run without -r so the filesystem was not resized.</p><div class="links"><a class="rr-chip" href="/rhel.html#extending-lvm">Extending LVM</a><a class="rr-chip" href="/linux-admin.html#q-lvm1b">Extend an LV with no free space</a><a class="rr-chip" href="/rhel.html#lvm-components">LVM components</a></div></section><section class="rr-scn" id="boot-failure"><h3><span aria-hidden="true">🚫</span> Boot failure / rescue mode</h3><p>Drops to emergency shell, kernel panic, or stuck at GRUB or dracut.</p><div class="rr-code"><pre><code>systemctl --failed
+journalctl -xb -p err --no-pager
+cat /etc/fstab; findmnt --verify
+ls /boot; grubby --default-kernel</code></pre></div><p><strong>Why it happens:</strong> A bad /etc/fstab entry, a missing initramfs or kernel, a failed filesystem check, or a storage driver or LVM problem after patching.</p><div class="links"><a class="rr-chip" href="/rhel.html#boot-stages">Boot stages</a><a class="rr-chip" href="/os-interview.html#q-server-not-booting-after-patching-how-do-you-troubleshoo">Server not booting after patching</a><a class="rr-chip" href="/linux-admin.html#grub2-boot-kernel-management-dracut-issue-fix">GRUB2 / dracut fix</a></div></section><section class="rr-scn" id="selinux-denied"><h3><span aria-hidden="true">🛡️</span> SELinux denied</h3><p>Permission denied although file modes and ownership look right.</p><div class="rr-code"><pre><code>getenforce
+ausearch -m avc -ts recent
+ls -lZ /path
+restorecon -Rv /path</code></pre></div><p><strong>Why it happens:</strong> The file has the wrong SELinux context, a non-standard port or a boolean is not enabled. Fix the label or boolean; do not leave SELinux disabled.</p><div class="links"><a class="rr-chip" href="/rhel.html#troubleshooting-selinux-denials">Troubleshooting SELinux denials</a><a class="rr-chip" href="/rhel.html#selinux-port-management">SELinux port management</a></div></section><section class="rr-scn" id="zombie-d-state"><h3><span aria-hidden="true">🧟</span> Zombie / D-state processes</h3><p>Defunct (Z) processes pile up, or processes are stuck in uninterruptible sleep (D).</p><div class="rr-code"><pre><code>ps -eo pid,ppid,stat,wchan:20,cmd | awk &#x27;$3 ~ /^[ZD]/&#x27;
+ps -o pid,ppid,cmd -p PPID
+cat /proc/PID/stack   # root, kernel stack of a D process
+dmesg -T | tail -30</code></pre></div><p><strong>Why it happens:</strong> Zombies are finished children whose parent has not called wait(); fix or restart the parent. D-state is usually blocked on storage or NFS and cannot be killed until the I/O returns.</p><div class="links"><a class="rr-chip" href="/rhel.html#process-states">Process states</a><a class="rr-chip" href="/solaris.html#q-what-are-stale-nfs-mounts-and-how-do-you-resolve-them">Stale NFS mounts</a></div></section>
+</main>
+</div>
+<button id="btt" type="button" aria-label="Back to top" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
+</footer>
+<!--/rr:footer-->
+</body>
+</html>

@@ -1,0 +1,321 @@
+[
+ {
+  "id": "disk-full",
+  "icon": "💾",
+  "title": "Disk full",
+  "symptom": "“No space left on device”, a filesystem at 100%, or applications failing to write.",
+  "first": [
+   "df -hT",
+   "du -xh --max-depth=1 /var | sort -h | tail",
+   "df -i                # inodes",
+   "lsof +L1             # deleted files still held open"
+  ],
+  "why": "Large or runaway logs, deleted-but-open files, inode exhaustion, snapshots or thin pools filling up.",
+  "article": "disk-full",
+  "links": [
+   {
+    "t": "Inodes Q&A",
+    "u": "/os-interview.html#q-no-space-left-on-device-related-to-inodes"
+   },
+   {
+    "t": "Space free but cannot create files",
+    "u": "/os-interview.html#q-filesystem-shows-space-free-but-no-new-files-can-be-crea"
+   },
+   {
+    "t": "Extending LVM",
+    "u": "/rhel.html#extending-lvm"
+   }
+  ]
+ },
+ {
+  "id": "read-only",
+  "icon": "🔒",
+  "title": "Filesystem read-only",
+  "symptom": "“Read-only file system” when writing, or a mount that flipped to ro.",
+  "first": [
+   "findmnt -no TARGET,OPTIONS /path",
+   "dmesg -T | grep -i -E 'remount|I/O error|EXT4-fs|XFS'",
+   "lsblk -o NAME,RO,MOUNTPOINT",
+   "multipath -ll       # SAN: all paths down?"
+  ],
+  "why": "The kernel remounted ext4 read-only after I/O or metadata errors, the XFS log shut down, a SAN path/LUN failed, or the mount was ro by configuration.",
+  "article": "filesystem-read-only",
+  "links": [
+   {
+    "t": "fsck",
+    "u": "/rhel.html#fsck-file-system-check"
+   },
+   {
+    "t": "SAN & multipath",
+    "u": "/linux-admin.html#san-multipath-storage"
+   }
+  ]
+ },
+ {
+  "id": "high-load",
+  "icon": "📈",
+  "title": "High load",
+  "symptom": "Load average far above the CPU count; the server feels slow.",
+  "first": [
+   "uptime; nproc",
+   "vmstat 1 5",
+   "top -b -n1 | head -20",
+   "iostat -xz 1 3"
+  ],
+  "why": "Load counts runnable and uninterruptible (D-state) tasks, so CPU saturation, I/O waits and memory pressure can all raise it.",
+  "article": "high-load",
+  "links": [
+   {
+    "t": "SAR & performance",
+    "u": "/linux-admin.html#performance-monitoring-sar"
+   },
+   {
+    "t": "Top CPU/memory processes",
+    "u": "/linux-admin.html#q-perf1b"
+   }
+  ]
+ },
+ {
+  "id": "high-memory",
+  "icon": "🧠",
+  "title": "High memory / OOM",
+  "symptom": "Free memory near zero, heavy swapping, or processes killed by the OOM killer.",
+  "first": [
+   "free -h",
+   "ps -eo pid,user,%mem,rss,cmd --sort=-%mem | head",
+   "vmstat 1 5          # si/so = swap in/out",
+   "dmesg -T | grep -i -E 'out of memory|oom-killer'"
+  ],
+  "why": "A leaking or oversized process, too little RAM or swap for the workload, or cgroup limits. Check the “available” column, not “free”.",
+  "links": [
+   {
+    "t": "Memory & swap",
+    "u": "/rhel.html#rhel-memory-management-swap"
+   },
+   {
+    "t": "Find top memory processes",
+    "u": "/linux-admin.html#q-perf1b"
+   }
+  ]
+ },
+ {
+  "id": "high-iowait",
+  "icon": "⏳",
+  "title": "High I/O wait",
+  "symptom": "CPU is mostly idle but the system is slow; %wa is high in top or vmstat.",
+  "first": [
+   "vmstat 1 5          # wa and b columns",
+   "iostat -xz 1 5       # await, %util, aqu-sz",
+   "pidstat -d 1 5       # per-process disk I/O",
+   "ps -eo state,pid,wchan:20,cmd | awk '$1==\"D\"'"
+  ],
+  "why": "Slow or saturated storage (disk, SAN path, NFS server), a backup or scan hammering the disk, or failing hardware.",
+  "links": [
+   {
+    "t": "Fix disk I/O bottlenecks",
+    "u": "/os-interview.html#q-how-do-you-fix-disk-i-o-bottleneck-issues"
+   },
+   {
+    "t": "iostat explained",
+    "u": "/linux-admin.html#q-perf1c"
+   }
+  ]
+ },
+ {
+  "id": "service-wont-start",
+  "icon": "⚙️",
+  "title": "Service won’t start",
+  "symptom": "systemctl start fails, or the service is “failed” or flapping after a reboot.",
+  "first": [
+   "systemctl status SERVICE -l --no-pager",
+   "journalctl -xeu SERVICE --no-pager | tail -40",
+   "systemctl cat SERVICE",
+   "ss -ltnp             # port already in use?"
+  ],
+  "why": "Bad configuration, a missing ExecStart binary or user, a port conflict, permissions or SELinux, or an unmet dependency.",
+  "article": "service-wont-start",
+  "links": [
+   {
+    "t": "Managing services",
+    "u": "/rhel.html#rhel-managing-services-daemons"
+   },
+   {
+    "t": "systemd chapter",
+    "u": "/linux-guide/#systemd-services-start-stop-and-boot"
+   }
+  ]
+ },
+ {
+  "id": "network-down",
+  "icon": "🌐",
+  "title": "Network not working",
+  "symptom": "No connectivity, wrong IP, or names not resolving.",
+  "first": [
+   "ip -br addr; ip route",
+   "nmcli device status",
+   "ping -c3 GATEWAY; ping -c3 8.8.8.8",
+   "getent hosts example.com"
+  ],
+  "why": "Interface down or misconfigured, wrong gateway or VLAN, DNS failure, firewall rules or a duplicate IP.",
+  "links": [
+   {
+    "t": "Network configuration & troubleshooting",
+    "u": "/rhel.html#rhel-network-configuration-troubleshooting"
+   },
+   {
+    "t": "Network latency (Solaris Q&A)",
+    "u": "/solaris.html#q-how-do-you-troubleshoot-network-latency"
+   }
+  ]
+ },
+ {
+  "id": "ssh-refused",
+  "icon": "🔑",
+  "title": "SSH connection refused",
+  "symptom": "“Connection refused”, a timeout, or a login that is rejected.",
+  "first": [
+   "systemctl status sshd",
+   "ss -ltnp | grep ':22'",
+   "firewall-cmd --list-all",
+   "sshd -t; journalctl -u sshd -e --no-pager | tail"
+  ],
+  "why": "sshd not running or listening elsewhere, a firewall or security group, a bad sshd_config, SELinux port labels, or key/permission problems. Refused means a reply came back; a timeout usually means a firewall drop.",
+  "links": [
+   {
+    "t": "SSH & remote administration",
+    "u": "/rhel.html#rhel-ssh-remote-administration"
+   },
+   {
+    "t": "Firewall",
+    "u": "/rhel.html#rhel-firewall-iptables"
+   }
+  ]
+ },
+ {
+  "id": "multipath",
+  "icon": "🔀",
+  "title": "Multipath / SAN path failure",
+  "symptom": "Paths shown as failed or faulty, a missing LUN, or I/O errors from SAN storage.",
+  "first": [
+   "multipath -ll",
+   "multipathd show paths",
+   "lsscsi; ls /sys/class/fc_host/",
+   "dmesg -T | grep -i -E 'multipath|scsi|fail|I/O error' | tail"
+  ],
+  "why": "A failed HBA, cable, switch port or controller; zoning or masking changes; or stale paths after a LUN was removed.",
+  "links": [
+   {
+    "t": "Multipath explained",
+    "u": "/linux-admin.html#q-san1a"
+   },
+   {
+    "t": "Orphan paths",
+    "u": "/linux-admin.html#q-san1b"
+   },
+   {
+    "t": "SAN & multipath",
+    "u": "/linux-admin.html#san-multipath-storage"
+   }
+  ]
+ },
+ {
+  "id": "lvm-issue",
+  "icon": "🗂️",
+  "title": "LVM won’t extend / missing",
+  "symptom": "“Insufficient free space”, a VG or PV that is missing, or a filesystem that did not grow.",
+  "first": [
+   "pvs; vgs; lvs",
+   "vgs -o +vg_free_count,vg_free",
+   "lsblk",
+   "lvextend -r -L +5G /dev/VG/LV   # after checking free space"
+  ],
+  "why": "No free extents in the VG, a new disk not yet added with pvcreate and vgextend, or lvextend run without -r so the filesystem was not resized.",
+  "links": [
+   {
+    "t": "Extending LVM",
+    "u": "/rhel.html#extending-lvm"
+   },
+   {
+    "t": "Extend an LV with no free space",
+    "u": "/linux-admin.html#q-lvm1b"
+   },
+   {
+    "t": "LVM components",
+    "u": "/rhel.html#lvm-components"
+   }
+  ]
+ },
+ {
+  "id": "boot-failure",
+  "icon": "🚫",
+  "title": "Boot failure / rescue mode",
+  "symptom": "Drops to emergency shell, kernel panic, or stuck at GRUB or dracut.",
+  "first": [
+   "systemctl --failed",
+   "journalctl -xb -p err --no-pager",
+   "cat /etc/fstab; findmnt --verify",
+   "ls /boot; grubby --default-kernel"
+  ],
+  "why": "A bad /etc/fstab entry, a missing initramfs or kernel, a failed filesystem check, or a storage driver or LVM problem after patching.",
+  "links": [
+   {
+    "t": "Boot stages",
+    "u": "/rhel.html#boot-stages"
+   },
+   {
+    "t": "Server not booting after patching",
+    "u": "/os-interview.html#q-server-not-booting-after-patching-how-do-you-troubleshoo"
+   },
+   {
+    "t": "GRUB2 / dracut fix",
+    "u": "/linux-admin.html#grub2-boot-kernel-management-dracut-issue-fix"
+   }
+  ]
+ },
+ {
+  "id": "selinux-denied",
+  "icon": "🛡️",
+  "title": "SELinux denied",
+  "symptom": "Permission denied although file modes and ownership look right.",
+  "first": [
+   "getenforce",
+   "ausearch -m avc -ts recent",
+   "ls -lZ /path",
+   "restorecon -Rv /path"
+  ],
+  "why": "The file has the wrong SELinux context, a non-standard port or a boolean is not enabled. Fix the label or boolean; do not leave SELinux disabled.",
+  "links": [
+   {
+    "t": "Troubleshooting SELinux denials",
+    "u": "/rhel.html#troubleshooting-selinux-denials"
+   },
+   {
+    "t": "SELinux port management",
+    "u": "/rhel.html#selinux-port-management"
+   }
+  ]
+ },
+ {
+  "id": "zombie-d-state",
+  "icon": "🧟",
+  "title": "Zombie / D-state processes",
+  "symptom": "Defunct (Z) processes pile up, or processes are stuck in uninterruptible sleep (D).",
+  "first": [
+   "ps -eo pid,ppid,stat,wchan:20,cmd | awk '$3 ~ /^[ZD]/'",
+   "ps -o pid,ppid,cmd -p PPID",
+   "cat /proc/PID/stack   # root, kernel stack of a D process",
+   "dmesg -T | tail -30"
+  ],
+  "why": "Zombies are finished children whose parent has not called wait(); fix or restart the parent. D-state is usually blocked on storage or NFS and cannot be killed until the I/O returns.",
+  "links": [
+   {
+    "t": "Process states",
+    "u": "/rhel.html#process-states"
+   },
+   {
+    "t": "Stale NFS mounts",
+    "u": "/solaris.html#q-what-are-stale-nfs-mounts-and-how-do-you-resolve-them"
+   }
+  ]
+ }
+]

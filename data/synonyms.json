@@ -1,0 +1,232 @@
+{
+ "lv": [
+  "lvm",
+  "logical volume"
+ ],
+ "vg": [
+  "volume group",
+  "lvm"
+ ],
+ "pv": [
+  "physical volume",
+  "lvm"
+ ],
+ "fs": [
+  "filesystem"
+ ],
+ "ro": [
+  "read-only"
+ ],
+ "oom": [
+  "out of memory",
+  "oom-killer"
+ ],
+ "nic": [
+  "network interface",
+  "bonding"
+ ],
+ "selinux": [
+  "avc",
+  "semanage",
+  "restorecon"
+ ],
+ "mpath": [
+  "multipath",
+  "dm-multipath"
+ ],
+ "rhcsa": [
+  "rhel"
+ ],
+ "ldom": [
+  "ldoms",
+  "logical domain"
+ ],
+ "disk full": [
+  "no space left",
+  "df",
+  "inode"
+ ],
+ "high load": [
+  "load average",
+  "uptime",
+  "vmstat"
+ ],
+ "k8s": [
+  "kubernetes"
+ ],
+ "aap": [
+  "ansible automation platform",
+  "tower",
+  "awx"
+ ],
+ "tower": [
+  "aap",
+  "awx"
+ ],
+ "cpu": [
+  "load average",
+  "top"
+ ],
+ "mem": [
+  "memory",
+  "swap"
+ ],
+ "ssh": [
+  "sshd",
+  "openssh"
+ ],
+ "fw": [
+  "firewall",
+  "firewalld",
+  "iptables"
+ ],
+ "firewall": [
+  "firewalld",
+  "iptables",
+  "nftables"
+ ],
+ "boot": [
+  "grub",
+  "initramfs",
+  "dracut"
+ ],
+ "reboot": [
+  "boot",
+  "shutdown"
+ ],
+ "patch": [
+  "patching",
+  "yum",
+  "dnf",
+  "update"
+ ],
+ "update": [
+  "patching",
+  "dnf",
+  "yum"
+ ],
+ "perf": [
+  "performance",
+  "sar",
+  "vmstat",
+  "iostat"
+ ],
+ "cron": [
+  "crontab",
+  "scheduling",
+  "at"
+ ],
+ "dns": [
+  "bind",
+  "named",
+  "resolv"
+ ],
+ "time": [
+  "chrony",
+  "ntp"
+ ],
+ "ntp": [
+  "chrony"
+ ],
+ "ldap": [
+  "openldap",
+  "sssd"
+ ],
+ "san": [
+  "multipath",
+  "hba",
+  "lun"
+ ],
+ "lun": [
+  "san",
+  "multipath"
+ ],
+ "hba": [
+  "fibre channel",
+  "san"
+ ],
+ "zombie": [
+  "defunct",
+  "process states"
+ ],
+ "hung": [
+  "d state",
+  "uninterruptible"
+ ],
+ "permissions": [
+  "chmod",
+  "chown",
+  "acl",
+  "umask"
+ ],
+ "sudo": [
+  "sudoers",
+  "visudo"
+ ],
+ "container": [
+  "podman",
+  "docker"
+ ],
+ "docker": [
+  "podman",
+  "container"
+ ],
+ "git": [
+  "version control"
+ ],
+ "raid": [
+  "mdadm",
+  "lvm",
+  "perc"
+ ],
+ "idrac": [
+  "dell",
+  "racadm"
+ ],
+ "ilo": [
+  "hp",
+  "proliant"
+ ],
+ "zones": [
+  "solaris zones",
+  "container"
+ ],
+ "smf": [
+  "svcadm",
+  "svcs"
+ ],
+ "bonding": [
+  "teaming",
+  "lacp",
+  "nic"
+ ],
+ "swap": [
+  "memory",
+  "paging"
+ ],
+ "read only": [
+  "read-only",
+  "ro",
+  "remount"
+ ],
+ "no space": [
+  "disk full",
+  "df",
+  "inode"
+ ],
+ "cannot write": [
+  "read-only",
+  "disk full",
+  "permission"
+ ],
+ "permission denied": [
+  "selinux",
+  "chmod",
+  "acl"
+ ],
+ "slow": [
+  "performance",
+  "load average",
+  "iowait"
+ ]
+}
