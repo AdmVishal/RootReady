@@ -3,21 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
-<meta name="theme-color" content="#12161c">
-<meta name="description" content="HP-UX & Common Ops — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="HP-UX & Common Ops — root_n_reels">
-<meta property="og:description" content="HP-UX & Common Ops — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
-<meta property="og:image" content="https://www.rootnreels.in/assets/logo-lockup.png">
-<meta property="og:url" content="https://www.rootnreels.in/hpux.html">
-<meta name="twitter:card" content="summary_large_image">
-<title>HP-UX & Common Ops — root_n_reels</title>
+<title>HP-UX 11i Administration &amp; Common Ops: LVM, VxFS, Ignite-UX, Serviceguard | root_n_reels</title>
 <link rel="stylesheet" href="studyhub.css?v=20260911">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* ── site-wide overrides ── */
 :root { --topbar-h:58px; --sidebar-w:240px; }
@@ -202,40 +189,90 @@ tr:hover td { background:rgba(20,30,50,.025); }
 
 
 </style>
-</head>
-<body>
+<!--rr:head-->
+<meta name="description" content="HP-UX 11i reference (PA-RISC/Itanium, LVM/VxFS, Ignite-UX) plus cross-platform common operations: remote access, clustering, vSphere, patching, backup and ITSM.">
+<link rel="canonical" href="https://www.rootnreels.in/hpux.html">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="HP-UX 11i Administration &amp; Common Ops: LVM, VxFS, Ignite-UX, Serviceguard | root_n_reels"><meta property="og:description" content="HP-UX 11i reference (PA-RISC/Itanium, LVM/VxFS, Ignite-UX) plus cross-platform common operations: remote access, clustering, vSphere, patching, backup and ITSM.">
+<meta property="og:url" content="https://www.rootnreels.in/hpux.html"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="HP-UX 11i Administration &amp; Common Ops: LVM, VxFS, Ignite-UX, Serviceguard | root_n_reels"><meta name="twitter:description" content="HP-UX 11i reference (PA-RISC/Itanium, LVM/VxFS, Ignite-UX) plus cross-platform common operations: remote access, clustering, vSphere, patching, backup and ITSM."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"Unix","item":"https://www.rootnreels.in/unix/"},{"@type":"ListItem","position":3,"name":"HP-UX & Common Ops","item":"https://www.rootnreels.in/hpux.html"}]},{"@type":"TechArticle","headline":"HP-UX & Common Ops","description":"HP-UX 11i reference (PA-RISC/Itanium, LVM/VxFS, Ignite-UX) plus cross-platform common operations: remote access, clustering, vSphere, patching, backup and ITSM.","url":"https://www.rootnreels.in/hpux.html","mainEntityOfPage":"https://www.rootnreels.in/hpux.html","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-09-24","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Expert","dependencies":"HP-UX 11i + cross-platform ops"}]}</script>
+<!--/rr:head--></head>
+<body class="rr" data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-<div id="site-topbar">
-  <a href="index.html" class="logo"><img src="assets/logo-icon.png" alt="root_n_reels" class="logo-img">root<span>_n_</span>reels</a>
-  <span class="page-title-bar">HP-UX · Common Operations · Legacy Reference</span>
-  <div class="topbar-spacer"></div>
-  <button id="menu-btn" onclick="toggleNav()">☰</button>
-</div>
-<div id="prog"></div>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/">Linux</a><a href="/unix/" aria-current="page">Unix</a><a href="/networking/">Networking</a><a href="/devops/">DevOps</a><a href="/troubleshooting/">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header--><div id="prog"></div>
 <div id="mob-ov" onclick="toggleNav()"></div>
 
 <div class="site-body">
-  <nav id="site-nav">
-    <div class="nav-sec">Navigation</div>
-<a href="youtube.html" class="nav-link">📺 YouTube Tutorials</a>
-    <a href="index.html" class="nav-link ">🏠 Home</a>
-<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
-<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
-<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
-<a href="hpux.html" class="nav-link active">🟧 HP-UX</a>
-<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
-<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
-<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
-<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
-<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
-<a href="ansible.html" class="nav-link">🤖 Ansible AAP</a>
-<a href="devops-bible.html" class="nav-link">♾️ DevOps Bible</a>
-<a href="index.html#contact" class="nav-link ">✉️ Contact</a>
-
-
-  </nav>
+  <!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
 
   <main id="main-content">
+<!--rr:crumbs--><nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/unix/">Unix</a></li><li aria-current="page">HP-UX &amp; Common Ops</li></ol></nav><!--/rr:crumbs-->
     
 <div class="page-hero">
   <h1>🟧 HP-UX, Common Ops &amp; Legacy</h1>
@@ -247,6 +284,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
     <span class="badge badge-green">29+ Sections</span>
   </div>
 </div>
+<!--rr:meta--><div class="rr-meta"><span class="chip" style="--cat:#D97706"><span class="dot"></span>Unix</span><span class="chip">L2–L3</span><span class="chip">Q&amp;A</span><span class="chip" title="Versions this page covers">Covers: HP-UX 11i + cross-platform ops</span><span>Long reference · ~75 min</span> <span>Updated <time datetime="2026-09-24">2026-09-24</time></span> <span>by Vishal Sharma</span><span class="acts"><button type="button" class="rr-act" data-rr-save aria-pressed="false"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Save</span></button><button type="button" class="rr-act" data-rr-share><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span class="lbl">Share</span></button><button type="button" class="rr-act" data-rr-print><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">Print</span></button></span></div><!--/rr:meta-->
 <div class="content-section section-card" id="tab-hpux-overview">
 <div class="ph"><div class="ph-row">
 <div class="ph-icon" style="background:#f9731622">🟧</div>
@@ -300,7 +338,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">HP-UX 11i v1/v2/v3 (B.11.31), PA-RISC vs Itanium, hardware/version/patch identification commands.</div>
 </div>
 </div></div>
-<div id="cards-hpux-hpux-platform"><div class="qc concept" onclick="tq(this)">
+<div id="cards-hpux-hpux-platform"><div class="qc concept" id="q-what-is-hp-ux-and-on-what-hardware-does-it-run" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -310,7 +348,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">HP-UX is Hewlett Packard's commercial UNIX, derived from System V. It runs only on HP/HPE proprietary hardware: PA-RISC (HP 9000) and Itanium (HPE Integrity rx/Superdome) servers. HP-UX 11i v3 is 64-bit. End of standard support is 2025–2026, so most estates are being migrated, but L3 admins are still expected to support them through end of life.</p><table class="dt"><thead><tr><th>Release</th><th>Internal Name</th><th>Notes</th></tr></thead><tbody><tr><td>HP-UX 11i v1</td><td>B.11.11</td><td>PA-RISC era; legacy</td></tr><tr><td>HP-UX 11i v2</td><td>B.11.23</td><td>First Itanium release</td></tr><tr><td>HP-UX 11i v3</td><td>B.11.31</td><td>Current and final; PA-RISC + Itanium; agile addressing</td></tr></tbody></table></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-how-do-you-identify-hp-ux-version-hardware-model-and-pat" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-cm">Commands</span>
@@ -329,7 +367,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">End-to-end LV creation, the mknod group gotcha, VxFS Online JFS resize and Online JFS licensing trap.</div>
 </div>
 </div></div>
-<div id="cards-hpux-hpux-storage"><div class="qc concept" onclick="tq(this)">
+<div id="cards-hpux-hpux-storage"><div class="qc concept" id="q-compare-hp-ux-lvm-with-linux-lvm-how-do-you-create-an-lv" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -339,7 +377,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><table class="dt"><thead><tr><th>Concept</th><th>Linux LVM</th><th>HP-UX LVM</th></tr></thead><tbody><tr><td>Init disk</td><td>pvcreate /dev/sdb</td><td>pvcreate /dev/rdsk/c0t1d0</td></tr><tr><td>Allocation unit</td><td>Physical Extent, default 4 MiB</td><td>Physical Extent, default 4 MB</td></tr><tr><td>Create VG</td><td>vgcreate vg_data /dev/sdb</td><td>vgcreate /dev/vg01 /dev/dsk/c0t1d0</td></tr><tr><td>VG metadata</td><td>/etc/lvm/</td><td>/etc/lvmtab</td></tr><tr><td>Create LV</td><td>lvcreate -L 20G -n lv_app vg_data</td><td>lvcreate -L 20480 -n lv_app /dev/vg01</td></tr><tr><td>Filesystem</td><td>mkfs.xfs / mkfs.ext4</td><td>newfs -F vxfs /dev/vg01/rlv_app</td></tr><tr><td>Online grow</td><td>lvextend -L +10G -r</td><td>lvextend then fsadm / extendfs</td></tr><tr><td>Default FS</td><td>XFS / ext4</td><td>VxFS (HFS legacy)</td></tr></tbody></table><div class="cb"><div class="cl"><span class="cm"># Full end-to-end on HP-UX 11i v3:</span></div><div class="cl"><span class="kw">ioscan -funC disk</span><span class="cm">                    # Discover disks</span></div><div class="cl"><span class="kw">insf -e</span><span class="cm">                              # Create device special files</span></div><div class="cl"><span class="kw">pvcreate -f /dev/rdsk/c2t1d0</span><span class="cm">         # Initialise as PV</span></div><div class="cl"><span class="kw">mkdir /dev/vg01</span><span class="cm">                      # VG directory</span></div><div class="cl"><span class="kw">mknod /dev/vg01/group c 64 0x010000</span><span class="cm">  # Group device node</span></div><div class="cl"><span class="kw">vgcreate /dev/vg01 /dev/dsk/c2t1d0</span></div><div class="cl"><span class="kw">lvcreate -L 20480 -n lv_app /dev/vg01</span><span class="cm">  # Size in MB on HP-UX</span></div><div class="cl"><span class="kw">newfs -F vxfs /dev/vg01/rlv_app</span></div><div class="cl"><span class="kw">mkdir /app &amp;&amp; mount /dev/vg01/lv_app /app</span></div><div class="cl"><span class="kw">echo '/dev/vg01/lv_app /app vxfs delaylog 0 2' &gt;&gt; /etc/fstab</span></div></div><div class="box warn">HP-UX VG creation needs a unique minor number in the group device file (0x010000 for vg01; vg02 would be 0x020000). Forgetting <code>mknod group</code> is the most common HP-UX LVM mistake on the job.</div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-how-do-you-extend-an-hp-ux-lv-and-grow-the-vxfs-filesyst" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-cm">Commands</span>
@@ -358,7 +396,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Integrity EFI boot, swinstall + Quality Pack + swverify, kctune dynamic tunables and Oracle-on-HP-UX tunables.</div>
 </div>
 </div></div>
-<div id="cards-hpux-hpux-boot"><div class="qc concept" onclick="tq(this)">
+<div id="cards-hpux-hpux-boot"><div class="qc concept" id="q-describe-the-hp-ux-boot-process-on-integrity-itanium-har" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -368,7 +406,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>Power on → POST runs from PDC/EFI firmware.</li><li>EFI Boot Manager presents options (HPUX, Service Menu, Shell).</li><li>EFI loads HPUX.EFI (the HP-UX bootloader) from /EFI/HPUX on the EFI System Partition.</li><li>HPUX.EFI loads /stand/vmunix (the kernel) and the AUTO file determines boot mode.</li><li>Kernel initialises, mounts / from /etc/fstab, runs /sbin/init.</li><li>init reads /etc/inittab and runs /sbin/rc which executes /sbin/rcN.d/Sxx scripts for the target run level.</li></ol><div class="cb"><div class="cl"><span class="cm"># Interrupt boot to access EFI:</span></div><div class="cl"><span class="cm"># At boot prompt press any key, then select 'EFI Shell'</span></div><div class="cl"><span class="kw">fs0:</span><span class="cm">                                  # Switch to the EFI partition</span></div><div class="cl"><span class="kw">hpux</span><span class="cm">                                  # Run the HP-UX loader manually</span></div><div class="cl"><span class="kw">boot -is /stand/vmunix</span><span class="cm">                # Boot single-user (interactive)</span></div><div class="cl"><span class="kw">boot -lm /stand/vmunix</span><span class="cm">                # LVM maintenance mode</span></div><div class="cl"><span class="cm"># Once running:</span></div><div class="cl"><span class="kw">/usr/sbin/setboot</span><span class="cm">                     # Show / change primary/alt paths</span></div><div class="cl"><span class="kw">/usr/sbin/setboot -p &lt;hwpath&gt;</span><span class="cm">         # Set new primary boot path</span></div><div class="cl"><span class="kw">/usr/sbin/lvlnboot -v</span><span class="cm">                 # Validate boot LV layout</span></div></div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-how-do-you-install-patches-on-hp-ux-using-swinstall-and" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-cm">Commands</span>
@@ -378,7 +416,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">Patches arrive as depots (.depot or directory format). The Software Distributor (SD-UX) tools (swinstall, swremove, swlist, swverify) manage them. A Quality Pack (QPK) is a tested bundle of patches HP releases periodically — usually you install QPK plus selected critical patches rather than individual fixes.</p><div class="cb"><div class="cl"><span class="cm"># Inspect a depot before installing:</span></div><div class="cl"><span class="kw">swlist -d -s /var/tmp/qpkbase.depot</span></div><div class="cl"><span class="cm"># Install from a depot (interactive TUI):</span></div><div class="cl"><span class="kw">swinstall -s /var/tmp/qpkbase.depot</span></div><div class="cl"><span class="cm"># Install all patches non-interactively:</span></div><div class="cl"><span class="kw">swinstall -x autoreboot=true -x patch_match_target=true \</span></div><div class="cl"><span class="kw">          -s /var/tmp/qpkbase.depot \*</span></div><div class="cl"><span class="cm"># After install, verify integrity:</span></div><div class="cl"><span class="kw">swverify \*</span><span class="cm">                          # Verify all software</span></div><div class="cl"><span class="kw">swlist -l patch | wc -l</span><span class="cm">              # Count installed patches</span></div><div class="cl"><span class="kw">swlist -l bundle | grep -i quality</span><span class="cm">   # Confirm QPK level</span></div><div class="cl"><span class="cm"># Remove a bad patch:</span></div><div class="cl"><span class="kw">swremove PHKL_45678</span></div><div class="cl"><span class="cm"># Cleanup committed patches to free space:</span></div><div class="cl"><span class="kw">cleanup -c 1</span><span class="cm">                          # Keep 1 superseded version</span></div></div><div class="box tip">Mention <code>swverify</code> in interviews — it audits all installed software against its manifests, similar to <code>rpm -V</code> but built into SD-UX. Senior admins run it after every patch session.</div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-how-do-you-tune-the-hp-ux-kernel-compare-with-linux-sysc" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-cm">Commands</span>
@@ -397,7 +435,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Network OS install, make_net_recovery for DR, golden-image cloning, and web admin via SMH.</div>
 </div>
 </div></div>
-<div id="cards-hpux-hpux-deploy"><div class="qc concept" onclick="tq(this)">
+<div id="cards-hpux-hpux-deploy"><div class="qc concept" id="q-what-is-ignite-ux-and-how-do-you-use-it-for-os-deploymen" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -407,7 +445,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">Ignite-UX is HP's equivalent of Kickstart (RHEL) or JumpStart / AI (Solaris) — a network installation framework that also produces system-recovery archives. It is core to every HP-UX shop for disaster recovery.</p><ul class="sl"><li>Network OS install: PXE-like boot from an Ignite server, then automated install using a configuration profile.</li><li>System recovery: <code>make_net_recovery</code> creates a bootable network archive of a live system; <code>make_tape_recovery</code> writes one to DDS/LTO tape.</li><li>Cloning: capture one golden system with <code>make_net_recovery</code>, then deploy it to dozens of identical servers.</li><li>Restore: boot the target from Ignite or the recovery tape and the system is rebuilt automatically.</li></ul><div class="cb"><div class="cl"><span class="cm"># Make a bootable network recovery archive (client → Ignite server):</span></div><div class="cl"><span class="kw">make_net_recovery -s ignite-server -a 192.168.0.50:/var/opt/ignite/recovery</span></div><div class="cl"><span class="cm"># Tape-based recovery to /dev/rmt/0mn:</span></div><div class="cl"><span class="kw">make_tape_recovery -a /dev/rmt/0mn -v</span></div><div class="cl"><span class="cm"># On the Ignite server — clients and archives:</span></div><div class="cl"><span class="kw">/opt/ignite/bin/manage_index -l</span></div><div class="cl"><span class="cm"># View manifest of a recovered system:</span></div><div class="cl"><span class="kw">/opt/ignite/bin/print_manifest</span></div></div><div class="box star">Knowing <code>make_net_recovery</code> by name (and being able to say it ran nightly for 100+ HP-UX servers in your environment) is one of the strongest HP-UX seniority signals you can give.</div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-explain-sam-smh-and-when-you-use-them-versus-the-cli" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-co">Concept</span>
@@ -426,7 +464,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">glance key-bindings (c/d/m/t), and HP-UX↔Linux tool mapping for live performance triage.</div>
 </div>
 </div></div>
-<div id="cards-hpux-hpux-perf"><div class="qc command" onclick="tq(this)">
+<div id="cards-hpux-hpux-perf"><div class="qc command" id="q-which-performance-tools-do-you-use-on-hp-ux-and-how-do-t" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-cm">Commands</span>
@@ -445,7 +483,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">vPars vs Integrity VMs vs nPars (common confusion), plus Serviceguard cluster diagnostics with cmviewcl.</div>
 </div>
 </div></div>
-<div id="cards-hpux-hpux-virt"><div class="qc concept" onclick="tq(this)">
+<div id="cards-hpux-hpux-virt"><div class="qc concept" id="q-compare-hp-ux-virtual-partitions-vpars-integrity-vms-hpv" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -455,7 +493,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><table class="dt"><thead><tr><th>Technology</th><th>Granularity</th><th>Isolation</th><th>Best For</th></tr></thead><tbody><tr><td>nPar (hard partition)</td><td>By cell board</td><td>Electrical (no shared HW)</td><td>Maximum isolation, large Superdome</td></tr><tr><td>vPar (virtual partition)</td><td>By CPU/RAM share</td><td>Software-level, hard-partitioned CPUs</td><td>Multiple independent OS instances on one box</td></tr><tr><td>Integrity VM (HPVM)</td><td>Full hypervisor</td><td>Hypervisor-managed</td><td>Server consolidation, dynamic workloads</td></tr></tbody></table><div class="cb"><div class="cl"><span class="cm"># vPar — list and manage:</span></div><div class="cl"><span class="kw">vparstatus</span><span class="cm">                           # List vPars + resources</span></div><div class="cl"><span class="kw">vparcreate -p vpar1 -a cpu::2 -a mem::4096</span></div><div class="cl"><span class="kw">vparmodify -p vpar1 -a cpu::4</span><span class="cm">        # Live CPU add</span></div><div class="cl"><span class="kw">vparboot -p vpar1</span></div><div class="cl"><span class="cm"># Integrity VM — like KVM/VMware:</span></div><div class="cl"><span class="kw">hpvmstatus</span><span class="cm">                           # List guest VMs</span></div><div class="cl"><span class="kw">hpvmcreate -P guest1 -O hpux -c 2 -r 4G -d disk:scsi::file:/var/opt/hpvm/guest1/disk1</span></div><div class="cl"><span class="kw">hpvmstart  -P guest1</span></div><div class="cl"><span class="kw">hpvmconsole -P guest1</span><span class="cm">                # Attach to guest console</span></div></div><div class="box warn">vPars and HPVM are NOT the same — interviewers test this. vPars are hard partitions of physical CPUs sharing one chassis; HPVM is a hypervisor running fully virtualised guests. Mixing them up is an instant red flag.</div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-what-is-hp-serviceguard-and-how-do-you-check-the-health" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-cm">Commands</span>
@@ -474,7 +512,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Live perf hang triage with kcusage, EFI boot recovery via vmunix.prev, and the 15-task HP-UX↔Solaris↔RHEL comparison table.</div>
 </div>
 </div></div>
-<div id="cards-hpux-hpux-scenarios"><div class="qc scenario" onclick="tq(this)">
+<div id="cards-hpux-hpux-scenarios"><div class="qc scenario" id="q-scenario-an-hp-ux-11i-v3-production-server-is-intermitte" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-s">Scenario</span>
@@ -484,7 +522,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>Take ownership on the bridge. Confirm symptoms with timestamps from app logs vs. system metrics.</li><li>Live capture during the next hang: keep <code>glance</code>, <code>vmstat 1</code>, <code>sar -d 1</code> and <code>iostat 1</code> running in screen sessions.</li><li>CPU vs. I/O: in <code>glance</code> press 'c' — any CPU pinned in sys%? Press 'd' — any device with await &amp;gt; 50ms?</li><li>Memory: <code>swapinfo -tm</code>; check paging via vmstat <code>pi/po</code>.</li><li>Kernel pressure: <code>kctune</code> for table limits hitting their max (<code>nfile</code>, <code>nproc</code>, <code>nflocks</code>); use <code>kcusage</code> for live consumption.</li><li>Filesystem: VxFS intent-log saturation — <code>vxstat -f</code> and <code>vxfsstat -v /app</code>.</li><li>Network: <code>lanadmin -g mibstats &amp;lt;ppa&amp;gt;</code> for errors; <code>netstat -s</code> for retransmits.</li><li>HBA / SAN: <code>ioscan -funC disk</code>, EMS hardware events in <code>/var/opt/resmon/log</code>.</li><li>If still unresolved: <code>cstm</code> diagnostics and HPE Support with the OS manifest + supportinfo bundle.</li><li>Document the RCA, update the runbook, share with L1/L2.</li></ol><div class="box tip"><code>kcusage</code> is the HP-UX-specific tool nobody remembers — it shows which kernel tunables are approaching their limit. Mentioning it during a perf scenario is a strong L3 signal.</div></div>
-</div><div class="qc critical" onclick="tq(this)">
+</div><div class="qc critical" id="q-scenario-an-hp-ux-server-will-not-boot-it-stops-at-the-e" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-c">Critical</span>
@@ -494,7 +532,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>Connect via the iLO/MP console — the EFI shell will already be visible.</li><li>From EFI: <code>fs0:</code> to access the EFI partition; <code>ls</code> to confirm HPUX.EFI is present.</li><li>Boot the previous kernel manually: <code>hpux /stand/vmunix.prev</code> (HP-UX keeps the previous kernel as <code>vmunix.prev</code> after a patch).</li><li>Once booted, set the system to use the previous kernel: <code>kconfig -a previous</code> to activate the previous configuration.</li><li>If kernel files are missing, boot from an Ignite-UX recovery image: <code>boot lan.&amp;lt;ignite-ip&amp;gt; install</code> from EFI.</li><li>Restore the system from the most recent <code>make_net_recovery</code> archive.</li><li>Investigate which patch caused the issue and engage HPE; raise a problem ticket.</li></ol><div class="box warn">HP-UX maintains the previous kernel automatically — this is why kernel patching on HP-UX feels safer than Linux. Never skip <code>kconfig</code> verification after a kernel patch — the rollback path depends on it.</div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-uick-reference-side-by-side-comparison-of-common-tasks-a" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-cm">Commands</span>
@@ -573,7 +611,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Out-of-band server management with HP iLO 3/4 and Cisco UCS Service Profiles for stateless compute.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-remote"><div class="qc concept" onclick="tq(this)">
+<div id="cards-common-cmn-remote"><div class="qc concept" id="q-what-is-hp-ilo-and-what-can-you-do-with-it" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -583,7 +621,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">iLO (Integrated Lights-Out) is HP's out-of-band management processor — a dedicated chip with its own network port, independent of the host OS and power state.</p><ul class="sl"><li>Integrated Remote Console (IRC) — KVM-over-IP video/keyboard/mouse access.</li><li>Virtual Media — mount an ISO remotely for OS install or rescue.</li><li>Power control — graceful shutdown, hard reset, power cycle.</li><li>Integrated Management Log (IML) — hardware fault diagnostics (drives, DIMMs, NIC, thermal).</li><li>hponcfg / RIBCL — CLI and scriptable XML configuration of iLO from the host OS.</li><li>iLO4 adds REST API (Redfish) and an HTML5 console over iLO3.</li></ul><div class="cb"><div class="cl"><span class="cm"># From the host OS — dump current iLO config</span></div><div class="cl"><span class="kw">hponcfg -g</span></div><div class="cl"><span class="cm"># Push a corrected iLO config (RIBCL XML), zero OS downtime</span></div><div class="cl"><span class="kw">hponcfg -f corrected_ilo.xml</span></div><div class="cl"><span class="kw">hpasmcli -s 'show temp; show fans'</span></div></div></div>
-</div><div class="qc critical" onclick="tq(this)">
+</div><div class="qc critical" id="q-a-remote-server-is-unreachable-via-ssh-and-you-cannot-ge" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-c">Critical</span>
@@ -593,7 +631,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>Access the iLO interface on its dedicated management network (OOB) — independent of production.</li><li>Open the Integrated Remote Console for a direct video feed — OS crashed, hung on boot, or kernel panic?</li><li>Review the IML for hardware alerts: failed drives, memory errors, NIC faults, thermal events.</li><li>Check the System Event Log (SEL) for BIOS/hardware-level errors.</li><li>If the OS is hung: attempt graceful shutdown via iLO; only hard-reset after documenting the decision.</li><li>If the OS cannot boot: mount a rescue ISO via Virtual Media.</li><li>Document every action in the incident ticket with timestamps.</li></ol><div class="box tip">Saying “management network / OOB” signals you understand iLO network segmentation. Mentioning hponcfg for config-from-OS shows real depth.</div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-explain-the-cisco-ucs-architecture-and-the-role-of-ucs-m" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-co">Concept</span>
@@ -603,7 +641,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>UCS Manager (UCSM) — centralised management for blade/rack servers; runs on the Fabric Interconnect pair.</li><li>Fabric Interconnects (FI) — redundant A/B pair providing unified Ethernet + FC connectivity and failover.</li><li>Service Profiles — hardware identity (MAC, WWN, UUID, boot policy, firmware) defined in software, not bound to physical hardware.</li><li>vNICs / vHBAs — virtual interfaces presented to the server from FI-level policies.</li><li>UCS KVM — Java/HTML5 console (equivalent to iLO for Cisco hardware).</li></ul></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-explain-how-a-ucs-service-profile-enables-server-replace" onclick="tq(this)">
 <div class="qh">
 <span class="qn">04</span>
 <span class="qb b-co">Concept</span>
@@ -613,7 +651,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">A service profile binds all hardware identity (MAC, WWN, UUID, boot policy, network/storage policies) to a logical object rather than the physical blade. When a blade fails I disassociate the profile from the dead hardware and reassociate it to a spare. The new blade inherits identical MACs and WWNs, boots from SAN, and is operational in minutes. From the network and storage perspective the server is identical — this is what makes UCS compute truly stateless and ideal for HA.</p><div class="box tip">This demonstrates senior-level UCS understanding. Interviewers can tell whether you have actually performed a service-profile move or are reciting theory — speak from experience.</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-a-ucs-blade-shows-intermittent-network-drops-th" onclick="tq(this)">
 <div class="qh">
 <span class="qn">05</span>
 <span class="qb b-s">Scenario</span>
@@ -632,7 +670,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Corosync/Pacemaker/STONITH, GFS2 distributed filesystem, split-brain recovery and Veritas Cluster Server.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-cluster"><div class="qc concept" onclick="tq(this)">
+<div id="cards-common-cmn-cluster"><div class="qc concept" id="q-explain-the-rhel-ha-cluster-stack-corosync-pacemaker-pcs" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -642,7 +680,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Corosync — cluster communication/membership layer; manages quorum (corosync.conf).</li><li>Pacemaker — resource manager; controls resource agents (VIPs, services, filesystems).</li><li>pcs — command suite (replaces ccs/crm in RHEL 7+) to configure and manage the cluster.</li><li>GFS2 — cluster-aware filesystem allowing concurrent read/write from multiple nodes; requires DLM.</li><li>STONITH / Fencing — 'Shoot The Other Node In The Head'; mandatory for split-brain prevention.</li></ul><div class="cb"><div class="cl"><span class="kw">pcs status</span><span class="cm">                        # Cluster + resource status</span></div><div class="cl"><span class="kw">pcs resource show</span><span class="cm">                 # Configured resources</span></div><div class="cl"><span class="kw">pcs cluster start --all</span></div><div class="cl"><span class="kw">pcs node standby &lt;node&gt;</span><span class="cm">           # Move resources off a node</span></div><div class="cl"><span class="kw">pcs stonith show</span><span class="cm">                  # Fencing config</span></div><div class="cl"><span class="kw">corosync-quorumtool -l</span><span class="cm">            # Quorum + membership</span></div><div class="cl"><span class="kw">dlm_tool status</span><span class="cm">                   # DLM lockspace health (GFS2)</span></div></div></div>
-</div><div class="qc critical" onclick="tq(this)">
+</div><div class="qc critical" id="q-a-two-node-pacemaker-cluster-shows-one-node-offline-in-p" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-c">Critical</span>
@@ -652,7 +690,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li><code>pcs status</code> — confirm which node is offline; check STONITH status; never assume fencing did not occur.</li><li>Check Corosync on the affected node; review /var/log/cluster/corosync.log for ring errors or split-brain.</li><li>Verify quorum: <code>corosync-quorumtool -l</code> — lost quorum freezes resource management.</li><li>If the node was fenced, find and fix WHY before re-adding it.</li><li>Rejoin only after confirming health: <code>pcs node unstandby &amp;lt;node&amp;gt;</code>.</li><li>For GFS2: check <code>dlm_tool status</code> and <code>gfs2_tool df</code> before allowing concurrent mounts.</li></ol><div class="box warn">NEVER force-join a node with stale data or an unknown state — on GFS2 this can cause data corruption. The STONITH/fencing caution is exactly what senior candidates raise and juniors miss.</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-both-nodes-in-a-two-node-gfs2-cluster-show-them" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-s">Scenario</span>
@@ -662,7 +700,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">This is a P1 — split-brain with GFS2 can cause data corruption. Escalate immediately.</p><ol class="nl"><li>Do NOT touch both nodes simultaneously. Identify the last known-good node from logs and monitoring.</li><li>Fence the suspect node via STONITH: <code>pcs stonith fence &amp;lt;node&amp;gt;</code> — ensures only one node has FS access.</li><li>With only one node active, run <code>fsck.gfs2</code> on the volumes in single-node mode.</li><li>Review Corosync logs on both nodes for root cause — network partition, deadlocked DLM, misconfigured quorum.</li><li>Restore the second node only after root cause is fixed, under a controlled change.</li><li>Post-incident: full RCA; add a quorum device (qdevice) for better two-node split-brain resolution.</li></ol></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-what-are-the-core-veritas-cluster-vcs-concepts-and-diagn" onclick="tq(this)">
 <div class="qh">
 <span class="qn">04</span>
 <span class="qb b-cm">Commands</span>
@@ -672,7 +710,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Service Group — a collection of resources that fail over together.</li><li>Resource &amp; Agent — managed entities (IP, mount, app) and the agents that control them.</li><li>Failover vs Switchover — failover is unplanned (node dies); switchover is a planned move.</li><li>VxVM (Volume Manager) — disk groups, volumes, plexes; VxFS — Veritas File System.</li></ul><div class="cb"><div class="cl"><span class="kw">hastatus -sum</span><span class="cm">                     # Cluster + service group summary</span></div><div class="cl"><span class="kw">hagrp -state</span><span class="cm">                      # Service group states</span></div><div class="cl"><span class="kw">hagrp -switch &lt;sg&gt; -to &lt;node&gt;</span><span class="cm">     # Controlled switchover</span></div><div class="cl"><span class="kw">hares -state</span><span class="cm">                      # Resource states</span></div><div class="cl"><span class="kw">vxdg list / vxprint -ht</span><span class="cm">           # VxVM disk groups &amp; volumes</span></div></div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-two-node-pacemaker-cluster-shows-one-node-offline-invest" onclick="tq(this)">
 <div class="qh">
 <span class="qn">05</span>
 <span class="qb b-co">Concept</span>
@@ -682,7 +720,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>pcs status — check STONITH; never assume fencing did not occur.</li><li>Corosync logs for ring errors / split-brain; corosync-quorumtool -l for quorum.</li><li>If fenced, find WHY before re-adding the node.</li><li>pcs node unstandby &lt;node&gt; only after confirming health.</li><li>For GFS2: check dlm_tool status before concurrent mounts.</li></ol><div class="box warn">NEVER force-join a node with stale/unknown state — on GFS2 this can cause data corruption. This caution separates senior from junior.</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-gfs2-split-brain-both-nodes-show-primary-filesy" onclick="tq(this)">
 <div class="qh">
 <span class="qn">06</span>
 <span class="qb b-s">Scenario</span>
@@ -692,7 +730,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>P1 — escalate immediately. Do NOT touch both nodes at once.</li><li>Identify last known-good node; fence the suspect via pcs stonith fence &lt;node&gt;.</li><li>Run fsck.gfs2 in single-node mode.</li><li>Root cause in Corosync logs (partition / DLM deadlock / quorum).</li><li>Restore node 2 only after fix; add a qdevice for two-node resolution.</li></ol></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-core-veritas-cluster-vcs-concepts-and-diagnostic-command" onclick="tq(this)">
 <div class="qh">
 <span class="qn">07</span>
 <span class="qb b-cm">Commands</span>
@@ -711,7 +749,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">ESXi storage-latency triage, unresponsive-host recovery, UCS Service Profile concept and remote OOB workflows.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-vsphere"><div class="qc critical" onclick="tq(this)">
+<div id="cards-common-cmn-vsphere"><div class="qc critical" id="q-a-vm-shows-high-disk-latency-guest-host-or-storage-layer" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-c">Critical</span>
@@ -721,7 +759,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><table class="dt"><thead><tr><th>Layer</th><th>Tool</th><th>Metric / Interpretation</th></tr></thead><tbody><tr><td>Guest</td><td>iostat -x</td><td>await, %util — high await+low %util = path issue</td></tr><tr><td>ESXi Host</td><td>esxtop → d</td><td>DAVG/KAVG/GAVG — high KAVG = ESXi saturation</td></tr><tr><td>Storage path</td><td>esxcli storage san fc stats get</td><td>Round-robin path balance</td></tr><tr><td>Datastore</td><td>vCenter</td><td>Noisy-neighbour congestion</td></tr></tbody></table><div class="box tip">DAVG vs KAVG vs GAVG separates real production troubleshooters. GAVG = DAVG + KAVG.</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-esxi-host-stops-responding-to-vcenter-vms-still" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-s">Scenario</span>
@@ -731,7 +769,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><div class="cb"><div class="cl"><span class="kw">ssh &lt;esxi-mgmt-ip&gt; ; esxcli vm process list</span></div><div class="cl"><span class="kw">tail -100 /var/log/hostd.log /var/log/vpxa.log</span></div><div class="cl"><span class="kw">/etc/init.d/hostd restart ; /etc/init.d/vpxa restart</span></div><div class="cl"><span class="cm"># Resolves most 'not responding' issues without touching VMs</span></div></div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-how-does-a-ucs-service-profile-enable-server-replacement" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-co">Concept</span>
@@ -741,7 +779,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">A service profile binds MAC, WWN, UUID, and boot policy to a logical object, not the blade. Reassociate to a spare blade → identical identities, boots from SAN, operational in minutes. Compute becomes stateless.</p></div>
-</div><div class="qc critical" onclick="tq(this)">
+</div><div class="qc critical" id="q-remote-server-unreachable-via-ssh-no-dc-access-ilo-workf" onclick="tq(this)">
 <div class="qh">
 <span class="qn">04</span>
 <span class="qb b-c">Critical</span>
@@ -760,7 +798,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Cross-OS layered methodology, Oracle DB tuning side-by-side (RHEL/Solaris/HP-UX), and quarterly capacity planning.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-perfmethod"><div class="qc concept" onclick="tq(this)">
+<div id="cards-common-cmn-perfmethod"><div class="qc concept" id="q-walk-me-through-your-methodology-when-a-production-serve" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -770,7 +808,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><div class="sub">Layered approach: CPU → Memory → Disk → Network → Recent changes</div><table class="dt"><thead><tr><th>Layer</th><th>RHEL</th><th>Solaris</th><th>HP-UX</th></tr></thead><tbody><tr><td>Real-time</td><td>top / htop</td><td>prstat -a</td><td>glance / top</td></tr><tr><td>CPU</td><td>mpstat -P ALL 1</td><td>mpstat 1 / sar -u</td><td>sar -u / glance c</td></tr><tr><td>Memory</td><td>free -h ; vmstat</td><td>vmstat / prstat -s rss</td><td>swapinfo -tm ; vmstat</td></tr><tr><td>Disk</td><td>iostat -xz 1 ; iotop</td><td>iostat -xnz 1</td><td>sar -d ; iostat</td></tr><tr><td>Network</td><td>ss -s ; sar -n DEV</td><td>netstat -s ; dlstat</td><td>lanadmin -g ; netstat</td></tr><tr><td>History</td><td>sar / atop</td><td>sar -A</td><td>OVPA / MeasureWare</td></tr></tbody></table><div class="box tip">Always correlate slowness with a recent change — patch, config change, new cron job. 80% of production slowness has a change-related root cause.</div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-which-kernel-parameters-do-you-tune-for-an-oracle-databa" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-cm">Commands</span>
@@ -780,7 +818,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><table class="dt"><thead><tr><th>Parameter</th><th>RHEL (sysctl)</th><th>Solaris (/etc/system)</th><th>HP-UX (kctune)</th></tr></thead><tbody><tr><td>Max SHM segment</td><td>kernel.shmmax</td><td>shmsys:shminfo_shmmax</td><td>shmmax</td></tr><tr><td>SHM identifiers</td><td>kernel.shmmni</td><td>shmsys:shminfo_shmmni</td><td>shmmni</td></tr><tr><td>Semaphores</td><td>kernel.sem</td><td>semsys:seminfo_*</td><td>semmns / semmni</td></tr><tr><td>Max open files</td><td>fs.file-max</td><td>rlim_fd_max</td><td>maxfiles_lim</td></tr><tr><td>Swappiness</td><td>vm.swappiness=10</td><td>lotsfree / desfree</td><td>vps_ceiling</td></tr><tr><td>HugePages</td><td>vm.nr_hugepages</td><td>use_brk_lpg = 1</td><td>vps_pagesize</td></tr></tbody></table><div class="cb"><div class="cl"><span class="cm"># RHEL — apply permanently</span></div><div class="cl"><span class="kw">vim /etc/sysctl.conf &amp;&amp; sysctl -p</span></div><div class="cl"><span class="cm"># Solaris — via /etc/system (reboot) or projmod (live)</span></div><div class="cl"><span class="kw">projmod -s -K 'project.max-shm-memory=(priv,64G,deny)' user.oracle</span></div><div class="cl"><span class="cm"># HP-UX — kctune is dynamic where possible</span></div><div class="cl"><span class="kw">kctune shmmax=68719476736</span></div><div class="cl"><span class="kw">kctune -h maxfiles=4096</span><span class="cm">              # Held; next boot</span></div></div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-how-do-you-do-capacity-planning-for-a-unix-linux-estate" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-co">Concept</span>
@@ -799,7 +837,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Quarterly patch cycle across RHEL/Solaris/HP-UX, hardening matrix and compliance evidence pipeline.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-patchsec"><div class="qc concept" onclick="tq(this)">
+<div id="cards-common-cmn-patchsec"><div class="qc concept" id="q-how-do-you-run-a-quarterly-patching-cycle-across-rhel-so" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -809,7 +847,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><table class="dt"><thead><tr><th>Phase</th><th>Action</th><th>Output</th></tr></thead><tbody><tr><td>Plan (Week 1)</td><td>Identify advisories: Red Hat CVE feed, Oracle Solaris MOS, HPE ITRC. Map to CMDB.</td><td>Patch matrix per OS</td></tr><tr><td>Test (Week 2)</td><td>Deploy to Dev + UAT. Regression + smoke tests with app team.</td><td>Test sign-off</td></tr><tr><td>Stage (Week 3)</td><td>Deploy to DR/Staging. Confirm cluster failover still works post-patch.</td><td>DR sign-off</td></tr><tr><td>Prod (Week 4)</td><td>Wave-based rollout. Snapshot before, validate after.</td><td>Patch report</td></tr></tbody></table><div class="box tip">Auditor: “How do you patch HP-UX?” Answer: “We install the latest Quality Pack plus targeted critical patches via swinstall, validated with swverify. Rollback is the previous kernel kept automatically by HP-UX, plus a make_net_recovery archive taken the night before.”</div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-what-is-your-approach-to-hardening-across-rhel-solaris-a" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-co">Concept</span>
@@ -819,7 +857,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><table class="dt"><thead><tr><th>Area</th><th>RHEL</th><th>Solaris</th><th>HP-UX</th></tr></thead><tbody><tr><td>SSH</td><td>PermitRootLogin no, keys only</td><td>Same; ssh in SMF</td><td>Same; HP Secure Shell</td></tr><tr><td>Mandatory access</td><td>SELinux Enforcing</td><td>RBAC + Trusted Extensions</td><td>HP-UX Bastille</td></tr><tr><td>Firewall</td><td>firewalld / nftables</td><td>ipfilter / pf</td><td>IPFilter</td></tr><tr><td>Audit</td><td>auditd</td><td>BSM (auditconfig)</td><td>audsys / audevent</td></tr><tr><td>File integrity</td><td>AIDE</td><td>Solaris Audit + BART</td><td>Bastille file integrity</td></tr><tr><td>Compliance scan</td><td>OpenSCAP</td><td>Solaris Audit baselines</td><td>Bastille / SCM</td></tr><tr><td>Password policy</td><td>/etc/security/pwquality</td><td>/etc/default/passwd</td><td>/etc/default/security</td></tr></tbody></table></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-how-do-you-prove-compliance-across-a-heterogeneous-fleet" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-co">Concept</span>
@@ -838,7 +876,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Production-grade multi-OS Bash, Python REST scripting, and Ansible playbooks across heterogeneous Unix.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-automation"><div class="qc command" onclick="tq(this)">
+<div id="cards-common-cmn-automation"><div class="qc command" id="q-write-a-production-grade-bash-script-to-check-disk-usage" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-cm">Commands</span>
@@ -848,7 +886,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><div class="cb"><div class="cl"><span class="kw">#!/bin/bash</span></div><div class="cl"><span class="cm"># Production-grade disk alert script</span></div><div class="cl"><span class="kw">THRESHOLD=85</span></div><div class="cl"><span class="kw">SERVERS=("server1" "server2" "server3")</span></div><div class="cl"><span class="kw">ALERT_LOG="/var/log/disk_alerts.log"</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">for host in "${SERVERS[@]}"; do</span></div><div class="cl"><span class="kw">  ssh -o ConnectTimeout=5 -o BatchMode=yes "$host" \</span></div><div class="cl"><span class="kw">    'df -h --output=pcent,target' 2&gt;/dev/null \</span></div><div class="cl"><span class="kw">    | grep -vE '^Use|tmpfs|devtmpfs' \</span></div><div class="cl"><span class="kw">    | while read pct mount; do</span></div><div class="cl"><span class="kw">        usage="${pct//%/}"</span></div><div class="cl"><span class="kw">        if [ "$usage" -ge "$THRESHOLD" ]; then</span></div><div class="cl"><span class="kw">          echo "$(date +%FT%T) ALERT: $host $mount $pct" | tee -a "$ALERT_LOG"</span></div><div class="cl"><span class="kw">        fi</span></div><div class="cl"><span class="kw">      done \</span></div><div class="cl"><span class="kw">    || echo "$(date) WARN: cannot reach $host" &gt;&gt; "$ALERT_LOG"</span></div><div class="cl"><span class="kw">done</span></div></div><div class="box tip">Interviewers look for ConnectTimeout (prevents hanging), BatchMode=yes (key-based, no prompt), filtering tmpfs/devtmpfs, and timestamped logging. These prove you've debugged scripts in production at 2 a.m.</div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-how-would-you-write-a-python-script-to-pull-server-metri" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-cm">Commands</span>
@@ -858,7 +896,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><div class="cb"><div class="cl"><span class="kw">import requests, sys</span></div><div class="cl"><span class="kw">API = "https://monitoring.internal/api/v1"</span></div><div class="cl"><span class="kw">HDRS = {"Authorization": "Bearer &lt;token&gt;", "Accept": "application/json"}</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">def get_metrics(host):</span></div><div class="cl"><span class="kw">    try:</span></div><div class="cl"><span class="kw">        r = requests.get(f"{API}/servers/{host}/metrics",</span></div><div class="cl"><span class="kw">                         headers=HDRS, timeout=10)</span><span class="cm">   # always set timeout</span></div><div class="cl"><span class="kw">        r.raise_for_status()</span><span class="cm">                       # raises on 4xx/5xx</span></div><div class="cl"><span class="kw">        return r.json()</span></div><div class="cl"><span class="kw">    except requests.exceptions.Timeout:</span></div><div class="cl"><span class="kw">        print(f"WARN: timeout for {host}", file=sys.stderr)</span></div><div class="cl"><span class="kw">    except requests.exceptions.HTTPError as e:</span></div><div class="cl"><span class="kw">        print(f"ERROR: {host}: {e}", file=sys.stderr)</span></div><div class="cl"><span class="kw">    return None</span></div></div><div class="box tip">Key signals: explicit timeout, raise_for_status(), specific exception types, errors to stderr. This is production-quality, not 'works on my machine'.</div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-write-a-production-grade-bash-script-to-check-filesystem" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-cm">Commands</span>
@@ -868,7 +906,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><div class="cb"><div class="cl"><span class="kw">#!/bin/bash</span></div><div class="cl"><span class="cm"># Production-grade multi-OS disk alert.</span></div><div class="cl"><span class="kw">set -uo pipefail</span></div><div class="cl"><span class="kw">THRESHOLD=85</span></div><div class="cl"><span class="kw">ALERT_LOG="/var/log/disk_alerts.log"</span></div><div class="cl"><span class="kw">SERVERS_FILE="/etc/admin/servers.txt"</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">detect_os() {</span></div><div class="cl"><span class="kw">  ssh -o ConnectTimeout=5 -o BatchMode=yes "$1" 'uname -s' 2&gt;/dev/null</span></div><div class="cl"><span class="kw">}</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">while read -r host; do</span></div><div class="cl"><span class="kw">  [[ -z "$host" || "$host" =~ ^# ]] &amp;&amp; continue</span></div><div class="cl"><span class="kw">  os=$(detect_os "$host")</span></div><div class="cl"><span class="kw">  case "$os" in</span></div><div class="cl"><span class="kw">    Linux)   DFCMD="df -h --output=pcent,target | tail -n +2" ;;</span></div><div class="cl"><span class="kw">    SunOS)   DFCMD="df -h | awk 'NR&gt;1 {print \$5, \$6}'" ;;</span></div><div class="cl"><span class="kw">    HP-UX)   DFCMD="bdf | awk 'NR&gt;1 {print \$5, \$6}'" ;;</span></div><div class="cl"><span class="kw">    *)       echo "$(date) WARN: unknown OS for $host" &gt;&gt;"$ALERT_LOG"; continue ;;</span></div><div class="cl"><span class="kw">  esac</span></div><div class="cl"><span class="kw">  ssh -o ConnectTimeout=5 -o BatchMode=yes "$host" "$DFCMD" 2&gt;/dev/null \</span></div><div class="cl"><span class="kw">    | grep -vE 'tmpfs|devtmpfs|proc|cdrom' \</span></div><div class="cl"><span class="kw">    | while read pct mount; do</span></div><div class="cl"><span class="kw">        usage="${pct//%/}"</span></div><div class="cl"><span class="kw">        [[ ! "$usage" =~ ^[0-9]+$ ]] &amp;&amp; continue</span></div><div class="cl"><span class="kw">        [ "$usage" -ge "$THRESHOLD" ] &amp;&amp; \</span></div><div class="cl"><span class="kw">          echo "$(date +%FT%T) ALERT $host ($os) $mount $pct" | tee -a "$ALERT_LOG"</span></div><div class="cl"><span class="kw">      done</span></div><div class="cl"><span class="kw">done &lt; "$SERVERS_FILE"</span></div></div><div class="box tip">Per-OS handling (Linux <code>df</code>, HP-UX <code>bdf</code>), ConnectTimeout, BatchMode, comment-filtering, timestamped logging — exactly the signals interviewers look for. Most candidates write a Linux-only df script; call out the multi-OS handling.</div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-why-ansible-for-a-heterogeneous-unix-estate-design-consi" onclick="tq(this)">
 <div class="qh">
 <span class="qn">04</span>
 <span class="qb b-co">Concept</span>
@@ -878,7 +916,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Agentless: only Python on the target — RHEL has it natively, Solaris and HP-UX have it via depot/IPS.</li><li>SSH-based: works through existing jump-host architecture, no special ports.</li><li>Idempotent: safe to re-run; declarative state instead of imperative scripts.</li><li>Group/host vars let one playbook handle RHEL/Solaris/HP-UX differences via facts and when-clauses.</li><li>AWX/Ansible Tower for RBAC, scheduling, audit trail and approvals — critical for L3 production use.</li></ul></div>
-</div><div class="qc task" onclick="tq(this)">
+</div><div class="qc task" id="q-task-show-an-ansible-playbook-that-patches-a-heterogeneo" onclick="tq(this)">
 <div class="qh">
 <span class="qn">05</span>
 <span class="qb b-t">Task</span>
@@ -888,7 +926,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><div class="cb"><div class="cl"><span class="kw">---</span></div><div class="cl"><span class="kw">- name: Heterogeneous Unix patching</span></div><div class="cl"><span class="kw">  hosts: unix_estate</span></div><div class="cl"><span class="kw">  serial: 10%</span><span class="cm">                          # Wave-based rollout</span></div><div class="cl"><span class="kw">  max_fail_percentage: 5</span><span class="cm">               # Stop if 5% fail</span></div><div class="cl"><span class="kw">  any_errors_fatal: false</span></div><div class="cl"><span class="kw">  gather_facts: true</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">  tasks:</span></div><div class="cl"><span class="kw">    - name: Pre-check — record kernel + uptime</span></div><div class="cl"><span class="kw">      shell: "uname -r; uptime"</span></div><div class="cl"><span class="kw">      register: pre</span></div><div class="cl"><span class="kw">      changed_when: false</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">    - name: RHEL — apply security patches</span></div><div class="cl"><span class="kw">      ansible.builtin.dnf:</span></div><div class="cl"><span class="kw">        name: "*"</span></div><div class="cl"><span class="kw">        state: latest</span></div><div class="cl"><span class="kw">        security: true</span></div><div class="cl"><span class="kw">      when: ansible_os_family == 'RedHat'</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">    - name: Solaris 11 — pkg update</span></div><div class="cl"><span class="kw">      community.general.pkg5:</span></div><div class="cl"><span class="kw">        name: '*'</span></div><div class="cl"><span class="kw">        accept_licenses: true</span></div><div class="cl"><span class="kw">      when: ansible_distribution == 'Solaris' and ansible_distribution_major_version|int == 11</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">    - name: HP-UX — swinstall from depot</span></div><div class="cl"><span class="kw">      shell: |</span></div><div class="cl"><span class="kw">        swinstall -x autoreboot=false -x patch_match_target=true \</span></div><div class="cl"><span class="kw">                  -s {{ hpux_depot_path }} \*</span></div><div class="cl"><span class="kw">      when: ansible_system == 'HP-UX'</span></div><div class="cl"><span class="kw"> </span></div><div class="cl"><span class="kw">    - name: Reboot if required (RHEL)</span></div><div class="cl"><span class="kw">      reboot: { reboot_timeout: 600 }</span></div><div class="cl"><span class="kw">      when: ansible_os_family == 'RedHat' and needs_reboot.rc == 1</span></div></div><div class="box warn"><code>serial</code> + <code>max_fail_percentage</code> together are what make the playbook safe in production. Without them one playbook run can take down the whole fleet. Always mention these — most candidates forget.</div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-how-do-you-handle-secrets-and-inventory-at-scale" onclick="tq(this)">
 <div class="qh">
 <span class="qn">06</span>
 <span class="qb b-co">Concept</span>
@@ -898,7 +936,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Ansible Vault for encrypted variables (passwords, API tokens) — vault password via CyberArk / HashiCorp Vault, never on disk.</li><li>Dynamic inventory from CMDB/ServiceNow so groups always match reality.</li><li>Group_vars per OS: <code>group_vars/rhel.yml</code>, <code>solaris.yml</code>, <code>hpux.yml</code>.</li><li>Tower/AWX for credentials, scheduled jobs, role-based approvals, audit logs.</li><li>Run all playbooks in <code>--check --diff</code> first in production-like environments.</li></ul></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-push-a-config-change-to-200-servers-with-salt-s" onclick="tq(this)">
 <div class="qh">
 <span class="qn">07</span>
 <span class="qb b-s">Scenario</span>
@@ -908,7 +946,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>Canary in staging: salt -G 'role:web and environment:staging' state.apply.</li><li>10% of prod: salt -G 'environment:production' --batch-size 10% state.apply.</li><li>Monitor with salt-run jobs.lookup_jid; states are idempotent.</li><li>Full rollout only after the 10% batch is clean, under change control.</li></ol><div class="box tip">Never say 'I'd just run it on all 200'. Batch-size + staged rollout signals production maturity.</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-after-ad-password-change-users-can-t-ssh-sssd-s" onclick="tq(this)">
 <div class="qh">
 <span class="qn">08</span>
 <span class="qb b-s">Scenario</span>
@@ -918,7 +956,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><div class="cb"><div class="cl"><span class="kw">sssctl user-show &lt;user&gt;</span><span class="cm">           # Cache state + last pw change</span></div><div class="cl"><span class="kw">sssctl cache-expire -u &lt;user&gt;</span><span class="cm">     # Invalidate cache</span></div><div class="cl"><span class="kw">chronyc tracking</span><span class="cm">                  # &gt;5min skew breaks Kerberos</span></div><div class="cl"><span class="kw"># debug_level=7 in sssd.conf, restart, read domain log</span></div></div><div class="box warn">Clock skew is the most common silent cause of Kerberos/SSSD failures — check time sync first.</div></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-production-grade-bash-disk-alert-script-what-makes-it-se" onclick="tq(this)">
 <div class="qh">
 <span class="qn">09</span>
 <span class="qb b-cm">Commands</span>
@@ -937,7 +975,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">RPO/RTO design, NetBackup architecture and commands, Veeam vs NetBackup, and DR test procedure.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-backup"><div class="qc concept" onclick="tq(this)">
+<div id="cards-common-cmn-backup"><div class="qc concept" id="q-explain-rpo-and-rto-and-how-they-drive-your-backup-desig" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -947,7 +985,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>RPO (Recovery Point Objective) — how much data you can afford to lose. RPO 1 hour ⇒ backups (or replication) every hour.</li><li>RTO (Recovery Time Objective) — how long it can take to restore service. RTO 4 hours ⇒ entire restore + app validation must fit in 4 hours.</li><li>Tier-1 typically: RPO 15 min via replication, RTO 1 hour via warm standby.</li><li>Tier-3 typically: RPO 24h via nightly backup, RTO 24–48h via restore.</li><li>Backup design must serve both — incremental for RPO, full + cataloguing for RTO.</li></ul></div>
-</div><div class="qc command" onclick="tq(this)">
+</div><div class="qc command" id="q-describe-netbackup-architecture-and-the-key-admin-tasks" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-cm">Commands</span>
@@ -957,7 +995,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Master Server — runs the catalogue, schedules and policies.</li><li>Media Server(s) — move data between clients and storage; offloads the master.</li><li>Client — runs the NetBackup agent on every protected server.</li><li>Storage Units — disk pools (MSDP de-dupe), tape libraries, cloud targets.</li><li>Policies — what to back up, when, retention, replication, encryption.</li></ul><div class="cb"><div class="cl"><span class="kw">bpps -a</span><span class="cm">                              # All NetBackup processes</span></div><div class="cl"><span class="kw">bpclntcmd -pn</span><span class="cm">                        # Client → master connectivity</span></div><div class="cl"><span class="kw">bppllist</span><span class="cm">                             # List policies</span></div><div class="cl"><span class="kw">bpbackup -p &lt;policy&gt; -h &lt;client&gt;</span><span class="cm">     # On-demand backup</span></div><div class="cl"><span class="kw">bprestore -R &lt;renamefile&gt; -L &lt;log&gt; ...</span><span class="cm">  # Restore</span></div><div class="cl"><span class="kw">bperror -problems -hoursago 24</span><span class="cm">       # Errors in last 24h</span></div><div class="cl"><span class="kw">nbstlutil list</span><span class="cm">                       # SLP state</span></div><div class="cl"><span class="kw">bpdbjobs -summary</span><span class="cm">                    # Job summary</span></div></div><div class="box tip">Quote <code>bpdbjobs</code> in interviews — every NetBackup admin uses it daily. Pair with <code>bperror -problems -hoursago 24</code> for the morning health check routine.</div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-how-does-veeam-back-up-linux-servers-compare-with-netbac" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-co">Concept</span>
@@ -967,7 +1005,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">Veeam targets VM-heavy environments — integrates with vSphere/Hyper-V to take application-consistent snapshots and ships them to a repository. For physical Linux, the Veeam Agent for Linux (VAL) handles file/volume/image-level backups.</p><table class="dt"><thead><tr><th>Aspect</th><th>NetBackup</th><th>Veeam</th></tr></thead><tbody><tr><td>Strength</td><td>Enterprise multi-OS, tape, large scale</td><td>VMware-native, fast, simple UI</td></tr><tr><td>Client install</td><td>Agent on every host</td><td>Agentless for VMs; VAL for physical</td></tr><tr><td>Granularity</td><td>File, image, app-aware</td><td>Image-based + app-aware</td></tr><tr><td>Replication / DR</td><td>AIR, SLP, Auto Image Replication</td><td>Backup Copy, Cloud Connect, Replication</td></tr><tr><td>Best fit</td><td>Mixed RHEL/Solaris/HP-UX + tape</td><td>Heavily virtualised; vSphere first</td></tr></tbody></table></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-how-do-you-run-a-dr-test-for-a-heterogeneous-unix-estate" onclick="tq(this)">
 <div class="qh">
 <span class="qn">04</span>
 <span class="qb b-s">Scenario</span>
@@ -986,7 +1024,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">P1 takeover playbook, RCA methodology, recurring-incident problem management and vendor escalation.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-l3support"><div class="qc concept" onclick="tq(this)">
+<div id="cards-common-cmn-l3support"><div class="qc concept" id="q-walk-me-through-how-you-take-over-a-major-p1-incident-fr" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -996,7 +1034,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>Join the P1 bridge within the 15-minute SLA. Introduce yourself; take ownership of the technical lead role.</li><li>Confirm scope and impact in the first 5 minutes — systems, business services, user count.</li><li>Read the existing timeline L2 has captured; ask only the questions L2 has not already answered.</li><li>Triage layers in parallel: OS, network, storage, app — assign owners on the bridge.</li><li>Communicate every 15 minutes — even if “still investigating, no change” — to the incident manager.</li><li>Mitigation first, root-cause second: get the service back, then dig.</li><li>After resolution: own the RCA, present at the PIR within 48 hours, drive preventive actions.</li></ol><table class="dt"><thead><tr><th>Priority</th><th>Response</th><th>Resolution Target</th><th>Update Cadence</th></tr></thead><tbody><tr><td>P1 Critical</td><td>15 min</td><td>4 hours</td><td>Every 15–30 min</td></tr><tr><td>P2 High</td><td>30 min</td><td>8 hours</td><td>Hourly</td></tr><tr><td>P3 Medium</td><td>4 hours</td><td>24 hours</td><td>Daily</td></tr><tr><td>P4 Low</td><td>Next business day</td><td>72 hours</td><td>On request</td></tr></tbody></table></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-what-is-your-rca-methodology-and-what-makes-a-good-rca-d" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-co">Concept</span>
@@ -1006,7 +1044,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Use 5-Whys plus Ishikawa (fishbone) — never stop at the first technical cause.</li><li>Distinguish trigger, root cause, and contributing factors.</li><li>Timeline first: every action with timestamps, who did what.</li><li>Preventive vs. corrective: corrective fixes this incident; preventive stops the class recurring.</li><li>Track preventive actions in the change calendar with owners and due dates — RCA without follow-through is theatre.</li></ul><div class="box tip">A good L3 RCA is one page maximum: Summary, Timeline, Impact, Trigger, Root Cause, Contributing Factors, Preventive Actions with owners + due dates. Anything longer is not read by stakeholders.</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-six-p2-incidents-over-a-month-same-symptom-rand" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-s">Scenario</span>
@@ -1016,7 +1054,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Pull incident history; correlate timestamps, zone brand, host, OS version, recent changes.</li><li>Pattern: all six in solaris10 branded zones, hosts patched in the last 30 days, between 02:00 and 04:00 (backup window).</li><li>Raise a formal Problem Record — reactive to proactive.</li><li>Hypothesis: backup snapshot pressure under solaris10 brand emulation; verify in /var/adm/messages + DTrace on next reproduction.</li><li>Raise a Change to reschedule backups or tune zone resource caps; track preventive actions.</li><li>Brief leadership: pattern found, RCA in progress, interim workaround applied, permanent fix in Change CHG-xxxxx.</li></ul><div class="box star">“I noticed the L2 team kept resolving the same incident; nobody had raised a problem ticket. I built the correlation report, opened the problem record, drove the RCA, and reduced incident volume by 75% the following month.”</div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-how-do-you-handle-vendor-escalations-across-red-hat-orac" onclick="tq(this)">
 <div class="qh">
 <span class="qn">04</span>
 <span class="qb b-co">Concept</span>
@@ -1035,7 +1073,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">P1 handling, problem management discipline, prioritisation, and STAR-structured behavioural answers.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-itsm"><div class="qc concept" onclick="tq(this)">
+<div id="cards-common-cmn-itsm"><div class="qc concept" id="q-how-do-you-handle-a-major-p1-incident-involving-multiple" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -1045,7 +1083,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ol class="nl"><li>Join the P1 bridge immediately; declare yourself technical lead for the OS layer.</li><li>Triage within the first 15 minutes: server health, network, services, recent changes.</li><li>Maintain a live timeline — every action with timestamps.</li><li>Coordinate App, DBA, Network, Storage teams; prevent siloed working.</li><li>Apply 5-Whys to find root cause while restoring service in parallel.</li><li>Update the incident manager every 15–30 minutes.</li><li>After resolution, draft the RCA and present the PIR within 48 hours.</li></ol><table class="dt"><thead><tr><th>Priority</th><th>Response</th><th>Resolution Target</th><th>Updates</th></tr></thead><tbody><tr><td>P1 Critical</td><td>15 min</td><td>4 hours</td><td>Every 15–30 min</td></tr><tr><td>P2 High</td><td>30 min</td><td>8 hours</td><td>Hourly</td></tr><tr><td>P3 Medium</td><td>4 hours</td><td>24 hours</td><td>Daily</td></tr><tr><td>P4 Low</td><td>Next business day</td><td>72 hours</td><td>On request</td></tr></tbody></table></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-an-engineer-wants-an-urgent-production-firewall" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-s">Scenario</span>
@@ -1055,7 +1093,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Explain that an Emergency Change Request takes under 30 minutes and the risk of an undocumented firewall change outweighs the inconvenience.</li><li>Help them draft the ECR immediately and fast-track it through the CAB on-call approver.</li><li>Implement within 40 minutes — still in time for the demo.</li><li>Afterwards, send a one-pager on raising emergency changes so they can self-serve next time.</li></ul><div class="box star">“Process exists to protect the environment and the team. A good ops engineer enforces it even under pressure — but makes compliance as fast as possible.”</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-six-p2-incidents-over-a-month-same-symptom-diff" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-s">Scenario</span>
@@ -1065,7 +1103,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Proactively pull incident history and correlate: timestamps, server model, OS version, recent changes.</li><li>Pattern: all RHEL 7.6, same hardware, incidents 02:00–04:00 during backup windows.</li><li>Raise a formal Problem Record — moving from reactive to proactive.</li><li>Hypothesis: backup software causing memory pressure / I/O starvation → OOM kills or storage timeouts. Verify in /var/log/messages and dmesg.</li><li>Raise a Change to tune backup I/O priority (ionice), reschedule, or patch a known kernel bug.</li><li>Communicate a brief to management: pattern identified, RCA in progress, interim workaround applied, permanent fix in Change #.</li></ul></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-how-do-you-prioritise-when-handling-multiple-critical-is" onclick="tq(this)">
 <div class="qh">
 <span class="qn">04</span>
 <span class="qb b-co">Concept</span>
@@ -1075,7 +1113,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Own the P1 (business-stopping) immediately and set up the bridge.</li><li>Delegate initial investigation of the P2 (degraded but running) to a colleague.</li><li>Snooze the P3 (disk alert) for 30 minutes with a plan to address after the P1 stabilises.</li><li>Update all tickets every 15 minutes — stakeholders should never have to ask for status.</li></ul><div class="box tip">Always structure behavioural answers with STAR (Situation, Task, Action, Result) and end with a measurable result and a Lessons-Learned tail.</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-scenario-system-rebooted-unexpectedly-no-warning-find-ro" onclick="tq(this)">
 <div class="qh">
 <span class="qn">05</span>
 <span class="qb b-s">Scenario</span>
@@ -1085,7 +1123,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><div class="cb"><div class="cl"><span class="kw">last reboot ; who -b</span></div><div class="cl"><span class="kw">tail -500 /var/adm/messages | grep -i 'panic|error'</span><span class="cm">  # Solaris</span></div><div class="cl"><span class="kw">journalctl -b -1 | grep -i 'panic|oops|error'</span><span class="cm">       # RHEL</span></div><div class="cl"><span class="kw">mdb -k unix.0 vmcore.0  /  crash .../vmcore</span></div><div class="cl"><span class="kw">fmadm faulty  /  dmesg | grep -i 'mce|oom'</span></div></div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-6-p2-incidents-month-same-symptom-no-problem-record-what" onclick="tq(this)">
 <div class="qh">
 <span class="qn">06</span>
 <span class="qb b-co">Concept</span>
@@ -1095,7 +1133,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Pull incident history; correlate timestamps, hardware, OS version, changes.</li><li>Pattern: all RHEL 7.6, same hardware, 02:00–04:00 during backups.</li><li>Raise a Problem Record — reactive to proactive.</li><li>Hypothesis: backup I/O starvation → OOM kills; verify in messages/dmesg.</li><li>Change to tune backup ionice / reschedule / patch kernel bug.</li></ul></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-engineer-wants-an-urgent-production-firewall-change-with" onclick="tq(this)">
 <div class="qh">
 <span class="qn">07</span>
 <span class="qb b-s">Scenario</span>
@@ -1114,7 +1152,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="ph-desc">Documentation discipline (runbook/SOP/KB), mentoring L1/L2 into L3, and ready-to-deliver STAR stories.</div>
 </div>
 </div></div>
-<div id="cards-common-cmn-mentor"><div class="qc concept" onclick="tq(this)">
+<div id="cards-common-cmn-mentor"><div class="qc concept" id="q-what-documentation-do-you-produce-and-maintain-as-an-l3" onclick="tq(this)">
 <div class="qh">
 <span class="qn">01</span>
 <span class="qb b-co">Concept</span>
@@ -1124,7 +1162,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Runbooks — step-by-step procedures for known operational tasks (boot from rescue, fail over a Serviceguard package).</li><li>Standard Operating Procedures (SOPs) — process documents (patching cycle, change ticket workflow).</li><li>Knowledge Base articles — searchable, symptom-led; one article per recurring symptom L2 should resolve.</li><li>Architecture documents — diagrams of zone layouts, Serviceguard configs, network topology; refreshed annually.</li><li>RCA library — completed incident RCAs, indexed by service and root cause class.</li></ul><div class="box tip">Name the SPECIFIC types and what each is for. “Yes I document things” is a junior answer. “Runbook for ops, SOP for process, KB for L2, architecture for new joiners, RCA library for problem management” is a senior answer.</div></div>
-</div><div class="qc concept" onclick="tq(this)">
+</div><div class="qc concept" id="q-how-do-you-mentor-l1-l2-engineers-to-grow-into-l3" onclick="tq(this)">
 <div class="qh">
 <span class="qn">02</span>
 <span class="qb b-co">Concept</span>
@@ -1134,7 +1172,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Weekly 1:1 — 30 minutes per engineer; review their tickets, identify learning gaps, set one skill goal.</li><li>Shadowing — pair them with you on P1 incidents (read-only → assistant → primary with you backing).</li><li>Ticket review — two of their tickets per week, walk through what could have been faster or deeper.</li><li>Topic of the month — one deep dive (e.g. September: Serviceguard) with a runbook deliverable owned by the L2.</li><li>Stretch assignments — give them ownership of small projects so they grow ownership, not just technical skills.</li><li>Visible recognition — credit them in incident reports and to their manager.</li></ul><div class="box star">“I mentored two L2 engineers into L3 over 18 months — one took over my Solaris on-call rotation, the other now leads our HP-UX migration project.” Concrete outcomes beat generic mentoring claims.</div></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-tell-me-about-a-p1-incident-you-owned-end-to-end" onclick="tq(this)">
 <div class="qh">
 <span class="qn">03</span>
 <span class="qb b-s">Scenario</span>
@@ -1144,7 +1182,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><ul class="sl"><li>Situation: name the service, the business impact (revenue / user count / SLA risk).</li><li>Task: what was YOUR responsibility on the bridge.</li><li>Action: 3–4 concrete technical actions you led — not what the team did.</li><li>Result: quantified — “Resolved in 47 minutes, no SLA breach, identified the kernel bug that led to permanent fix in next patch cycle.”</li></ul></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-tell-me-about-an-automation-you-built-that-delivered-mea" onclick="tq(this)">
 <div class="qh">
 <span class="qn">04</span>
 <span class="qb b-s">Scenario</span>
@@ -1154,7 +1192,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="qchev">▾</span>
 </div>
 <div class="qbody"><div class="alabel">Answer</div><p class="atext">Have a concrete example with numbers: “I replaced a manual patching SOP with an Ansible playbook that handles RHEL, Solaris and HP-UX. Patch night went from 8 hours of 3 engineers to 2 hours of 1 engineer — 75% effort reduction and zero post-patch incidents in the next six months.”</p></div>
-</div><div class="qc scenario" onclick="tq(this)">
+</div><div class="qc scenario" id="q-tell-me-about-a-time-you-pushed-back-on-a-process-and-ma" onclick="tq(this)">
 <div class="qh">
 <span class="qn">05</span>
 <span class="qb b-s">Scenario</span>
@@ -1190,7 +1228,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 <div id="cards-patching">
 <!-- Q1 -->
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-do-you-perform-unix-linux-os-patching-activity" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">01</span>
 <span class="q-badge badge-concept">Concept</span>
@@ -1253,7 +1291,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <!-- Q2 -->
-<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-card scenario" id="q-server-not-booting-after-patching-how-do-you-troubleshoo" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">02</span>
 <span class="q-badge badge-scenario">Scenario</span>
@@ -1304,7 +1342,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <!-- Q3 -->
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-do-you-manage-quarterly-patching-on-100-servers-with" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">03</span>
 <span class="q-badge badge-concept">Concept</span>
@@ -1339,7 +1377,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <!-- Q4 -->
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-a-critical-cve-cvss-9-5-is-released-for-openssh-you-have" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">04</span>
 <span class="q-badge badge-critical">Critical</span>
@@ -1366,7 +1404,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <!-- Q5 -->
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-do-you-perform-vulnerability-remediation" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">05</span>
 <span class="q-badge badge-concept">Concept</span>
@@ -1394,7 +1432,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <!-- Q6 -->
-<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-card command" id="q-what-is-the-difference-between-hotfix-patch-and-service" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">06</span>
 <span class="q-badge badge-command">Commands</span>
@@ -1424,7 +1462,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-boot">
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-explain-the-linux-boot-process-what-is-the-role-of-initr" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">01</span><span class="q-badge badge-concept">Concept</span>
 <span class="q-text">Explain the Linux boot process. What is the role of initramfs during boot?</span>
@@ -1457,7 +1495,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">dracut -f --regenerate-all</span> <span class="comment"># Rebuild for ALL kernels</span></div>
 </div>
 </div>
-<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-card scenario" id="q-server-boots-to-emergency-shell-failed-to-mount-data-it" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">02</span><span class="q-badge badge-scenario">Scenario</span>
 <span class="q-text">Server boots to emergency shell: "Failed to mount /data". It's a production DB server. How do you recover?</span>
@@ -1484,7 +1522,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="tip-box">Know the 'nofail' mount option — it lets the system boot even if a non-critical disk is missing. Critical for banking systems where you need to restore service quickly.</div>
 </div>
 </div>
-<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-card command" id="q-how-do-you-reinstall-grub-and-rebuild-initramfs" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">03</span><span class="q-badge badge-command">Commands</span>
 <span class="q-text">How do you reinstall GRUB and rebuild initramfs?</span>
@@ -1511,7 +1549,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">exit &amp;&amp; reboot</span></div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-explain-the-steps-to-troubleshoot-kernel-panic-errors" onclick="toggleQ(this)">
 <div class="q-header">
 <span class="q-num">04</span><span class="q-badge badge-critical">Critical</span>
 <span class="q-text">Explain the steps to troubleshoot kernel panic errors.</span>
@@ -1561,7 +1599,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-lvm">
-<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-card command" id="q-how-do-you-extend-lv-and-filesystem-size" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-command">Commands</span><span class="q-text">How do you extend LV and filesystem size?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1593,7 +1631,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="tip-box">The -r flag (lvextend -r) is the shortcut that extends LV and resizes filesystem in one step — mention this in the interview.</div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-lvm-volumes-not-showing-when-we-run-vgs-what-could-be-th" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-critical">Critical</span><span class="q-text">LVM Volumes not showing when we run vgs — what could be the reason and how do you fix it?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1627,7 +1665,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="warn-box">vgchange -ay is the first command to try whenever LVs are missing. Never use --partial flag in production without understanding the implications — it can activate a VG with missing PVs and potentially cause data corruption.</div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-filesystem-shows-space-free-but-no-new-files-can-be-crea" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-critical">Critical</span><span class="q-text">Filesystem shows space free but no new files can be created. Why?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer — Inode Exhaustion</div>
@@ -1659,7 +1697,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="tip-box">This is a classic trick question — df -h looks fine but you cannot create files. Always check df -i when you see "No space left on device".</div>
 </div>
 </div>
-<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-card command" id="q-explain-about-multipathing-dm-multipath-on-linux" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">04</span><span class="q-badge badge-command">Commands</span><span class="q-text">Explain about multipathing (DM-Multipath) on Linux.</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1688,7 +1726,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </table>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-how-do-you-repair-a-filesystem" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">05</span><span class="q-badge badge-critical">Critical</span><span class="q-text">How do you repair a filesystem?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1717,7 +1755,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">dmesg | grep -i 'I/O error\|EXT4-fs error\|XFS'</span></div>
 </div>
 </div>
-<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-card scenario" id="q-var-filesystem-hits-100-at-3-am-causing-application-fail" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">06</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">/var filesystem hits 100% at 3 AM causing application failures. How do you recover?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1757,7 +1795,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-security">
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-what-is-your-approach-to-server-hardening-as-per-bank-se" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What is your approach to server hardening as per bank security policy?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1791,7 +1829,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="tip-box">Mention OpenSCAP/CIS benchmarks and running a compliance scan post-hardening — shows process maturity beyond just making changes.</div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-can-you-provide-permission-to-a-user-to-run-a-comman" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How can you provide permission to a user to run a command as root?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1820,7 +1858,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </ul>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-explain-pam-pluggable-authentication-modules-and-how-you" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain PAM (Pluggable Authentication Modules) and how you use it.</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1845,7 +1883,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="warn-box">Always keep a root session open while testing PAM changes — a misconfiguration can lock ALL users out of the system.</div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-explain-about-ulimit-what-is-it-and-how-is-it-configured" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">04</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain about ulimit — what is it and how is it configured?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1875,7 +1913,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </table>
 </div>
 </div>
-<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-card scenario" id="q-a-service-account-is-logging-into-production-via-ssh-pas" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">05</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">A service account is logging into production via SSH password — violating key-auth policy. What do you do?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1915,7 +1953,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-performance">
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-do-you-troubleshoot-server-slowness-issues" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How do you troubleshoot server slowness issues?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer — Layered Approach: CPU → Memory → Disk → Network</div>
@@ -1950,7 +1988,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="tip-box">Always check if the slowness correlates with a recent change — patch, config change, or new cron job. 80% of slowness issues have a change-related root cause.</div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-how-do-you-fix-disk-i-o-bottleneck-issues" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-critical">Critical</span><span class="q-text">How do you fix Disk I/O bottleneck issues?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -1985,7 +2023,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </table>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-do-you-improve-server-performance" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How do you improve server performance?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2011,7 +2049,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="tip-box">Always measure before and after tuning — use sar to collect baseline data for comparison. Performance changes without measurement data are just guesses.</div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-what-kernel-parameters-do-you-tune-for-an-oracle-databas" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">04</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What kernel parameters do you tune for an Oracle Database server?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2044,7 +2082,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-networking">
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-a-server-is-unable-to-resolve-domain-names-how-would-you" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-critical">Critical</span><span class="q-text">A server is unable to resolve domain names. How would you fix it?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer — Layered DNS Troubleshooting</div>
@@ -2076,7 +2114,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">nmcli con up 'eth0'</span></div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-explain-nic-bonding-teaming-modes-and-which-mode-do-you" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain NIC Bonding/Teaming modes and which mode do you use in banking production?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2096,7 +2134,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">ip addr show bond0</span></div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-is-it-possible-to-add-multiple-ip-addresses-to-one-singl" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Is it possible to add multiple IP addresses to one single NIC card?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2130,7 +2168,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-scripting">
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-do-you-have-shell-scripting-knowledge-what-is-a-for-loop" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Do you have shell scripting knowledge? What is a for loop?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2161,7 +2199,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">done &lt; /etc/server_list.txt</span></div>
 </div>
 </div>
-<div class="q-card command" onclick="toggleQ(this)">
+<div class="q-card command" id="q-how-do-you-use-awk-sed-and-grep-for-log-analysis" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-command">Commands</span><span class="q-text">How do you use awk, sed, and grep for log analysis?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2187,7 +2225,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">grep 'ORA-' /app/logs/app.log | awk '{print $1, $2, $NF}' | sort -u</span></div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-shell-scripting-vs-ansible-when-do-you-use-each" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Shell scripting vs Ansible — when do you use each?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2215,7 +2253,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-errors">
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-too-many-open-files-error" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-critical">Error</span><span class="q-text">"Too many open files" error</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Cause &amp; Fix</div>
@@ -2232,7 +2270,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">systemctl daemon-reload &amp;&amp; systemctl restart &lt;service&gt;</span></div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-bash-fork-retry-resource-temporarily-unavailable" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-critical">Error</span><span class="q-text">"bash: fork: retry: Resource temporarily unavailable"</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Cause &amp; Fix</div>
@@ -2248,7 +2286,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">pkill -u &lt;username&gt; &lt;processname&gt;</span></div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-no-space-left-on-device-related-to-inodes" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-critical">Error</span><span class="q-text">"No space left on device" — related to inodes</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Cause &amp; Fix</div>
@@ -2262,7 +2300,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">find /var/log -name "*.log" -mtime +30 -delete</span></div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-cannot-allocate-memory" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">04</span><span class="q-badge badge-critical">Error</span><span class="q-text">"Cannot allocate memory"</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Cause &amp; Fix</div>
@@ -2280,7 +2318,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">kill -9 &lt;PID&gt;</span></div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-device-is-busy-when-unmounting-filesystem" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">05</span><span class="q-badge badge-critical">Error</span><span class="q-text">"device is busy" when unmounting filesystem</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Cause &amp; Fix</div>
@@ -2295,7 +2333,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">umount -l /mountpoint</span></div>
 </div>
 </div>
-<div class="q-card critical" onclick="toggleQ(this)">
+<div class="q-card critical" id="q-lvm-volume-not-found-inactive" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">06</span><span class="q-badge badge-critical">Error</span><span class="q-text">"LVM Volume not found / inactive"</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Cause &amp; Fix</div>
@@ -2322,7 +2360,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-vmware">
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-do-you-take-a-vm-snapshot-and-what-are-the-rules" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How do you take a VM snapshot and what are the rules?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2341,7 +2379,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="info-box" style="margin-top:0.5rem"><strong>Quiesce option:</strong> Freezes guest filesystem I/O before snapshot for consistency — requires VMware Tools to be installed and running.</div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-what-if-vm-snapshot-fails" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What if VM snapshot fails?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2362,7 +2400,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">yum update open-vm-tools -y</span></div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-what-is-vmotion-explain-the-types" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What is vMotion? Explain the types.</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2384,7 +2422,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="tip-box">Banking use case: use vMotion to evacuate all VMs from an ESXi host before patching it. DRS automates vMotion for load balancing across the cluster.</div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-can-you-explain-about-vm-templates" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">04</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Can you explain about VM templates?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2407,7 +2445,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="comment"># 4. Document template version in naming convention</span></div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-explain-about-vmware-tools-why-is-it-important" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">05</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain about VMware Tools — why is it important?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2430,7 +2468,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">vmware-toolbox-cmd -v</span></div>
 </div>
 </div>
-<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-card scenario" id="q-vmware-vcenter-shows-90-cpu-ready-on-a-vm-the-applicatio" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">06</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">VMware vCenter shows 90% CPU Ready on a VM. The application team says it's slow. Diagnose and resolve.</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2464,7 +2502,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-solaris">
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-what-are-the-key-administrative-tasks-you-perform-on-sol" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What are the key administrative tasks you perform on Solaris 10 and 11?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2495,7 +2533,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">dladm show-link</span> <span class="comment"># Show network links</span></div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-explain-zfs-on-solaris-key-features-and-how-you-use-them" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain ZFS on Solaris — key features and how you use them.</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2528,7 +2566,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="tip-box">ZFS snapshot + rollback is one of the most powerful features for OS admins — instant deployment rollback without backup restore time. Mention real-world use: rolling back a failed application deployment in seconds.</div>
 </div>
 </div>
-<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-card scenario" id="q-a-solaris-zone-is-consuming-excessive-cpu-memory-impacti" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">A Solaris zone is consuming excessive CPU/memory, impacting other zones. How do you resolve?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2566,7 +2604,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-aix">
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-explain-aix-s-lvm-architecture-and-how-it-differs-from-l" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Explain AIX's LVM architecture and how it differs from Linux LVM.</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2597,7 +2635,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <span class="cmd">errpt -a | head -50</span> <span class="comment"># Hardware/software error report</span></div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-what-is-nim-network-installation-management-and-how-have" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-concept">Concept</span><span class="q-text">What is NIM (Network Installation Management) and how have you used it?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2634,7 +2672,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 <div id="cards-itsm">
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-do-you-handle-a-major-incident-p1-involving-multiple" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">01</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How do you handle a Major Incident (P1) involving multiple teams?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2656,7 +2694,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </table>
 </div>
 </div>
-<div class="q-card scenario" onclick="toggleQ(this)">
+<div class="q-card scenario" id="q-a-developer-asks-you-to-open-a-firewall-port-on-producti" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">02</span><span class="q-badge badge-scenario">Scenario</span><span class="q-text">A developer asks you to open a firewall port on production urgently with no change ticket. What do you do?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2670,7 +2708,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="warn-box">This is a test of your process discipline under pressure. The answer is ALWAYS: raise the ECR first, then implement. Your job security and the bank's compliance depend on it.</div>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-are-you-using-any-monitoring-tools-what-alerts-do-you-us" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">03</span><span class="q-badge badge-concept">Concept</span><span class="q-text">Are you using any monitoring tools? What alerts do you usually get?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2698,7 +2736,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </table>
 </div>
 </div>
-<div class="q-card concept" onclick="toggleQ(this)">
+<div class="q-card concept" id="q-how-has-your-itil-certification-influenced-the-way-you-w" onclick="toggleQ(this)">
 <div class="q-header"><span class="q-num">04</span><span class="q-badge badge-concept">Concept</span><span class="q-text">How has your ITIL certification influenced the way you work?</span><span class="q-chevron">▾</span></div>
 <div class="q-body">
 <div class="answer-label">Answer</div>
@@ -2830,19 +2868,38 @@ tr:hover td { background:rgba(20,30,50,.025); }
 </div>
 </div>
 
-  </main>
+  <!--rr:related--><aside class="rr-related" aria-labelledby="rr-rel-h"><h2 id="rr-rel-h">Related</h2><div class="rr-related-grid"><a class="rr-card" href="/solaris.html" style="--cat:#D97706"><h3>Oracle Solaris</h3><p>Oracle Solaris 10 and 11 reference with 137+ Q&amp;As: SPARC hardware, ZFS, Zones, LDOMs, IPMP, SMF, Veritas Cluster, mdb an…</p><div class="meta"><span><span class="dot"></span>Unix</span></div></a><a class="rr-card" href="/os-interview.html" style="--cat:#059669"><h3>OS Admin L3 Interview Prep</h3><p>150+ L3 operating-system administration interview questions with answers: patching, boot, LVM, security, performance, ne…</p><div class="meta"><span><span class="dot"></span>root_n_reels</span></div></a><a class="rr-card" href="/itil.html" style="--cat:#0A7A4B"><h3>ITIL &amp; Unix Operations</h3><p>ITIL processes mapped to real Unix/Linux operations: incident, problem, change, release, CMDB and disaster recovery, wit…</p><div class="meta"><span><span class="dot"></span>Operations</span></div></a><a class="rr-card" href="/server-hardware.html" style="--cat:#64748B"><h3>Server Hardware Reference Guide</h3><p>HP ProLiant BL/C7000, iLO, Onboard Administrator, Virtual Connect, Dell PowerEdge, iDRAC, racadm, PERC and IBM MegaRAID …</p><div class="meta"><span><span class="dot"></span>Infrastructure</span></div></a></div></aside><!--/rr:related-->
+</main>
 
   <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#tab-hpux-overview" class="toc-link">tab-hpux-overview</a><a href="#tab-hpux-hpux-platform" class="toc-link">tab-hpux-hpux-platform</a><a href="#tab-hpux-hpux-storage" class="toc-link">tab-hpux-hpux-storage</a><a href="#tab-hpux-hpux-boot" class="toc-link">tab-hpux-hpux-boot</a><a href="#tab-hpux-hpux-deploy" class="toc-link">tab-hpux-hpux-deploy</a><a href="#tab-hpux-hpux-perf" class="toc-link">tab-hpux-hpux-perf</a><a href="#tab-hpux-hpux-virt" class="toc-link">tab-hpux-hpux-virt</a><a href="#tab-hpux-hpux-scenarios" class="toc-link">tab-hpux-hpux-scenarios</a><a href="#tab-common-overview" class="toc-link">tab-common-overview</a><a href="#tab-common-cmn-remote" class="toc-link">tab-common-cmn-remote</a><a href="#tab-common-cmn-cluster" class="toc-link">tab-common-cmn-cluster</a><a href="#tab-common-cmn-vsphere" class="toc-link">tab-common-cmn-vsphere</a><a href="#tab-common-cmn-perfmethod" class="toc-link">tab-common-cmn-perfmethod</a><a href="#tab-common-cmn-patchsec" class="toc-link">tab-common-cmn-patchsec</a><a href="#tab-common-cmn-automation" class="toc-link">tab-common-cmn-automation</a><a href="#tab-common-cmn-backup" class="toc-link">tab-common-cmn-backup</a><a href="#tab-common-cmn-l3support" class="toc-link">tab-common-cmn-l3support</a><a href="#tab-common-cmn-itsm" class="toc-link">tab-common-cmn-itsm</a><a href="#tab-common-cmn-mentor" class="toc-link">tab-common-cmn-mentor</a><a href="#tab-legacy-overview" class="toc-link">tab-legacy-overview</a><a href="#tab-legacy-patching" class="toc-link">tab-legacy-patching</a><a href="#tab-legacy-boot" class="toc-link">tab-legacy-boot</a><a href="#tab-legacy-lvm" class="toc-link">tab-legacy-lvm</a><a href="#tab-legacy-security" class="toc-link">tab-legacy-security</a><a href="#tab-legacy-performance" class="toc-link">tab-legacy-performance</a><a href="#tab-legacy-networking" class="toc-link">tab-legacy-networking</a><a href="#tab-legacy-scripting" class="toc-link">tab-legacy-scripting</a><a href="#tab-legacy-errors" class="toc-link">tab-legacy-errors</a><a href="#tab-legacy-vmware" class="toc-link">tab-legacy-vmware</a><a href="#tab-legacy-solaris" class="toc-link">tab-legacy-solaris</a><a href="#tab-legacy-aix" class="toc-link">tab-legacy-aix</a><a href="#tab-legacy-itsm" class="toc-link">tab-legacy-itsm</a><a href="#tab-legacy-quickref" class="toc-link">tab-legacy-quickref</a></nav>
 </div>
 
 <button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
 
-<footer id="site-footer">
-  <span>root_n_reels — Technical Reference Library</span>
-  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
-  <span>Vishal Sharma · <a href="mailto:admvishal24@gmail.com">admvishal24@gmail.com</a> · <a href="https://www.rootnreels.in">www.rootnreels.in</a></span>
-  <span><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram</a> · <a href="https://youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube</a></span>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
 </footer>
+<!--/rr:footer-->
 
 <script>
 // Progress + back-to-top

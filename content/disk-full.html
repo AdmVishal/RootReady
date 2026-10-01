@@ -1,0 +1,74 @@
+<div class="rr-callout quick"><div><span class="t">Quick answer</span>
+<p>Find the full filesystem with <code>df -hT</code>, then drill down with <code>du -xh --max-depth=1</code>. If <code>df</code> says full but <code>du</code> adds up to less, a deleted file is still held open (<code>lsof +L1</code>). If you get “No space left on device” while <code>df</code> shows free space, you are out of inodes (<code>df -i</code>).</p></div></div>
+
+<h2>Symptoms</h2>
+<ul>
+<li><code>No space left on device</code> when writing or creating files</li>
+<li><code>df -h</code> shows 100% on <code>/</code>, <code>/var</code>, <code>/tmp</code> or an application mount</li>
+<li>Services crash, logins hang, or package updates fail</li>
+</ul>
+
+<h2>Diagnose</h2>
+<pre>$ df -hT                                   # which filesystem, what type
+$ df -i                                    # inodes: IUse% at 100% means no new files
+$ sudo du -xh --max-depth=1 /var | sort -h | tail
+$ sudo du -xh --max-depth=1 /var/log | sort -h | tail
+$ sudo find /var -xdev -type f -size +500M -exec ls -lh {} \;</pre>
+<p><code>-x</code> keeps <code>du</code> on a single filesystem so the numbers line up with <code>df</code>. Repeat one level deeper until you reach the culprit.</p>
+<pre class="output">Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sda3      xfs    20G   20G   64K 100% /var
+$ sudo du -xh --max-depth=1 /var | sort -h | tail -3
+1.2G    /var/lib
+17G     /var/log
+18G     /var</pre>
+
+<h2>When df and du disagree: deleted files still open</h2>
+<p>A process keeps writing to a log that someone deleted, so the space is not released.</p>
+<pre>$ sudo lsof -nP +L1 | grep /var</pre>
+<p>Preferred fix: restart or reload the owning service so it closes the file. If you cannot restart it, you can truncate the open file through <code>/proc</code>:</p>
+<pre>$ sudo sh -c ': > /proc/PID/fd/FD'     # PID and FD come from the lsof output</pre>
+<div class="rr-callout danger"><div><span class="t">Be careful</span>
+<p>Do not truncate database files, journal files or anything you cannot identify. Confirm the file is a log first. Do not <code>rm</code> files under <code>/var/lib</code> to “make room”.</p></div></div>
+
+<h2>When there is space but you cannot create files: inodes</h2>
+<pre>$ df -i /var
+$ sudo find /var -xdev -printf '%h\n' | sort | uniq -c | sort -n | tail     # directories holding the most files</pre>
+<p>Millions of tiny files (session files, mail queue, cache) are the usual cause. Delete the junk by age, for example with <code>find DIR -type f -mtime +7 -delete</code> after reviewing the list.</p>
+
+<h2>Safe cleanup</h2>
+<pre># rotate and compress logs now
+$ sudo logrotate -f /etc/logrotate.conf
+# systemd journal: keep only 200 MB
+$ sudo journalctl --vacuum-size=200M
+# package caches (RHEL 8/9)
+$ sudo dnf clean all
+# old kernels beyond installonly_limit
+$ sudo dnf remove --oldinstallonly</pre>
+<p>Other places that hide space: reserved blocks on ext4 (<code>tune2fs -l DEVICE | grep -i reserved</code>), LVM snapshots and thin pools (<code>lvs -a</code>), container storage (<code>podman system df</code>) and core dumps in <code>/var/lib/systemd/coredump</code>.</p>
+
+<h2>Fix it properly: grow the filesystem</h2>
+<p>If the data is legitimate, extend it. With LVM and free space in the volume group:</p>
+<pre>$ sudo vgs
+$ sudo lvextend -r -L +5G /dev/vg01/lv_var     # -r also resizes the filesystem</pre>
+<p>Without <code>-r</code>, resize the filesystem yourself (<code>xfs_growfs /var</code> or <code>resize2fs DEVICE</code>). XFS can grow but not shrink. Details: <a href="/rhel.html#extending-lvm">Extending LVM</a>.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+<li>Deleting a big log with <code>rm</code> while the process still has it open: no space is freed.</li>
+<li>Running <code>du /</code> without <code>-x</code> and wandering into <code>/proc</code>, NFS mounts and other filesystems.</li>
+<li>Cleaning up and never fixing log rotation or monitoring, so it returns next week.</li>
+<li>Forgetting inodes when <code>df -h</code> looks fine.</li>
+</ul>
+
+<h2>Production considerations</h2>
+<div class="rr-callout prod"><div><span class="t">Production</span>
+<p>Free a little space safely first (rotate or vacuum logs) so the application can recover, then investigate. Record what grew and why, add an alert at 80% and 90%, and review the logrotate policy. For root or database volumes, plan the extension in a change window.</p></div></div>
+
+<h2>Interview questions</h2>
+<details class="rr-d"><summary>df shows 100% but du shows much less. Why?</summary><div>
+<p>Deleted files are still held open by a process (<code>lsof +L1</code>), or the space is used by something <code>du</code> cannot see: reserved blocks, snapshots, or data under a mountpoint hidden by another mount. Restart the process to release the space.</p></div></details>
+<details class="rr-d"><summary>“No space left on device” but df shows free space. What is wrong?</summary><div>
+<p>Inode exhaustion (<code>df -i</code>) is the classic cause. Also consider quota limits and a full thin pool.</p></div></details>
+<details class="rr-d"><summary>How do you extend /var online?</summary><div>
+<p>Add a PV or use free extents in the VG, then <code>lvextend -r -L +SIZE /dev/VG/LV</code>. XFS and ext4 can grow online.</p></div></details>
+<p>More: <a href="/os-interview.html#q-no-space-left-on-device-related-to-inodes">Inodes Q&amp;A</a> · <a href="/linux-guide/#backup-and-recovery">Backup and recovery</a>.</p>

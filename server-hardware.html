@@ -3,21 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
-<meta name="theme-color" content="#12161c">
-<meta name="description" content="Server Hardware Reference Guide — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Server Hardware Reference Guide — root_n_reels">
-<meta property="og:description" content="Server Hardware Reference Guide — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
-<meta property="og:image" content="https://www.rootnreels.in/assets/logo-lockup.png">
-<meta property="og:url" content="https://www.rootnreels.in/server-hardware.html">
-<meta name="twitter:card" content="summary_large_image">
-<title>Server Hardware Reference Guide — root_n_reels</title>
+<title>Server Hardware Reference: HP iLO, Dell iDRAC, RAID, Virtual Connect, racadm | root_n_reels</title>
 <link rel="stylesheet" href="studyhub.css?v=20260911">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* ── site-wide overrides ── */
 :root { --topbar-h:58px; --sidebar-w:240px; }
@@ -254,67 +241,90 @@ tr:hover td { background:rgba(20,30,50,.025); }
 .phc-abadge { display:block; font-family:var(--font-mono); font-size:.65rem; font-weight:700; color:var(--accent); margin-bottom:8px; }
 
 </style>
-</head>
-<body>
+<!--rr:head-->
+<meta name="description" content="HP ProLiant BL/C7000, iLO, Onboard Administrator, Virtual Connect, Dell PowerEdge, iDRAC, racadm, PERC and IBM MegaRAID with five real-world scenarios.">
+<link rel="canonical" href="https://www.rootnreels.in/server-hardware.html">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="Server Hardware Reference: HP iLO, Dell iDRAC, RAID, Virtual Connect, racadm | root_n_reels"><meta property="og:description" content="HP ProLiant BL/C7000, iLO, Onboard Administrator, Virtual Connect, Dell PowerEdge, iDRAC, racadm, PERC and IBM MegaRAID with five real-world scenarios.">
+<meta property="og:url" content="https://www.rootnreels.in/server-hardware.html"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Server Hardware Reference: HP iLO, Dell iDRAC, RAID, Virtual Connect, racadm | root_n_reels"><meta name="twitter:description" content="HP ProLiant BL/C7000, iLO, Onboard Administrator, Virtual Connect, Dell PowerEdge, iDRAC, racadm, PERC and IBM MegaRAID with five real-world scenarios."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"Infrastructure","item":"https://www.rootnreels.in/infrastructure/"},{"@type":"ListItem","position":3,"name":"Server Hardware Reference Guide","item":"https://www.rootnreels.in/server-hardware.html"}]},{"@type":"TechArticle","headline":"Server Hardware Reference Guide","description":"HP ProLiant BL/C7000, iLO, Onboard Administrator, Virtual Connect, Dell PowerEdge, iDRAC, racadm, PERC and IBM MegaRAID with five real-world scenarios.","url":"https://www.rootnreels.in/server-hardware.html","mainEntityOfPage":"https://www.rootnreels.in/server-hardware.html","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-09-24","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Expert","dependencies":"HP ProLiant · Dell PowerEdge · IBM"}]}</script>
+<!--/rr:head--></head>
+<body class="rr" data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-<div id="site-topbar">
-  <a href="index.html" class="logo"><img src="assets/logo-icon.png" alt="root_n_reels" class="logo-img">root<span>_n_</span>reels</a>
-  <span class="page-title-bar">HP ProLiant BL · Dell PowerEdge · IBM MegaRAID</span>
-  <div class="topbar-spacer"></div>
-  <button id="menu-btn" onclick="toggleNav()">☰</button>
-</div>
-<div id="prog"></div>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/">Linux</a><a href="/unix/">Unix</a><a href="/networking/">Networking</a><a href="/devops/">DevOps</a><a href="/troubleshooting/">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header--><div id="prog"></div>
 <div id="mob-ov"></div>
 
 <div class="site-body">
-  <nav id="site-nav">
-    <div class="nav-sec">Navigation</div>
-<a href="youtube.html" class="nav-link">📺 YouTube Tutorials</a>
-    <a href="index.html" class="nav-link ">🏠 Home</a>
-<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
-<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
-<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
-<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
-<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
-<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
-<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
-<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
-<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a><a href="server-hardware.html" class="nav-link active">🖥️ Server Hardware</a>
-
-  <a href="#sparc-overview" class="toc-link">☀️ Oracle SPARC Servers</a>
-<a href="#sparc-intro" class="toc-link h3">Series Overview & Comparison</a>
-<a href="#sparc-tseries" class="toc-link h3">T Series — CMT Servers</a>
-<a href="#sparc-t-arch" class="toc-link h3">· Architecture & Thread Density</a>
-<a href="#sparc-t-features" class="toc-link h3">· Software in Silicon & RAS</a>
-<a href="#sparc-t-admin" class="toc-link h3">· ILOM & Administration</a>
-<a href="#sparc-mseries" class="toc-link h3">M Series — Mission-Critical</a>
-<a href="#sparc-m-arch" class="toc-link h3">· Architecture & Models</a>
-<a href="#sparc-m-ras" class="toc-link h3">· RAS & XSCF</a>
-<a href="#sparc-m-dr" class="toc-link h3">· Dynamic Reconfiguration</a>
-<a href="#sparc-sseries" class="toc-link h3">S Series — SPARC S7</a>
-<a href="#sparc-s-arch" class="toc-link h3">· S7-2 Architecture</a>
-<a href="#sparc-s-ssm" class="toc-link h3">· Silicon Secured Memory</a>
-<a href="#sparc-vseries" class="toc-link h3">V Series & LDoms</a>
-<a href="#sparc-v-arch" class="toc-link h3">· LDom Architecture & Commands</a>
-<a href="#sparc-processors" class="toc-link h3">Processor Generations</a>
-<a href="#sparc-proc-gen" class="toc-link h3">· Generation Comparison Table</a>
-<a href="#sparc-proc-numa" class="toc-link h3">· NUMA Topology</a>
-<a href="#sparc-admin" class="toc-link h3">Administration Tasks</a>
-<a href="#sparc-boot-admin" class="toc-link h3">· Boot Management & OBP</a>
-<a href="#sparc-fma" class="toc-link h3">· FMA Fault Management</a>
-<a href="#sparc-zfs-hw" class="toc-link h3">· ZFS on SPARC</a>
-<a href="#sparc-interview" class="toc-link h3">Interview Q&A Guide</a>
-<a href="#sparc-qa-arch" class="toc-link h3">· Architecture Questions</a>
-<a href="#sparc-qa-ops" class="toc-link h3">· Operational Questions</a>
-<a href="#sparc-qa-scenarios" class="toc-link h3">· Scenario Questions</a>
-<a href="#sparc-quickref" class="toc-link h3">· Quick Reference</a>
-
-<a href="ansible.html" class="nav-link">🤖 Ansible AAP</a>
-<a href="devops-bible.html" class="nav-link">♾️ DevOps Bible</a>
-<a href="index.html#contact" class="nav-link ">✉️ Contact</a>
-</nav>
+  <!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
 
   <main id="main-content">
+<!--rr:crumbs--><nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li aria-current="page">Server Hardware Reference Guide</li></ol></nav><!--/rr:crumbs-->
     
 <div class="page-hero">
   <h1>🖥️ Server Hardware Reference Guide</h1>
@@ -326,12 +336,13 @@ tr:hover td { background:rgba(20,30,50,.025); }
     <span class="badge badge-purple">RAID · Firmware · Scenarios</span>
   </div>
 </div>
+<!--rr:meta--><div class="rr-meta"><span class="chip" style="--cat:#64748B"><span class="dot"></span>Infrastructure</span><span class="chip">L2–L3</span><span class="chip">Reference</span><span class="chip" title="Versions this page covers">Covers: HP ProLiant · Dell PowerEdge · IBM</span><span>Long reference · ~45 min</span> <span>Updated <time datetime="2026-09-24">2026-09-24</time></span> <span>by Vishal Sharma</span><span class="acts"><button type="button" class="rr-act" data-rr-save aria-pressed="false"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Save</span></button><button type="button" class="rr-act" data-rr-share><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span class="lbl">Share</span></button><button type="button" class="rr-act" data-rr-print><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">Print</span></button></span></div><!--/rr:meta-->
 
 <div class="content-section la-section" id="hw-raid">
   <div class="la-section-header">
     <div class="la-section-icon">💽</div>
     <div>
-      <h2 class="la-section-title">HP Smart Array, IBM MegaRAID & HP ILO</h2>
+      <h2 class="la-section-title" id="hp-smart-array-ibm-megaraid-hp-ilo">HP Smart Array, IBM MegaRAID & HP ILO</h2>
       <p class="la-section-desc">RAID controller management, Smart Array commands, IBM MegaRAID storcli/MegaCli, and HP iLO out-of-band management</p>
     </div>
   </div>
@@ -339,7 +350,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="la-topic" id="hw1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">HP HPSSACLI / HPACUCLI — Smart Array Commands</h3>
+    <h3 class="la-topic-title" id="hp-hpssacli-hpacucli-smart-array-commands">HP HPSSACLI / HPACUCLI — Smart Array Commands</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Show full controller config</span>
@@ -402,7 +413,7 @@ ssacli ctrl slot=0 pd 1I:1:14 show detail</div>
 <div class="la-topic" id="hw2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">IBM MegaRAID storcli & MegaCli Commands</h3>
+    <h3 class="la-topic-title" id="ibm-megaraid-storcli-megacli-commands">IBM MegaRAID storcli & MegaCli Commands</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Show controller info</span>
@@ -436,7 +447,7 @@ dmidecode -t 0 | grep Firmware</div>
 <div class="la-topic" id="hw3">
   <div class="la-topic-header">
     <span class="la-topic-num">03</span>
-    <h3 class="la-topic-title">HP ILO — Out-of-Band Management</h3>
+    <h3 class="la-topic-title" id="hp-ilo-out-of-band-management">HP ILO — Out-of-Band Management</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Find ILO IP address</span>
@@ -474,14 +485,14 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
   <div class="la-section-header">
     <div class="la-section-icon">🔷</div>
     <div>
-      <h2 class="la-section-title">HP BladeSystem C7000 & BL Series</h2>
+      <h2 class="la-section-title" id="hp-bladesystem-c7000-bl-series">HP BladeSystem C7000 & BL Series</h2>
       <p class="la-section-desc">c7000 chassis components, Onboard Administrator, Virtual Connect, iLO deep dive, blade recovery, firmware updates</p>
     </div>
   </div>
   <div class="la-topic" id="hw-c7000-arch">
 <div class="la-topic-header">
 <span class="la-topic-num">Q1</span>
-<h3 class="la-topic-title">Describe the HP BladeSystem c7000 chassis architecture — all major hardware components.</h3>
+<h3 class="la-topic-title" id="describe-the-hp-bladesystem-c7000-chassis-architecture-all-m">Describe the HP BladeSystem c7000 chassis architecture — all major hardware components.</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>c7000</strong> is a 10U enclosure housing up to 16 half-height or 8 full-height blade servers.<br/><br/><ul class="slow-flags"><li><strong>Onboard Administrator (OA)</strong> — dual redundant management modules (slots 1 &amp; 2). Provides web UI, CLI, SNMP, REST API. Manages power, cooling, firmware, and inter-module communication.</li><li><strong>Blade Server Bays (1–16)</strong> — house BL460c, BL680c, BL2x220c. Half-height blades = 1 bay; full-height = 2 bays.</li><li><strong>Power Supply Bays (1–6)</strong> — up to six hot-plug PSUs. Minimum 4 for N+1 redundancy under full load.</li><li><strong>Fan Bays (1–10)</strong> — ten hot-plug redundant fans with zone-based cooling. Active Cool fans auto-adjust from thermal sensors.</li><li><strong>Interconnect Module Bays (1–8)</strong> — network (FlexFabric, VC) and SAN (FC, SAS) modules. Bays 1–2 = LOM connected; Bays 3–8 = mezzanine card connected.</li><li><strong>Insight Display</strong> — front LCD for chassis status, IP config, and UID control.</li><li><strong>Midplane</strong> — backplane connecting blades to interconnect modules and power distribution.</li></ul><div class="note"><strong>Key OA CLI:</strong> <code>show enclosure info</code> | <code>show server list</code> | <code>poweroff server 3</code> | <code>iLO reset 5</code> | <code>show interconnect list</code> | <code>show power</code></div></div>
@@ -489,7 +500,7 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div><div class="la-topic" id="hw-oa">
 <div class="la-topic-header">
 <span class="la-topic-num">Q2</span>
-<h3 class="la-topic-title">What is the HP Onboard Administrator (OA)? What can and cannot be configured through it?</h3>
+<h3 class="la-topic-title" id="what-is-the-hp-onboard-administrator-oa-what-can-and-cannot">What is the HP Onboard Administrator (OA)? What can and cannot be configured through it?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>The OA is the chassis management controller</strong> — equivalent to Dell's CMC. Runs embedded firmware.<div class="card-grid" style="margin-top:12px"><div class="note"><strong>✅ CAN DO</strong><ul class="slow-flags"><li>Power on/off/reset individual blades, set power capping per bay</li><li>Configure interconnect modules</li><li>Update blade iLO firmware remotely</li><li>Configure LDAP/RADIUS for OA authentication</li><li>Configure enclosure SNMP traps</li><li>Manage Virtual Connect from OA CLI</li><li>Configure UID LEDs, download chassis-wide logs</li><li>Configure rack topology</li></ul></div><div class="warn-box"><strong>❌ CANNOT DO</strong><ul class="slow-flags"><li>OS-level management (that is iLO's job)</li><li>Configure BIOS/boot order (done via iLO or iLO RESTful API)</li><li>Access individual disk controllers (done via Smart Array in iLO)</li><li>Manage VM workloads</li></ul></div></div><div class="note">Access: SSH to OA IP, HTTPS web UI, SNMP. Dual OA setup — primary active, secondary standby. Failover is automatic on primary OA failure.</div></div>
@@ -497,7 +508,7 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div><div class="la-topic" id="hw-vc">
 <div class="la-topic-header">
 <span class="la-topic-num">Q3</span>
-<h3 class="la-topic-title">Explain the Virtual Connect (VC) module in c7000. What problem does it solve and how do you manage it?</h3>
+<h3 class="la-topic-title" id="explain-the-virtual-connect-vc-module-in-c7000-what-problem">Explain the Virtual Connect (VC) module in c7000. What problem does it solve and how do you manage it?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Virtual Connect solves the N×M cabling problem</strong> in blade environments. Without VC, each blade's NICs would require individual cables to top-of-rack switches — in a 16-blade chassis that's 32+ cables.<ul class="slow-flags"><li><strong>Abstraction:</strong> VC presents virtual MAC addresses and WWNs to blades. Physical upstream connections are shared. When a blade is replaced, the same virtual MAC/WWN is reassigned — server identity preserved without switch reconfiguration.</li><li><strong>Uplink aggregation:</strong> VC modules aggregate blade traffic to a small number of uplinks to the core network.</li><li><strong>Server Profiles:</strong> define which networks and fabrics a blade can access. Profiles contain virtual MACs, WWNs, network assignments, and bandwidth policies.</li><li><strong>Management:</strong> HP OneView or VC Manager GUI, OA CLI (<code>vc manager</code> commands), or REST API.</li><li><strong>Common issue:</strong> Server profile conflict when re-seating blades — resolve by reassigning or cloning the profile.</li></ul><div class="note"><strong>★ PRO TIP:</strong> Interviewers ask: "What happens when a blade is removed and re-inserted in a different bay?" Answer: VC profile re-assignment — the virtual MAC/WWN follows the profile, not the physical blade bay.</div></div>
@@ -505,7 +516,7 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div><div class="la-topic" id="hw-ilo-deep">
 <div class="la-topic-header">
 <span class="la-topic-num">Q4</span>
-<h3 class="la-topic-title">What is HP iLO and how is it different from the OA? What can you do in iLO that you cannot do in OA?</h3>
+<h3 class="la-topic-title" id="what-is-hp-ilo-and-how-is-it-different-from-the-oa-what-can">What is HP iLO and how is it different from the OA? What can you do in iLO that you cannot do in OA?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>iLO (Integrated Lights-Out)</strong> is the per-blade management controller embedded on every HP ProLiant server. It is independent of the OS — has its own processor, memory, NIC, and power from the chassis standby rail. You can access iLO even when the OS is down, hung at POST, or powered off.<div class="tbl-wrap"><table><thead><tr><th>Capability</th><th>iLO</th><th>OA</th></tr></thead><tbody><tr><td>Management scope</td><td>Individual server (OS + hardware level)</td><td>Entire chassis (power, cooling, interconnects)</td></tr><tr><td>OS independence</td><td>Yes — works when OS is down</td><td>Yes — chassis level</td></tr><tr><td>Virtual console (KVM)</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>BIOS configuration</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>RAID management</td><td>✅ via Smart Array</td><td>❌ No</td></tr><tr><td>Virtual media (ISO mount)</td><td>✅ Yes</td><td>❌ No</td></tr><tr><td>iLO versions</td><td>iLO 4 (Gen8/9), iLO 5 (Gen10), iLO 6 (Gen11)</td><td>N/A</td></tr><tr><td>API</td><td>Redfish (iLO 5+)</td><td>REST/SNMP</td></tr></tbody></table></div><div class="note">In BL blades, iLO uses OA backplane connection — there is no physical iLO NIC port on the blade itself.</div></div>
@@ -513,7 +524,7 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div><div class="la-topic" id="hw-blade-recovery">
 <div class="la-topic-header">
 <span class="la-topic-num">Q5</span>
-<h3 class="la-topic-title">Walk me through remotely recovering a blade server with a hung kernel (OS unresponsive).</h3>
+<h3 class="la-topic-title" id="walk-me-through-remotely-recovering-a-blade-server-with-a-hu">Walk me through remotely recovering a blade server with a hung kernel (OS unresponsive).</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>L3 remote recovery procedure using iLO:</strong><ol style="color:var(--text2);font-size:.9rem;line-height:1.8;padding-left:20px;margin-top:8px"><li>Access iLO web UI or SSH: <code>ssh Administrator@&lt;iLO-IP&gt;</code>. If iLO unreachable, access via OA CLI → <code>iLO connect &lt;blade-number&gt;</code></li><li>Check IML: verify iLO System Health for hardware faults (memory ECC errors, processor faults, storage alerts)</li><li>Virtual Console: launch HTML5 iLO remote console — if hung kernel, you'll see the Linux panic output or frozen screen</li><li>Attempt graceful shutdown first: iLO Power &amp; Thermal → Momentary Press (sends ACPI power button signal). Wait 60 seconds.</li><li>If no response: Force Power Off (hard power cycle). Document as unclean shutdown.</li><li>After reboot: use virtual console to monitor POST and OS boot. If boot fails, mount ISO via iLO Virtual Media to boot from rescue image.</li><li>Post-recovery: check IML for hardware alerts, check OS logs (<code>/var/log/messages</code>, <code>dmesg</code>) after recovery.</li></ol></div>
@@ -521,7 +532,7 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div><div class="la-topic" id="hw-firmware">
 <div class="la-topic-header">
 <span class="la-topic-num">Q6</span>
-<h3 class="la-topic-title">How do you update iLO firmware, BIOS, and Smart Array firmware on HP BL blades in production?</h3>
+<h3 class="la-topic-title" id="how-do-you-update-ilo-firmware-bios-and-smart-array-firmware">How do you update iLO firmware, BIOS, and Smart Array firmware on HP BL blades in production?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Method</th><th>Description</th><th>Requires Reboot?</th></tr></thead><tbody><tr><td>HP SPP (Service Pack for ProLiant)</td><td>Bootable ISO containing all firmware/drivers. Mount via iLO Virtual Media, run interactive/automated update. Best for full stack updates.</td><td>Yes</td></tr><tr><td>HP iLO Amplifier / OneView</td><td>Centralized firmware management. Detects versions, applies baseline. Can update iLO firmware online (no reboot for iLO-only in iLO 4+).</td><td>iLO: No; BIOS: Yes</td></tr><tr><td>OA CLI push</td><td><code>FIRMWARE UPDATE &lt;bay&gt;</code> — updates iLO firmware to all blades from OA without booting OS.</td><td>No (iLO only)</td></tr><tr><td>HP Smart Update Manager (SUM)</td><td>Run on Linux, deploys RPM packages for online firmware update. Updates BIOS, NIC, Smart Array online.</td><td>Yes (BIOS)</td></tr><tr><td>Satellite + firmware RPMs</td><td>HP provides firmware as RPMs via HPE Software Delivery Repository. Deploy via package management.</td><td>Yes</td></tr></tbody></table></div><div class="warn-box"><strong>Production best practice:</strong> test on non-production blade first, schedule change window, verify iLO firmware compatibility matrix before BIOS update, always have iLO console access ready during BIOS update in case of POST failure.</div></div>
@@ -532,14 +543,14 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
   <div class="la-section-header">
     <div class="la-section-icon">🔶</div>
     <div>
-      <h2 class="la-section-title">Dell PowerEdge — iDRAC, PERC & Lifecycle Controller</h2>
+      <h2 class="la-section-title" id="dell-poweredge-idrac-perc-lifecycle-controller">Dell PowerEdge — iDRAC, PERC & Lifecycle Controller</h2>
       <p class="la-section-desc">iDRAC vs iLO comparison, racadm CLI commands, Lifecycle Controller, PERC RAID management</p>
     </div>
   </div>
   <div class="la-topic" id="hw-idrac-compare">
 <div class="la-topic-header">
 <span class="la-topic-num">Q7</span>
-<h3 class="la-topic-title">Compare HP iLO and Dell iDRAC — functional equivalents and key differences.</h3>
+<h3 class="la-topic-title" id="compare-hp-ilo-and-dell-idrac-functional-equivalents-and-key">Compare HP iLO and Dell iDRAC — functional equivalents and key differences.</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Feature</th><th>HP iLO</th><th>Dell iDRAC</th></tr></thead><tbody><tr><td>Management Controller</td><td>iLO (Integrated Lights-Out)</td><td>iDRAC (Integrated Dell Remote Access Controller)</td></tr><tr><td>Current Generation</td><td>iLO 6 (Gen11)</td><td>iDRAC9 (14G/15G), iDRAC10 (16G)</td></tr><tr><td>Chassis Management</td><td>OA (Onboard Administrator)</td><td>CMC (M-series), OME (rack)</td></tr><tr><td>API Standard</td><td>Redfish (iLO 5+), REST API</td><td>Redfish, WSMAN, REST API</td></tr><tr><td>Remote Console</td><td>IRC Java/HTML5</td><td>Virtual Console Java/HTML5, iDRAC Direct</td></tr><tr><td>Firmware Management</td><td>HPE OneView, SPP, SUM</td><td>iDRAC, OMSA, Lifecycle Controller</td></tr><tr><td>Storage Management</td><td>HP SSA / SSACLI</td><td>OMSA / racadm / PERC / storcli</td></tr><tr><td>OS Deployment</td><td>iLO Virtual Media + PXE</td><td>iDRAC Virtual Media + Lifecycle Controller</td></tr><tr><td>Free License</td><td>iLO Standard (basic)</td><td>iDRAC Basic (limited), Enterprise (full)</td></tr></tbody></table></div></div>
@@ -547,7 +558,7 @@ hponcfg -f /tmp/pwd_ilo.xml</div>
 </div><div class="la-topic" id="hw-racadm">
 <div class="la-topic-header">
 <span class="la-topic-num">Q8</span>
-<h3 class="la-topic-title">What is racadm and how do you use it for remote Dell server management? Give key commands.</h3>
+<h3 class="la-topic-title" id="what-is-racadm-and-how-do-you-use-it-for-remote-dell-server">What is racadm and how do you use it for remote Dell server management? Give key commands.</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>racadm</strong> is the Dell CLI for iDRAC management. Available as remote racadm, local racadm, or SSH to iDRAC.<div class="cmd-block"># System info &amp; sensors
@@ -579,7 +590,7 @@ racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; remoteimage -c -u &lt;user&gt; -p &
 </div><div class="la-topic" id="hw-lc">
 <div class="la-topic-header">
 <span class="la-topic-num">Q9</span>
-<h3 class="la-topic-title">What is the Dell Lifecycle Controller and how is it used in production?</h3>
+<h3 class="la-topic-title" id="what-is-the-dell-lifecycle-controller-and-how-is-it-used-in">What is the Dell Lifecycle Controller and how is it used in production?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>The Lifecycle Controller</strong> is firmware embedded in iDRAC providing OS-independent hardware management — accessed during server boot (F10) or via iDRAC.<ul class="slow-flags"><li><strong>OS Deployment:</strong> deploy OS from ISO via virtual media or network share without a PXE server. Configures drivers automatically.</li><li><strong>Firmware Update:</strong> update all server firmware (BIOS, iDRAC, PERC, NIC, PSU) from a network share or attached media in one pass.</li><li><strong>Hardware Configuration:</strong> configure BIOS settings, RAID arrays, network adapter settings, and boot order without booting the OS.</li><li><strong>Part Replacement:</strong> when replacing a system board or PERC controller, LC restores previous configuration from backup — critical for blade swap scenarios.</li><li><strong>System Erase:</strong> securely wipe all data and configuration — used for decommissioning.</li><li><strong>SupportAssist:</strong> collect hardware diagnostics for Dell support.</li></ul><div class="note">Access: Boot server → press F10 → Lifecycle Controller UI. Or via iDRAC: Configuration &gt; Lifecycle Controller. Or via racadm: <code>racadm get BIOS.*</code> to view and set BIOS settings.</div></div>
@@ -587,7 +598,7 @@ racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; remoteimage -c -u &lt;user&gt; -p &
 </div><div class="la-topic" id="hw-perc">
 <div class="la-topic-header">
 <span class="la-topic-num">Q10</span>
-<h3 class="la-topic-title">How do you manage a Dell PERC RAID controller? Health check, failed drive replacement, storage expansion.</h3>
+<h3 class="la-topic-title" id="how-do-you-manage-a-dell-perc-raid-controller-health-check-f">How do you manage a Dell PERC RAID controller? Health check, failed drive replacement, storage expansion.</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>PERC (PowerEdge RAID Controller)</strong> management tools:<div class="cmd-block"># Show controller status and all drives
@@ -617,7 +628,7 @@ storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Ne
   <div class="la-section-header">
     <div class="la-section-icon">🔴</div>
     <div>
-      <h2 class="la-section-title">Hardware Troubleshooting Scenarios</h2>
+      <h2 class="la-section-title" id="hardware-troubleshooting-scenarios">Hardware Troubleshooting Scenarios</h2>
       <p class="la-section-desc">5 real-world scenarios — power loss, POST failure, VC network outage, iDRAC unreachable, temperature alerts</p>
     </div>
   </div>
@@ -674,14 +685,14 @@ storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Ne
   <div class="la-section-header">
     <div class="la-section-icon">📋</div>
     <div>
-      <h2 class="la-section-title">Quick Reference — HP OA/iLO & Dell iDRAC/racadm Cheat Sheet</h2>
+      <h2 class="la-section-title" id="quick-reference-hp-oa-ilo-dell-idrac-racadm-cheat-sheet">Quick Reference — HP OA/iLO & Dell iDRAC/racadm Cheat Sheet</h2>
       <p class="la-section-desc">Complete command reference for HP OA CLI, iLO CLI, SSACLI, Dell racadm, and storcli</p>
     </div>
   </div>
   <div class="la-topic" id="hw-ref-tables">
 <div class="la-topic-header">
 <span class="la-topic-num">REF</span>
-<h3 class="la-topic-title">Quick Reference — HP OA/iLO &amp; Dell iDRAC/racadm Command Cheat Sheet</h3>
+<h3 class="la-topic-title" id="quick-reference-hp-oa-ilo-dell-idrac-racadm-command-cheat-sh">Quick Reference — HP OA/iLO &amp; Dell iDRAC/racadm Command Cheat Sheet</h3>
 </div>
 <div class="la-topic-body">
 <div class="tbl-wrap"><table><thead><tr><th>Task</th><th>HP OA / iLO Command</th></tr></thead><tbody><tr><td>Show all blades status</td><td><code>show server list</code> (OA CLI)</td></tr><tr><td>Power on blade in bay 3</td><td><code>poweron server 3</code> (OA CLI)</td></tr><tr><td>Reset iLO on bay 5</td><td><code>iLO reset 5</code> (OA CLI)</td></tr><tr><td>Show PSU status</td><td><code>show powersupply all</code> (OA CLI)</td></tr><tr><td>Show enclosure power</td><td><code>show enclosure power</code> (OA CLI)</td></tr><tr><td>Show interconnect modules</td><td><code>show interconnect list</code> (OA CLI)</td></tr><tr><td>iLO SSH login</td><td><code>ssh Administrator@&lt;iLO-IP&gt;</code></td></tr><tr><td>Show IML via iLO CLI</td><td><code>show /system1/log1</code> (iLO CLI)</td></tr><tr><td>Start virtual console</td><td><code>start /system1/oemhp_vsp1</code> (iLO CLI)</td></tr><tr><td>Show RAID via SSACLI</td><td><code>ssacli ctrl slot=0 ld all show</code></td></tr><tr><td>Show physical disks</td><td><code>ssacli ctrl slot=0 pd all show status</code></td></tr><tr><td>Rebuild status</td><td><code>ssacli ctrl slot=0 ld 1 show detail | grep -i progress</code></td></tr></tbody></table></div><div class="tbl-wrap"><table><thead><tr><th>Task</th><th>racadm / storcli Command</th></tr></thead><tbody><tr><td>Get system info</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsysinfo</code></td></tr><tr><td>Get all sensor data</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsensorinfo</code></td></tr><tr><td>Graceful shutdown</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction graceshutdown</code></td></tr><tr><td>Hard reset</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; serveraction hardreset</code></td></tr><tr><td>Get hardware event log</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getsel</code></td></tr><tr><td>Get iDRAC NIC config</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; getniccfg</code></td></tr><tr><td>Soft reset iDRAC</td><td><code>racadm -r &lt;IP&gt; -u root -p &lt;pass&gt; racreset</code></td></tr><tr><td>Show RAID virtual disks</td><td><code>storcli /c0 /vall show</code></td></tr><tr><td>Show all physical disks</td><td><code>storcli /c0 /eall/sall show</code></td></tr><tr><td>Check rebuild progress</td><td><code>storcli /c0/v0 show | grep Progress</code></td></tr><tr><td>Add hot spare</td><td><code>storcli /c0/e&lt;enc&gt;/s&lt;slot&gt; add hotsparedrive</code></td></tr><tr><td>Run consistency check</td><td><code>storcli /c0/v0 start cc</code></td></tr></tbody></table></div>
@@ -696,7 +707,7 @@ storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Ne
   <div class="la-section-header">
     <div class="la-section-icon">☀️</div>
     <div>
-      <h2 class="la-section-title">Oracle SPARC Server Hardware — Complete Study Guide</h2>
+      <h2 class="la-section-title" id="oracle-sparc-server-hardware-complete-study-guide">Oracle SPARC Server Hardware — Complete Study Guide</h2>
       <p class="la-section-desc">T Series · M Series · S Series · V Series · SuperCluster — Architecture, Features, Administration &amp; L3 Interview Guide</p>
     </div>
   </div>
@@ -704,7 +715,7 @@ storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Ne
 <div class="la-topic" id="sparc-intro">
   <div class="la-topic-header">
     <span class="la-topic-num">OVR</span>
-    <h3 class="la-topic-title">Oracle SPARC Server Portfolio — Overview & Series Comparison</h3>
+    <h3 class="la-topic-title" id="oracle-sparc-server-portfolio-overview-series-comparison">Oracle SPARC Server Portfolio — Overview & Series Comparison</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">Oracle SPARC servers are enterprise-grade systems built around the SPARC (Scalable Processor ARChitecture) processor family. Unlike x86, SPARC is RISC (Reduced Instruction Set Computing) architecture, designed for extreme reliability, RAS (Reliability, Availability, Serviceability), and mission-critical workloads. All SPARC servers run Oracle Solaris.</p>
@@ -712,11 +723,11 @@ storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Ne
 <div class="tbl-wrap"><table><thead><tr><th>Series</th><th>Processor</th><th>Market Segment</th><th>Key Strength</th><th>Typical Workloads</th></tr></thead><tbody><tr><td>T Series (CMT)</td><td>SPARC T4 → T8</td><td>Mid-range / Scale-out</td><td>Thread-dense — massive parallelism (256 threads in T8)</td><td>Web servers, Java apps, database frontends, cloud workloads</td></tr><tr><td>M Series (SMP)</td><td>SPARC M7 → M12</td><td>High-end / Mission-critical</td><td>Extreme RAS, large SMP, huge RAM capacity (up to 32TB)</td><td>Core banking, ERP, Oracle DB, mission-critical OLTP</td></tr><tr><td>S Series (Superserver)</td><td>SPARC S7</td><td>Entry-level / Department</td><td>Cost-effective, Software in Silicon, in-memory security</td><td>Dev/test, SMB workloads, departmental database</td></tr><tr><td>V Series (x86 + SPARC)</td><td>Varies</td><td>Virtual/Cloud</td><td>Engineered system integration, VM consolidation</td><td>Mixed Oracle workload consolidation</td></tr><tr><td>SuperCluster</td><td>T/M Series</td><td>Engineered System</td><td>Full-stack optimisation (HW+OS+DB+Middleware)</td><td>Oracle Exadata alternative — Oracle DB + middleware</td></tr></tbody></table></div>
 <div class="note"><strong>Key differentiator for interviews:</strong> SPARC servers feature <strong>Software in Silicon</strong> — hardware acceleration for cryptography, database compression, deduplication, and security monitoring built directly into the SPARC processor. This means zero CPU overhead for these operations.</div>
 </div>
-</div><div class="hw-sub" id="sparc-tseries" style="scroll-margin-top:74px"><h3>☀️ T Series — SPARC CMT (Chip Multithreading) Servers</h3></div>
+</div><div class="hw-sub" id="sparc-tseries" style="scroll-margin-top:74px"><h3 id="t-series-sparc-cmt-chip-multithreading-servers">☀️ T Series — SPARC CMT (Chip Multithreading) Servers</h3></div>
 <div class="la-topic" id="sparc-t-arch">
   <div class="la-topic-header">
     <span class="la-topic-num">T-01</span>
-    <h3 class="la-topic-title">T Series Architecture — CMT & Thread Density</h3>
+    <h3 class="la-topic-title" id="t-series-architecture-cmt-thread-density">T Series Architecture — CMT & Thread Density</h3>
   </div>
   <div class="la-topic-body">
 <div class="note"><strong>CMT = Chip Multithreading</strong> — the defining characteristic of T Series. A single SPARC T8 chip has 32 cores × 8 threads = 256 hardware threads per socket. Compare to a typical x86 server: 32 cores × 2 threads = 64 threads.</div>
@@ -734,7 +745,7 @@ storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Ne
 <div class="la-topic" id="sparc-t-features">
   <div class="la-topic-header">
     <span class="la-topic-num">T-02</span>
-    <h3 class="la-topic-title">T Series Key Features — Software in Silicon & RAS</h3>
+    <h3 class="la-topic-title" id="t-series-key-features-software-in-silicon-ras">T Series Key Features — Software in Silicon & RAS</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text"><strong>Software in Silicon</strong> — hardware-accelerated capabilities built into the SPARC T7/T8 processor die:</p>
@@ -748,7 +759,7 @@ storcli /c0/v0 start cc</div><div class="warn-box"><strong>Critical:</strong> Ne
 <div class="la-topic" id="sparc-t-admin">
   <div class="la-topic-header">
     <span class="la-topic-num">T-03</span>
-    <h3 class="la-topic-title">T Series Administration — ILOM, OBP & Key Commands</h3>
+    <h3 class="la-topic-title" id="t-series-administration-ilom-obp-key-commands">T Series Administration — ILOM, OBP & Key Commands</h3>
   </div>
   <div class="la-topic-body">
 <div class="cmd-label">ILOM — Integrated Lights Out Manager (equivalent to HP iLO / Dell iDRAC)</div>
@@ -832,11 +843,11 @@ fmstat                    # FMA module statistics
 fmdump -ev                # fault event log
 fmdump -V -u <UUID>       # detail for a specific fault UUID</div>
 </div>
-</div><div class="hw-sub" id="sparc-mseries" style="scroll-margin-top:74px"><h3>⬛ M Series — Mission-Critical SMP Servers</h3></div>
+</div><div class="hw-sub" id="sparc-mseries" style="scroll-margin-top:74px"><h3 id="m-series-mission-critical-smp-servers">⬛ M Series — Mission-Critical SMP Servers</h3></div>
 <div class="la-topic" id="sparc-m-arch">
   <div class="la-topic-header">
     <span class="la-topic-num">M-01</span>
-    <h3 class="la-topic-title">M Series Architecture — SMP & Extreme RAS</h3>
+    <h3 class="la-topic-title" id="m-series-architecture-smp-extreme-ras">M Series Architecture — SMP & Extreme RAS</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">The M Series is Oracle's flagship <strong>SMP (Symmetric Multiprocessing)</strong> server line — designed for absolute maximum reliability for mission-critical workloads like core banking, Oracle databases, and ERP. The M12 supports up to <strong>32 TB of RAM</strong> and 384 cores.</p>
@@ -849,7 +860,7 @@ fmdump -V -u <UUID>       # detail for a specific fault UUID</div>
 <div class="la-topic" id="sparc-m-ras">
   <div class="la-topic-header">
     <span class="la-topic-num">M-02</span>
-    <h3 class="la-topic-title">M Series RAS Features — Dynamic Domains & Memory Protection</h3>
+    <h3 class="la-topic-title" id="m-series-ras-features-dynamic-domains-memory-protection">M Series RAS Features — Dynamic Domains & Memory Protection</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">M Series RAS features go far beyond T Series — designed for five-nines (99.999%) uptime:</p>
@@ -892,7 +903,7 @@ XSCF> setntp -m manual -s <NTP-IP> # set NTP server</div>
 <div class="la-topic" id="sparc-m-dr">
   <div class="la-topic-header">
     <span class="la-topic-num">M-03</span>
-    <h3 class="la-topic-title">Dynamic Reconfiguration (DR) — CPU/Memory/IO Hot Operations</h3>
+    <h3 class="la-topic-title" id="dynamic-reconfiguration-dr-cpu-memory-io-hot-operations">Dynamic Reconfiguration (DR) — CPU/Memory/IO Hot Operations</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">DR is one of the most interview-tested M Series features. It allows zero-downtime hardware changes on a live production system.</p>
@@ -935,11 +946,11 @@ XSCF> showdomainstatus -d 0</div>
 
 <div class="warn-box"><strong>DR Pre-checks before removing a board from a live domain:</strong><br>1. Verify board is not running critical processes: <code>cfgadm -al SB0</code><br>2. Check memory usage — ensure remaining memory can absorb workload: <code>prtconf | grep Memory</code><br>3. Check CPU load — ensure remaining CPUs can handle workload: <code>mpstat 1 5</code><br>4. Alert application teams before CPU DR — some JVMs do not handle CPU removal gracefully.</div>
 </div>
-</div><div class="hw-sub" id="sparc-sseries" style="scroll-margin-top:74px"><h3>🟦 S Series — SPARC S7 Superserver</h3></div>
+</div><div class="hw-sub" id="sparc-sseries" style="scroll-margin-top:74px"><h3 id="s-series-sparc-s7-superserver">🟦 S Series — SPARC S7 Superserver</h3></div>
 <div class="la-topic" id="sparc-s-arch">
   <div class="la-topic-header">
     <span class="la-topic-num">S-01</span>
-    <h3 class="la-topic-title">SPARC S7-2 & S7-2L Architecture & Features</h3>
+    <h3 class="la-topic-title" id="sparc-s7-2-s7-2l-architecture-features">SPARC S7-2 & S7-2L Architecture & Features</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">The SPARC S7 (introduced 2016) is Oracle's entry/mid-range SPARC server — designed to bring Software in Silicon to a more cost-effective platform.</p>
@@ -955,7 +966,7 @@ XSCF> showdomainstatus -d 0</div>
 <div class="la-topic" id="sparc-s-ssm">
   <div class="la-topic-header">
     <span class="la-topic-num">S-02</span>
-    <h3 class="la-topic-title">Silicon Secured Memory (SSM) — Hardware Security Feature</h3>
+    <h3 class="la-topic-title" id="silicon-secured-memory-ssm-hardware-security-feature">Silicon Secured Memory (SSM) — Hardware Security Feature</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">SSM is one of the most distinctive SPARC S7/T7/T8/M7/M8 features. It uses hardware memory tagging to detect memory corruption attacks <strong>in the processor itself</strong>, before software-level security can even respond.</p>
@@ -981,11 +992,11 @@ kstat -m adi | grep enabled
 
 <div class="note"><strong>Interview context:</strong> SSM is often called "ADI" (Application Data Integrity) in lower-level documentation — it is the underlying hardware mechanism. SSM is the marketing/feature name. Understanding both terms shows depth.</div>
 </div>
-</div><div class="hw-sub" id="sparc-vseries" style="scroll-margin-top:74px"><h3>🟩 V Series — Oracle SPARC V & Virtual Platforms</h3></div>
+</div><div class="hw-sub" id="sparc-vseries" style="scroll-margin-top:74px"><h3 id="v-series-oracle-sparc-v-virtual-platforms">🟩 V Series — Oracle SPARC V & Virtual Platforms</h3></div>
 <div class="la-topic" id="sparc-v-arch">
   <div class="la-topic-header">
     <span class="la-topic-num">V-01</span>
-    <h3 class="la-topic-title">Oracle SPARC V Series — Engineered Virtualisation Platforms</h3>
+    <h3 class="la-topic-title" id="oracle-sparc-v-series-engineered-virtualisation-platforms">Oracle SPARC V Series — Engineered Virtualisation Platforms</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">The V Series covers Oracle's engineered virtualisation and hybrid platforms that combine SPARC hardware with Oracle software stack integration.</p>
@@ -1029,11 +1040,11 @@ ldm list-io                    # I/O device assignments
 # Power cap a domain (limit power consumption)
 ldm set-power-cap 100 guestA   # cap at 100 watts</div>
 </div>
-</div><div class="hw-sub" id="sparc-processors" style="scroll-margin-top:74px"><h3>🔬 SPARC Processor Generations — Technical Deep Dive</h3></div>
+</div><div class="hw-sub" id="sparc-processors" style="scroll-margin-top:74px"><h3 id="sparc-processor-generations-technical-deep-dive">🔬 SPARC Processor Generations — Technical Deep Dive</h3></div>
 <div class="la-topic" id="sparc-proc-gen">
   <div class="la-topic-header">
     <span class="la-topic-num">PROC-01</span>
-    <h3 class="la-topic-title">SPARC Processor Generations — Feature Evolution</h3>
+    <h3 class="la-topic-title" id="sparc-processor-generations-feature-evolution">SPARC Processor Generations — Feature Evolution</h3>
   </div>
   <div class="la-topic-body">
 <div class="tbl-wrap"><table><thead><tr><th>Generation</th><th>Used In</th><th>Key Innovation</th><th>Notable Feature</th></tr></thead><tbody><tr><td>SPARC64 VI</td><td>M3000–M4000</td><td>Chip-multithreading on M Series</td><td>First M-class CMT</td></tr><tr><td>SPARC64 VII</td><td>M4000–M9000</td><td>4-core, 2-thread HT</td><td>Double floating point throughput</td></tr><tr><td>SPARC64 VII+</td><td>M3000–M9000 refresh</td><td>Higher clock speed</td><td>ECC improvements</td></tr><tr><td>SPARC T3</td><td>T3-x Series</td><td>16-core CMT, 128 threads/socket</td><td>On-chip 10GbE</td></tr><tr><td>SPARC T4</td><td>T4-x, T4-1B</td><td>8-core, 8-thread, superscalar</td><td>Out-of-order execution + CMT (hybrid)</td></tr><tr><td>SPARC T5</td><td>T5-2, T5-4, T5-8</td><td>16-core, 128 threads/socket</td><td>2× T4 in one package</td></tr><tr><td>SPARC M5</td><td>M5-32</td><td>32-core SMP, 512 threads</td><td>First Software in Silicon preview</td></tr><tr><td>SPARC M6</td><td>M6-32</td><td>12-core, 96 threads/chip</td><td>32 sockets = 384 cores</td></tr><tr><td>SPARC M7/T7</td><td>M7-8, T7-2, T7-4</td><td>32-core, 256 threads/socket</td><td>Full Software in Silicon (DAX, SSM, Crypto)</td></tr><tr><td>SPARC M8/T8</td><td>M8-8, T8-2, T8-4</td><td>32-core, 256 threads, 4.5GHz</td><td>30% faster DAX v2, enhanced SSM</td></tr><tr><td>SPARC S7</td><td>S7-2, S7-2L</td><td>8-core, 64 threads/socket</td><td>Software in Silicon at entry-level</td></tr><tr><td>SPARC M12 (Fujitsu SPARC XII)</td><td>M12-2S</td><td>12-core, 4.25GHz</td><td>Designed for in-memory DB (SAP HANA)</td></tr></tbody></table></div>
@@ -1044,7 +1055,7 @@ ldm set-power-cap 100 guestA   # cap at 100 watts</div>
 <div class="la-topic" id="sparc-proc-numa">
   <div class="la-topic-header">
     <span class="la-topic-num">PROC-02</span>
-    <h3 class="la-topic-title">SPARC NUMA Architecture & Memory Topology</h3>
+    <h3 class="la-topic-title" id="sparc-numa-architecture-memory-topology">SPARC NUMA Architecture & Memory Topology</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">All modern multi-socket SPARC servers are NUMA (Non-Uniform Memory Access). Understanding NUMA topology is critical for performance tuning.</p>
@@ -1073,11 +1084,11 @@ lgrp -l <lgrp-id> command   # start command bound to specific NUMA node
 psrinfo -p | head     # show processor sets
 kstat cpu_info | grep -E "chip_id|core_id|lgroup_id"</div>
 </div>
-</div><div class="hw-sub" id="sparc-admin" style="scroll-margin-top:74px"><h3>🔧 Common SPARC Administration Tasks</h3></div>
+</div><div class="hw-sub" id="sparc-admin" style="scroll-margin-top:74px"><h3 id="common-sparc-administration-tasks">🔧 Common SPARC Administration Tasks</h3></div>
 <div class="la-topic" id="sparc-boot-admin">
   <div class="la-topic-header">
     <span class="la-topic-num">ADM-01</span>
-    <h3 class="la-topic-title">SPARC Boot Management — OBP, Solaris Boot & Troubleshooting</h3>
+    <h3 class="la-topic-title" id="sparc-boot-management-obp-solaris-boot-troubleshooting">SPARC Boot Management — OBP, Solaris Boot & Troubleshooting</h3>
   </div>
   <div class="la-topic-body">
 <div class="cmd-label">OBP Boot sequences</div>
@@ -1130,7 +1141,7 @@ beadm destroy old-BE # delete old boot environment</div>
 <div class="la-topic" id="sparc-fma">
   <div class="la-topic-header">
     <span class="la-topic-num">ADM-02</span>
-    <h3 class="la-topic-title">Solaris FMA — Fault Management Architecture</h3>
+    <h3 class="la-topic-title" id="solaris-fma-fault-management-architecture">Solaris FMA — Fault Management Architecture</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">FMA is Solaris's automated hardware and software fault management framework. It is one of the most L3-tested SPARC topics because it integrates hardware and software fault diagnosis.</p>
@@ -1179,7 +1190,7 @@ fmadm repaired <UUID></div>
 <div class="la-topic" id="sparc-zfs-hw">
   <div class="la-topic-header">
     <span class="la-topic-num">ADM-03</span>
-    <h3 class="la-topic-title">ZFS on SPARC — Hardware Accelerated Features</h3>
+    <h3 class="la-topic-title" id="zfs-on-sparc-hardware-accelerated-features">ZFS on SPARC — Hardware Accelerated Features</h3>
   </div>
   <div class="la-topic-body">
 <p class="body-text">ZFS on SPARC servers benefits directly from Software in Silicon — compression and deduplication are hardware-accelerated, not software. This makes ZFS practical where it would impose too much CPU overhead on x86.</p>
@@ -1222,11 +1233,11 @@ zpool status data                   # monitor resilvering progress</div>
 
 <div class="note"><strong>SPARC M7/T7+ advantage:</strong> ZFS deduplication on x86 typically causes 30-50% CPU overhead — often making it impractical. On SPARC M7+ with hardware dedup acceleration, the overhead is near zero. This is a genuine architectural advantage and a strong interview talking point.</div>
 </div>
-</div><div class="hw-sub" id="sparc-interview" style="scroll-margin-top:74px"><h3>🎯 SPARC Interview Q&A — L3 Level Questions</h3></div>
+</div><div class="hw-sub" id="sparc-interview" style="scroll-margin-top:74px"><h3 id="sparc-interview-q-a-l3-level-questions">🎯 SPARC Interview Q&A — L3 Level Questions</h3></div>
 <div class="la-topic" id="sparc-qa-arch">
   <div class="la-topic-header">
     <span class="la-topic-num">IQ-01</span>
-    <h3 class="la-topic-title">Architecture & Comparison Questions</h3>
+    <h3 class="la-topic-title" id="architecture-comparison-questions">Architecture & Comparison Questions</h3>
   </div>
   <div class="la-topic-body">
 
@@ -1257,7 +1268,7 @@ zpool status data                   # monitor resilvering progress</div>
 <div class="la-topic" id="sparc-qa-ops">
   <div class="la-topic-header">
     <span class="la-topic-num">IQ-02</span>
-    <h3 class="la-topic-title">Operational & Troubleshooting Questions</h3>
+    <h3 class="la-topic-title" id="operational-troubleshooting-questions">Operational & Troubleshooting Questions</h3>
   </div>
   <div class="la-topic-body">
 
@@ -1288,7 +1299,7 @@ zpool status data                   # monitor resilvering progress</div>
 <div class="la-topic" id="sparc-qa-scenarios">
   <div class="la-topic-header">
     <span class="la-topic-num">IQ-03</span>
-    <h3 class="la-topic-title">Real-World Scenario Questions</h3>
+    <h3 class="la-topic-title" id="real-world-scenario-questions">Real-World Scenario Questions</h3>
   </div>
   <div class="la-topic-body">
 
@@ -1307,7 +1318,7 @@ zpool status data                   # monitor resilvering progress</div>
 <div class="la-topic" id="sparc-quickref">
   <div class="la-topic-header">
     <span class="la-topic-num">REF-01</span>
-    <h3 class="la-topic-title">SPARC Quick Reference — Key Commands Cheat Sheet</h3>
+    <h3 class="la-topic-title" id="sparc-quick-reference-key-commands-cheat-sheet">SPARC Quick Reference — Key Commands Cheat Sheet</h3>
   </div>
   <div class="la-topic-body">
 <div class="tbl-wrap"><table><thead><tr><th>Task</th><th>Command / Location</th></tr></thead><tbody><tr><td>Access ILOM CLI</td><td><code>ssh root@&lt;ILOM-IP&gt;</code></td></tr><tr><td>Access XSCF CLI (M Series)</td><td><code>ssh platadm@&lt;XSCF-IP&gt;</code></td></tr><tr><td>Show system health (ILOM)</td><td><code>→ show /System</code></td></tr><tr><td>Show faults (ILOM)</td><td><code>→ show -level all /SP/faultmgmt/shell</code></td></tr><tr><td>Show hardware config (XSCF)</td><td><code>XSCF&gt; showhardconf</code></td></tr><tr><td>Show domain status (XSCF)</td><td><code>XSCF&gt; showdomainstatus -a</code></td></tr><tr><td>OBP boot verbose</td><td><code>ok&gt; boot disk0 -v</code></td></tr><tr><td>OBP scan SCSI devices</td><td><code>ok&gt; probe-scsi-all</code></td></tr><tr><td>OBP single user mode</td><td><code>ok&gt; boot disk0 -s</code></td></tr><tr><td>Show CPU topology</td><td><code>psrinfo -pv</code></td></tr><tr><td>Show memory config</td><td><code>prtconf | grep Memory</code></td></tr><tr><td>Show full hardware</td><td><code>prtdiag -v</code></td></tr><tr><td>Show FRU serials</td><td><code>prtfru</code></td></tr><tr><td>Show active faults</td><td><code>fmadm faulty</code></td></tr><tr><td>Fault detail</td><td><code>fmdump -V -u &lt;UUID&gt;</code></td></tr><tr><td>FMA statistics</td><td><code>fmstat</code></td></tr><tr><td>Mark fault repaired</td><td><code>fmadm repaired &lt;UUID&gt;</code></td></tr><tr><td>Retire a CPU core</td><td><code>psradm -f &lt;cpu-id&gt;</code></td></tr><tr><td>Bring CPU back online</td><td><code>psradm -n &lt;cpu-id&gt;</code></td></tr><tr><td>DR — show boards</td><td><code>cfgadm -al</code></td></tr><tr><td>DR — unconfigure board</td><td><code>cfgadm -c unconfigure SB0</code></td></tr><tr><td>DR — configure new board</td><td><code>cfgadm -c configure SB2</code></td></tr><tr><td>Show NUMA topology</td><td><code>lgrpinfo -T</code></td></tr><tr><td>Show LDom list</td><td><code>ldm list</code></td></tr><tr><td>LDom live migrate</td><td><code>ldm migrate-domain -n guestA ldoms@&lt;target&gt;</code></td></tr><tr><td>LDom resource utilisation</td><td><code>ldm list-util</code></td></tr><tr><td>ZFS pool status</td><td><code>zpool status</code></td></tr><tr><td>ZFS pool scrub</td><td><code>zpool scrub &lt;pool&gt;</code></td></tr><tr><td>Solaris boot environments</td><td><code>beadm list</code></td></tr><tr><td>SMF service status</td><td><code>svcs -x</code></td></tr></tbody></table></div>
@@ -1316,6 +1327,7 @@ zpool status data                   # monitor resilvering progress</div>
 </div>
 <!-- end Oracle SPARC section -->
 
+<!--rr:related--><aside class="rr-related" aria-labelledby="rr-rel-h"><h2 id="rr-rel-h">Related</h2><div class="rr-related-grid"><a class="rr-card" href="/nutanix.html" style="--cat:#64748B"><h3>Nutanix Foundations Guide</h3><p>Nutanix hyperconverged infrastructure fundamentals: Prism Element and Central, data resiliency, networking, Foundation i…</p><div class="meta"><span><span class="dot"></span>Infrastructure</span></div></a><a class="rr-card" href="/linux-admin.html" style="--cat:#2F80ED"><h3>Linux Admin Interview Guide</h3><p>Practical Linux administration commands and real-world Q&amp;As: LVM, SAN and multipath, scripting, networking, security and…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/solaris.html" style="--cat:#D97706"><h3>Oracle Solaris</h3><p>Oracle Solaris 10 and 11 reference with 137+ Q&amp;As: SPARC hardware, ZFS, Zones, LDOMs, IPMP, SMF, Veritas Cluster, mdb an…</p><div class="meta"><span><span class="dot"></span>Unix</span></div></a></div></aside><!--/rr:related-->
 </main>
 
   <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#hw-raid" class="toc-link">💽 HP Smart Array & IBM MegaRAID</a><a href="#hw1" class="toc-link h3">01 HP HPSSACLI / HPACUCLI — Smart Array Commands</a><a href="#hw2" class="toc-link h3">02 IBM MegaRAID storcli & MegaCli Commands</a><a href="#hw3" class="toc-link h3">03 HP ILO — Out-of-Band Management</a><a href="#hw-c7000" class="toc-link">🔷 HP BladeSystem C7000 & BL Series</a><a href="#hw-c7000-arch" class="toc-link h3">HP BladeSystem c7000 Chassis Architecture</a><a href="#hw-oa" class="toc-link h3">Onboard Administrator (OA) — Capabilities & Limits</a><a href="#hw-vc" class="toc-link h3">Virtual Connect (VC) Module</a><a href="#hw-ilo-deep" class="toc-link h3">HP iLO vs OA — Deep Dive</a><a href="#hw-blade-recovery" class="toc-link h3">Remote Recovery — Hung Kernel Blade</a><a href="#hw-firmware" class="toc-link h3">Firmware Updates — iLO, BIOS, Smart Array</a><a href="#hw-dell" class="toc-link">🔶 Dell PowerEdge — iDRAC, PERC & Lifecycle Controller</a><a href="#hw-idrac-compare" class="toc-link h3">HP iLO vs Dell iDRAC — Comparison</a><a href="#hw-racadm" class="toc-link h3">racadm CLI — Key Commands</a><a href="#hw-lc" class="toc-link h3">Dell Lifecycle Controller</a><a href="#hw-perc" class="toc-link h3">Dell PERC RAID — Health, Replace, Expand</a><a href="#hw-scenarios" class="toc-link">🔴 Hardware Troubleshooting Scenarios</a><a href="#sc-c7000-power" class="toc-link h3">HP C7000 Full Enclosure Power Loss</a><a href="#sc-blade-post" class="toc-link h3">HP BL460c Blade Fails to POST</a><a href="#sc-vc-network" class="toc-link h3">C7000 VC Module — 8 Blades Lose Network</a><a href="#sc-idrac-unreachable" class="toc-link h3">Dell iDRAC Unreachable After OS Patch</a><a href="#sc-dell-temp" class="toc-link h3">Dell R640 Critical Temperature Alert</a><a href="#hw-ref" class="toc-link">📋 Command Reference Cheat Sheet</a></nav>
@@ -1323,12 +1335,30 @@ zpool status data                   # monitor resilvering progress</div>
 
 <button id="btt">↑</button>
 
-<footer id="site-footer">
-  <span>root_n_reels — Technical Reference Library</span>
-  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
-  <span>Vishal Sharma · <a href="mailto:admvishal24@gmail.com">admvishal24@gmail.com</a> · <a href="https://www.rootnreels.in">www.rootnreels.in</a></span>
-  <span><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram</a> · <a href="https://youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube</a></span>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
 </footer>
+<!--/rr:footer-->
 
 <script>
 // Progress + back-to-top

@@ -3,21 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
-<meta name="theme-color" content="#12161c">
-<meta name="description" content="Linux Admin Interview Guide — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Linux Admin Interview Guide — root_n_reels">
-<meta property="og:description" content="Linux Admin Interview Guide — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
-<meta property="og:image" content="https://www.rootnreels.in/assets/logo-lockup.png">
-<meta property="og:url" content="https://www.rootnreels.in/linux-admin.html">
-<meta name="twitter:card" content="summary_large_image">
-<title>Linux Admin Interview Guide — root_n_reels</title>
+<title>Linux Admin Guide: LVM, SAN, Multipath, Performance &amp; Interview Q&amp;A | root_n_reels</title>
 <link rel="stylesheet" href="studyhub.css?v=20260911">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* ── site-wide overrides ── */
 :root { --topbar-h:58px; --sidebar-w:240px; }
@@ -245,40 +232,90 @@ tr:hover td { background:rgba(20,30,50,.025); }
 .slow-flags li::before{content:"• ";color:var(--green)}
 
 </style>
-</head>
-<body>
+<!--rr:head-->
+<meta name="description" content="Practical Linux administration commands and real-world Q&amp;As: LVM, SAN and multipath, scripting, networking, security and performance troubleshooting.">
+<link rel="canonical" href="https://www.rootnreels.in/linux-admin.html">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="Linux Admin Guide: LVM, SAN, Multipath, Performance &amp; Interview Q&amp;A | root_n_reels"><meta property="og:description" content="Practical Linux administration commands and real-world Q&amp;As: LVM, SAN and multipath, scripting, networking, security and performance troubleshooting.">
+<meta property="og:url" content="https://www.rootnreels.in/linux-admin.html"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Linux Admin Guide: LVM, SAN, Multipath, Performance &amp; Interview Q&amp;A | root_n_reels"><meta name="twitter:description" content="Practical Linux administration commands and real-world Q&amp;As: LVM, SAN and multipath, scripting, networking, security and performance troubleshooting."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"Linux & RHEL","item":"https://www.rootnreels.in/linux/"},{"@type":"ListItem","position":3,"name":"Linux Admin Interview Guide","item":"https://www.rootnreels.in/linux-admin.html"}]},{"@type":"TechArticle","headline":"Linux Admin Interview Guide","description":"Practical Linux administration commands and real-world Q&As: LVM, SAN and multipath, scripting, networking, security and performance troubleshooting.","url":"https://www.rootnreels.in/linux-admin.html","mainEntityOfPage":"https://www.rootnreels.in/linux-admin.html","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-09-24","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Expert","dependencies":"RHEL / Linux"}]}</script>
+<!--/rr:head--></head>
+<body class="rr" data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-<div id="site-topbar">
-  <a href="index.html" class="logo"><img src="assets/logo-icon.png" alt="root_n_reels" class="logo-img">root<span>_n_</span>reels</a>
-  <span class="page-title-bar">Linux & Unix SysAdmin Reference</span>
-  <div class="topbar-spacer"></div>
-  <button id="menu-btn" onclick="toggleNav()">☰</button>
-</div>
-<div id="prog"></div>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/" aria-current="page">Linux</a><a href="/unix/">Unix</a><a href="/networking/">Networking</a><a href="/devops/">DevOps</a><a href="/troubleshooting/">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header--><div id="prog"></div>
 <div id="mob-ov"></div>
 
 <div class="site-body">
-  <nav id="site-nav">
-    <div class="nav-sec">Navigation</div>
-<a href="youtube.html" class="nav-link">📺 YouTube Tutorials</a>
-    <a href="index.html" class="nav-link ">🏠 Home</a>
-<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
-<a href="linux-admin.html" class="nav-link active">💻 Linux Admin</a>
-<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
-<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
-<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
-<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
-<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
-<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
-<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
-<a href="ansible.html" class="nav-link">🤖 Ansible AAP</a>
-<a href="devops-bible.html" class="nav-link">♾️ DevOps Bible</a>
-<a href="index.html#contact" class="nav-link ">✉️ Contact</a>
-
-
-  </nav>
+  <!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
 
   <main id="main-content">
+<!--rr:crumbs--><nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/linux/">Linux &amp; RHEL</a></li><li aria-current="page">Linux Admin Interview Guide</li></ol></nav><!--/rr:crumbs-->
     
 <div class="page-hero">
   <h1>💻 Linux Admin Interview Guide</h1>
@@ -290,6 +327,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
     <span class="badge badge-purple">Best Practices</span>
   </div>
 </div>
+<!--rr:meta--><div class="rr-meta"><span class="chip" style="--cat:#2F80ED"><span class="dot"></span>Linux &amp; RHEL</span><span class="chip">L2–L3</span><span class="chip">Q&amp;A</span><span class="chip" title="Versions this page covers">Covers: RHEL / Linux</span><span>Long reference · ~45 min</span> <span>Updated <time datetime="2026-09-24">2026-09-24</time></span> <span>by Vishal Sharma</span><span class="acts"><button type="button" class="rr-act" data-rr-save aria-pressed="false"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Save</span></button><button type="button" class="rr-act" data-rr-share><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span class="lbl">Share</span></button><button type="button" class="rr-act" data-rr-print><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">Print</span></button></span></div><!--/rr:meta-->
 <div class="note" style="margin-bottom:28px">
   🗂️ <strong>Content reorganized for easier access:</strong>
   Server hardware topics (HP iLO, Dell iDRAC, RAID) are now on the
@@ -302,7 +340,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
   <div class="la-section-header">
     <div class="la-section-icon">💾</div>
     <div>
-      <h2 class="la-section-title">LVM & Filesystem Management</h2>
+      <h2 class="la-section-title" id="lvm-filesystem-management">LVM & Filesystem Management</h2>
       <p class="la-section-desc">Logical Volume Manager — create, extend, reduce, and manage filesystems in enterprise Linux</p>
     </div>
   </div>
@@ -310,7 +348,7 @@ tr:hover td { background:rgba(20,30,50,.025); }
 <div class="la-topic" id="lvm1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">PV → VG → LV Creation Workflow</h3>
+    <h3 class="la-topic-title" id="pv-vg-lv-creation-workflow">PV → VG → LV Creation Workflow</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <p class="body-text">The fundamental LVM hierarchy: Physical Volumes (PV) → Volume Groups (VG) → Logical Volumes (LV). Always follow this sequence when provisioning new storage.</p>
@@ -377,7 +415,7 @@ df -kh</div>
 <div class="la-topic" id="lvm2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">LV Extension Commands & Resize Scenarios</h3>
+    <h3 class="la-topic-title" id="lv-extension-commands-resize-scenarios">LV Extension Commands & Resize Scenarios</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Extend by adding size, auto-resize FS (-r)</span>
@@ -416,7 +454,7 @@ free -h</div>
 <div class="la-topic" id="lvm3">
   <div class="la-topic-header">
     <span class="la-topic-num">03</span>
-    <h3 class="la-topic-title">fstab Management & Mount Operations</h3>
+    <h3 class="la-topic-title" id="fstab-management-mount-operations">fstab Management & Mount Operations</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Always backup fstab before changes</span>
@@ -452,7 +490,7 @@ df -kh</div>
   <div class="la-section-header">
     <div class="la-section-icon">🔌</div>
     <div>
-      <h2 class="la-section-title">SAN & Multipath Storage</h2>
+      <h2 class="la-section-title" id="san-multipath-storage">SAN & Multipath Storage</h2>
       <p class="la-section-desc">Storage Area Network management, multipath I/O, FC HBAs, and disk migration procedures</p>
     </div>
   </div>
@@ -460,7 +498,7 @@ df -kh</div>
 <div class="la-topic" id="san1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">SAN Pre/Post Check Commands</h3>
+    <h3 class="la-topic-title" id="san-pre-post-check-commands">SAN Pre/Post Check Commands</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Pre-migration checks</span>
@@ -512,7 +550,7 @@ done</div>
 <div class="la-topic" id="san2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">FC HBA Troubleshooting & Path Management</h3>
+    <h3 class="la-topic-title" id="fc-hba-troubleshooting-path-management">FC HBA Troubleshooting & Path Management</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Check FC port states</span>
@@ -546,7 +584,7 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
   <div class="la-section-header">
     <div class="la-section-icon">🗄️</div>
     <div>
-      <h2 class="la-section-title">Backup & NetBackup (Veritas)</h2>
+      <h2 class="la-section-title" id="backup-netbackup-veritas">Backup & NetBackup (Veritas)</h2>
       <p class="la-section-desc">NetBackup client troubleshooting, certificate management, and log archival</p>
     </div>
   </div>
@@ -554,7 +592,7 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
 <div class="la-topic" id="nb1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">NetBackup Error 7641 — Certificate & Host Cache Fix</h3>
+    <h3 class="la-topic-title" id="netbackup-error-7641-certificate-host-cache-fix">NetBackup Error 7641 — Certificate & Host Cache Fix</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="warn-box"><strong>⚠ Error 7641</strong> — SSL certificate / host cache mismatch. Follow these steps in sequence.</div>
@@ -594,7 +632,7 @@ ls -d /sys/block/sd*/device/scsi_device/*</div>
 <div class="la-topic" id="nb2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">Log Compression & Archival (find + gzip/bzip2)</h3>
+    <h3 class="la-topic-title" id="log-compression-archival-find-gzip-bzip2">Log Compression & Archival (find + gzip/bzip2)</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <p class="body-text">A critical operational task — compressing old logs to reclaim disk space. The standard pattern uses <code>find</code> to identify, filter, and compress in a pipeline.</p>
@@ -637,7 +675,7 @@ find . -xdev -size +1000000c -exec ls -lh {} \; | sort -nrk 5 | head -15</div>
   <div class="la-section-header">
     <div class="la-section-icon">⚙️</div>
     <div>
-      <h2 class="la-section-title">sed, awk & Shell Scripting</h2>
+      <h2 class="la-section-title" id="sed-awk-shell-scripting">sed, awk & Shell Scripting</h2>
       <p class="la-section-desc">Text processing, in-place file editing, loop constructs, and automation patterns</p>
     </div>
   </div>
@@ -645,7 +683,7 @@ find . -xdev -size +1000000c -exec ls -lh {} \; | sort -nrk 5 | head -15</div>
 <div class="la-topic" id="sed1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">sed — In-place File Editing Patterns</h3>
+    <h3 class="la-topic-title" id="sed-in-place-file-editing-patterns">sed — In-place File Editing Patterns</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Add line at TOP of file</span>
@@ -698,7 +736,7 @@ cat /tmp/jointmp &gt; /opt/admin/join</div>
 <div class="la-topic" id="sed2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">Shell Loops — For Loops Over Server Lists</h3>
+    <h3 class="la-topic-title" id="shell-loops-for-loops-over-server-lists">Shell Loops — For Loops Over Server Lists</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Run command on multiple servers via SSH</span>
@@ -748,7 +786,7 @@ done</div>
 <div class="la-topic" id="sed3">
   <div class="la-topic-header">
     <span class="la-topic-num">03</span>
-    <h3 class="la-topic-title">ACL Management — setfacl / nfs4_setfacl</h3>
+    <h3 class="la-topic-title" id="acl-management-setfacl-nfs4-setfacl">ACL Management — setfacl / nfs4_setfacl</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Set ACL for a user on a directory</span>
@@ -779,7 +817,7 @@ sed -i '/apps/ s/defaults/defaults,acl/' /etc/fstab</div>
   <div class="la-section-header">
     <div class="la-section-icon">📊</div>
     <div>
-      <h2 class="la-section-title">Performance Monitoring & SAR</h2>
+      <h2 class="la-section-title" id="performance-monitoring-sar">Performance Monitoring & SAR</h2>
       <p class="la-section-desc">System Activity Reporter, CPU/memory/IO analysis, process troubleshooting</p>
     </div>
   </div>
@@ -787,7 +825,7 @@ sed -i '/apps/ s/defaults/defaults,acl/' /etc/fstab</div>
 <div class="la-topic" id="perf1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">SAR — System Activity Reporter Commands</h3>
+    <h3 class="la-topic-title" id="sar-system-activity-reporter-commands">SAR — System Activity Reporter Commands</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Navigate to SAR data directory</span>
@@ -838,7 +876,7 @@ echo "PFA" | mail -s "SAR REPORT From `uname -n`" \
 <div class="la-topic" id="perf2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">Reboot Reason Investigation</h3>
+    <h3 class="la-topic-title" id="reboot-reason-investigation">Reboot Reason Investigation</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Find reboot/shutdown reason in logs</span>
@@ -869,7 +907,7 @@ cat receiver.archive.log | grep reboo</div>
   <div class="la-section-header">
     <div class="la-section-icon">🔒</div>
     <div>
-      <h2 class="la-section-title">Security, SELinux & PAM</h2>
+      <h2 class="la-section-title" id="security-selinux-pam">Security, SELinux & PAM</h2>
       <p class="la-section-desc">PAM configuration, SELinux modes, crontab access control, RPM database repair</p>
     </div>
   </div>
@@ -877,7 +915,7 @@ cat receiver.archive.log | grep reboo</div>
 <div class="la-topic" id="sec1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">SELinux Management</h3>
+    <h3 class="la-topic-title" id="selinux-management">SELinux Management</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Check current SELinux mode</span>
@@ -908,7 +946,7 @@ audit2why &lt; /var/log/audit/audit.log</div>
 <div class="la-topic" id="sec2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">PAM Configuration — Crontab Access Control</h3>
+    <h3 class="la-topic-title" id="pam-configuration-crontab-access-control">PAM Configuration — Crontab Access Control</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="info-box"><strong>Issue:</strong> In RHEL 7, user FIDs cannot access crontab due to PAM configuration changes from RHEL 5/6.</div>
@@ -935,7 +973,7 @@ crontab -l</div>
 <div class="la-topic" id="sec3">
   <div class="la-topic-header">
     <span class="la-topic-num">03</span>
-    <h3 class="la-topic-title">RPM Database Rebuild Procedure</h3>
+    <h3 class="la-topic-title" id="rpm-database-rebuild-procedure">RPM Database Rebuild Procedure</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Step 1: Backup RPM database</span>
@@ -966,7 +1004,7 @@ yum clean all</div>
   <div class="la-section-header">
     <div class="la-section-icon">🔑</div>
     <div>
-      <h2 class="la-section-title">SSH Key Management & Kerberos Keytabs</h2>
+      <h2 class="la-section-title" id="ssh-key-management-kerberos-keytabs">SSH Key Management & Kerberos Keytabs</h2>
       <p class="la-section-desc">SSH key setup, bulk deployment scripts, keytab management, NSCD troubleshooting</p>
     </div>
   </div>
@@ -974,7 +1012,7 @@ yum clean all</div>
 <div class="la-topic" id="ssh1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">SSH Key Conversion & Deployment</h3>
+    <h3 class="la-topic-title" id="ssh-key-conversion-deployment">SSH Key Conversion & Deployment</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># SSH with specific cipher (for legacy systems)</span>
@@ -1015,7 +1053,7 @@ for j in `cat fid`; do setperm $j; done</div>
 <div class="la-topic" id="ssh2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">NSCD Troubleshooting — Name Service Cache Daemon</h3>
+    <h3 class="la-topic-title" id="nscd-troubleshooting-name-service-cache-daemon">NSCD Troubleshooting — Name Service Cache Daemon</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># NSCD cache database files</span>
@@ -1050,7 +1088,7 @@ getent group prv_hac_sd-2cad-109d | grep oracle</div>
   <div class="la-section-header">
     <div class="la-section-icon">🧠</div>
     <div>
-      <h2 class="la-section-title">Kernel Parameters & System Configuration</h2>
+      <h2 class="la-section-title" id="kernel-parameters-system-configuration">Kernel Parameters & System Configuration</h2>
       <p class="la-section-desc">sysctl tuning, GRUB management, Dracut issues, VCS clustering, Tanium</p>
     </div>
   </div>
@@ -1058,7 +1096,7 @@ getent group prv_hac_sd-2cad-109d | grep oracle</div>
 <div class="la-topic" id="kern1">
   <div class="la-topic-header">
     <span class="la-topic-num">01</span>
-    <h3 class="la-topic-title">Kernel Parameter Tuning — sysctl</h3>
+    <h3 class="la-topic-title" id="kernel-parameter-tuning-sysctl">Kernel Parameter Tuning — sysctl</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Set kernel parameters (persistent via sysctl.conf)</span>
@@ -1103,7 +1141,7 @@ echo 8000000 &gt; /proc/sys/vm/max_map_count
 <div class="la-topic" id="kern2">
   <div class="la-topic-header">
     <span class="la-topic-num">02</span>
-    <h3 class="la-topic-title">GRUB2 — Boot Kernel Management (Dracut Issue Fix)</h3>
+    <h3 class="la-topic-title" id="grub2-boot-kernel-management-dracut-issue-fix">GRUB2 — Boot Kernel Management (Dracut Issue Fix)</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="info-box"><strong>Dracut Prompt Issue:</strong> Server drops to dracut emergency shell at boot. Cause: grubenv missing/null or wrong default kernel set.</div>
@@ -1135,7 +1173,7 @@ package-cleanup --oldkernels --count=2</div>
 <div class="la-topic" id="kern3">
   <div class="la-topic-header">
     <span class="la-topic-num">03</span>
-    <h3 class="la-topic-title">VCS (Veritas Cluster Server) — Cluster Management</h3>
+    <h3 class="la-topic-title" id="vcs-veritas-cluster-server-cluster-management">VCS (Veritas Cluster Server) — Cluster Management</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># VCS command directory</span>
@@ -1182,7 +1220,7 @@ done | grep -i servername</div>
 <div class="la-topic" id="kern4">
   <div class="la-topic-header">
     <span class="la-topic-num">04</span>
-    <h3 class="la-topic-title">Tanium Client Troubleshooting</h3>
+    <h3 class="la-topic-title" id="tanium-client-troubleshooting">Tanium Client Troubleshooting</h3>
   </div>
   <div class="la-topic-body"><div class="topic-body">
 <div class="cmd-block"><span class="comment"># Stop Tanium client</span>
@@ -1217,7 +1255,7 @@ find /opt/Tanium/TaniumClient/tmp -mtime +30 -type f \
 <div class="la-section-header">
 <div class="la-section-icon">🐢</div>
 <div>
-<h2 class="la-section-title">Linux Server Running Slow? — Pro Level Diagnostic Guide</h2>
+<h2 class="la-section-title" id="linux-server-running-slow-pro-level-diagnostic-guide">Linux Server Running Slow? — Pro Level Diagnostic Guide</h2>
 <p class="la-section-desc">Diagnose like a pro. Fix the right problem. 10-step systematic approach — Measure · Isolate · Verify · Fix · Prevent</p>
 </div>
 </div>
@@ -1556,7 +1594,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" id="slow-flow" style="margin-top:8px">
 <div class="la-topic-header">
 <span class="la-topic-num">FLOW</span>
-<h3 class="la-topic-title">Pro Troubleshooting Flow</h3>
+<h3 class="la-topic-title" id="pro-troubleshooting-flow">Pro Troubleshooting Flow</h3>
 </div>
 <div class="slow-flow-steps">
 <div class="slow-flow-step">
@@ -1595,7 +1633,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" style="margin:0">
 <div class="la-topic-header">
 <span class="la-topic-num">TIPS</span>
-<h3 class="la-topic-title">⏱️ Time Saving Tips</h3>
+<h3 class="la-topic-title" id="time-saving-tips">⏱️ Time Saving Tips</h3>
 </div>
 <ul class="slow-flags" style="margin:0">
 <li>✔ Use <code>sar</code> for historical analysis</li>
@@ -1608,7 +1646,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" style="margin:0">
 <div class="la-topic-header">
 <span class="la-topic-num">RULES</span>
-<h3 class="la-topic-title">⭐ Golden Rules</h3>
+<h3 class="la-topic-title" id="golden-rules">⭐ Golden Rules</h3>
 </div>
 <ul class="slow-flags" style="margin:0">
 <li>⭐ Measure first, then act</li>
@@ -1621,7 +1659,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" style="margin:0">
 <div class="la-topic-header">
 <span class="la-topic-num">TOOLS</span>
-<h3 class="la-topic-title">🧰 Boden Tools</h3>
+<h3 class="la-topic-title" id="boden-tools">🧰 Boden Tools</h3>
 </div>
 <ul class="slow-flags" style="margin:0">
 <li><code>nmon</code> — system monitor</li>
@@ -1642,7 +1680,7 @@ $ redis-cli info stats</div>
 <div class="la-section-header">
 <div class="la-section-icon">⚙️</div>
 <div>
-<h2 class="la-section-title">kernel-devel — Linux Kernel Development Package</h2>
+<h2 class="la-section-title" id="kernel-devel-linux-kernel-development-package">kernel-devel — Linux Kernel Development Package</h2>
 <p class="la-section-desc">Header files and build files for the Linux kernel — required for compiling kernel modules, drivers, and enterprise software prerequisites</p>
 </div>
 </div>
@@ -1650,7 +1688,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" id="kd-what">
 <div class="la-topic-header">
 <span class="la-topic-num">01</span>
-<h3 class="la-topic-title">What is kernel-devel?</h3>
+<h3 class="la-topic-title" id="what-is-kernel-devel">What is kernel-devel?</h3>
 </div>
 <div class="la-topic-body">
 <p class="body-text"><strong>kernel-devel</strong> is a Linux package that contains the <strong>header files and build files for the Linux kernel</strong>. It is primarily used when software needs to <strong>compile kernel-dependent modules or drivers</strong> against the currently running kernel.</p>
@@ -1669,7 +1707,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" id="kd-db2">
 <div class="la-topic-header">
 <span class="la-topic-num">02</span>
-<h3 class="la-topic-title">Why Db2 Checks for kernel-devel</h3>
+<h3 class="la-topic-title" id="why-db2-checks-for-kernel-devel">Why Db2 Checks for kernel-devel</h3>
 </div>
 <div class="la-topic-body">
 <p class="body-text">During installation, <strong>Db2's prerequisite checker</strong> verifies that the system has the development files needed for certain low-level integrations and kernel-related operations. Even though Db2 itself is not a kernel module, IBM includes this check to ensure the system has a complete build environment and compatible kernel interfaces.</p>
@@ -1682,7 +1720,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" id="kd-usecases">
 <div class="la-topic-header">
 <span class="la-topic-num">03</span>
-<h3 class="la-topic-title">Common Use Cases for kernel-devel</h3>
+<h3 class="la-topic-title" id="common-use-cases-for-kernel-devel">Common Use Cases for kernel-devel</h3>
 </div>
 <div class="la-topic-body">
 <div class="card-grid">
@@ -1717,7 +1755,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" id="kd-packages">
 <div class="la-topic-header">
 <span class="la-topic-num">04</span>
-<h3 class="la-topic-title">Difference Between Kernel-Related Packages</h3>
+<h3 class="la-topic-title" id="difference-between-kernel-related-packages">Difference Between Kernel-Related Packages</h3>
 </div>
 <div class="la-topic-body">
 <div class="tbl-wrap">
@@ -1743,7 +1781,7 @@ $ redis-cli info stats</div>
 <div class="la-topic" id="kd-commands">
 <div class="la-topic-header">
 <span class="la-topic-num">05</span>
-<h3 class="la-topic-title">Commands — Check &amp; Verify on Your Server</h3>
+<h3 class="la-topic-title" id="commands-check-verify-on-your-server">Commands — Check &amp; Verify on Your Server</h3>
 </div>
 <div class="la-topic-body">
 <div class="cmd-label">Check if kernel-devel is installed</div>
@@ -1776,7 +1814,7 @@ rpm -q kernel-devel-$(uname -r)</div>
 <div class="la-section-header">
 <div class="la-section-icon">🛰️</div>
 <div>
-<h2 class="la-section-title">Red Hat Satellite 6/7 — Lifecycle Environments &amp; Patching</h2>
+<h2 class="la-section-title" id="red-hat-satellite-6-7-lifecycle-environments-patching">Red Hat Satellite 6/7 — Lifecycle Environments &amp; Patching</h2>
 <p class="la-section-desc">Architecture, content views, activation keys, patching workflows, Hammer CLI, troubleshooting — deep L3 operational reference</p>
 </div>
 </div>
@@ -1785,7 +1823,7 @@ rpm -q kernel-devel-$(uname -r)</div>
 <div class="la-topic" id="sat-q13">
 <div class="la-topic-header">
 <span class="la-topic-num">Q1</span>
-<h3 class="la-topic-title">Explain the Red Hat Satellite architecture — all major components and how they interact.</h3>
+<h3 class="la-topic-title" id="explain-the-red-hat-satellite-architecture-all-major-compone">Explain the Red Hat Satellite architecture — all major components and how they interact.</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><ul class="slow-flags"><li><strong>Foreman:</strong> the core of Satellite — handles host provisioning, lifecycle management, and the web UI. Provides the host model, host groups, lifecycle environments, and content views.</li><li><strong>Katello:</strong> the content management layer. Handles syncing from Red Hat CDN, creating content views, managing lifecycle environments, applying errata, and activation keys. Built on Pulp for content storage.</li><li><strong>Pulp 3:</strong> the content repository management backend. Stores synced RPM packages, errata, kickstart trees, and file content.</li><li><strong>Candlepin:</strong> the subscription management component. Tracks Red Hat subscriptions, registers hosts, and manages entitlements.</li><li><strong>Capsule Server (Smart Proxy):</strong> optional distributed component. Syncs content from Satellite and serves it locally to registered clients. Reduces WAN bandwidth. Runs Pulp, DHCP, DNS, TFTP for local provisioning.</li><li><strong>Satellite DB:</strong> PostgreSQL database storing all Satellite metadata — host records, content view versions, lifecycle environments, activation keys, tasks.</li><li><strong>Client tools:</strong> subscription-manager (registers host, manages repos), remote execution (REX) via SSH for job dispatch.</li></ul><div class="note"><strong>Data flow:</strong> Red Hat CDN → Satellite (sync) → Capsule (sync from Satellite) → Registered RHEL Hosts (yum/dnf updates)</div></div>
@@ -1794,7 +1832,7 @@ rpm -q kernel-devel-$(uname -r)</div>
 <div class="la-topic" id="sat-q14">
 <div class="la-topic-header">
 <span class="la-topic-num">Q2</span>
-<h3 class="la-topic-title">What is the difference between a Satellite Organization and a Location? Why does it matter for patching?</h3>
+<h3 class="la-topic-title" id="what-is-the-difference-between-a-satellite-organization-and">What is the difference between a Satellite Organization and a Location? Why does it matter for patching?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="card-grid"><div class="note"><strong>Organization</strong><br/>Logical grouping of resources by business unit or department. Each org has its own: content views, lifecycle environments, activation keys, subscriptions, repositories, and hosts. A host belongs to exactly one org. In multi-tenant environments (MSPs), each customer is typically a separate org.<br/><br/><strong>Key rule:</strong> Content views and lifecycle environments are org-scoped. You cannot share a content view across organizations — each org is self-contained from a content perspective.</div><div class="note"><strong>Location</strong><br/>Physical or logical grouping representing a datacenter, region, or site. Used to route provisioning (which capsule serves this location's DHCP/DNS/TFTP). A host belongs to a location.<br/><br/><strong>Patching relevance:</strong> Selecting the wrong org means you do not see the right hosts or content. Trying to promote a content view version from Org-A into Org-B is not possible.</div></div></div>
@@ -1804,7 +1842,7 @@ rpm -q kernel-devel-$(uname -r)</div>
 <div class="la-topic" id="sat-q15">
 <div class="la-topic-header">
 <span class="la-topic-num">Q3</span>
-<h3 class="la-topic-title">Explain the Lifecycle Environment concept in Satellite. How do you design a typical lifecycle path for enterprise patching?</h3>
+<h3 class="la-topic-title" id="explain-the-lifecycle-environment-concept-in-satellite-how-d">Explain the Lifecycle Environment concept in Satellite. How do you design a typical lifecycle path for enterprise patching?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>A Lifecycle Environment (LCE)</strong> represents a stage in the software promotion pipeline — analogous to SDLC stages. Environments are chained:<br/><br/><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 14px"><span class="la-topic-num">Library</span><span style="color:var(--green)">→</span><span class="la-topic-num">DEV</span><span style="color:var(--green)">→</span><span class="la-topic-num">SIT</span><span style="color:var(--green)">→</span><span class="la-topic-num">UAT</span><span style="color:var(--green)">→</span><span class="la-topic-num">PREPROD</span><span style="color:var(--green)">→</span><span class="la-topic-num">PROD</span></div><ul class="slow-flags"><li><strong>Library</strong> — the source environment. Contains all synced content from CDN. Content views are built from Library. Never directly register hosts to Library.</li><li><strong>Hosts are pinned to an environment</strong> — a production host registered to PROD only sees packages that have been explicitly promoted to PROD. It will NOT see a new package until the content view version is promoted to PROD.</li><li><strong>Time-delayed promotion:</strong> enforce that a CV version must sit in UAT for 7 days before promoting to PROD — gives time for testing. This is manual governance.</li></ul><div class="cmd-block"># Create lifecycle environment via Hammer CLI
@@ -1817,7 +1855,7 @@ POST /api/v2/environments  {path, organization_id}</div></div>
 <div class="la-topic" id="sat-q16">
 <div class="la-topic-header">
 <span class="la-topic-num">Q4</span>
-<h3 class="la-topic-title">What is a Content View in Satellite? Explain its components and the publish/promote workflow.</h3>
+<h3 class="la-topic-title" id="what-is-a-content-view-in-satellite-explain-its-components-a">What is a Content View in Satellite? Explain its components and the publish/promote workflow.</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>A Content View (CV)</strong> is a filtered, version-controlled snapshot of repository content. It controls exactly which packages, errata, and files are available to hosts in each lifecycle environment.<br/><br/><strong>Components:</strong><ul class="slow-flags"><li><strong>Repositories</strong> — which yum repos, file repos, and docker repos are included.</li><li><strong>Filters</strong> — include/exclude specific packages or errata by name, version, date, or type.</li><li><strong>Published versions</strong> — each publish creates an immutable version with a snapshot of content at that point in time.</li><li><strong>Composite Content View (CCV)</strong> — a CV made of other CVs. Used to combine OS content (RHEL BaseOS + AppStream) with middleware content into one deployable unit.</li></ul><div class="cmd-block"># Publish a new content view version
@@ -1834,7 +1872,7 @@ hammer content-view version promote \
 <div class="la-topic" id="sat-q17">
 <div class="la-topic-header">
 <span class="la-topic-num">Q5</span>
-<h3 class="la-topic-title">What is an Activation Key and how does it control what a host gets when it registers to Satellite?</h3>
+<h3 class="la-topic-title" id="what-is-an-activation-key-and-how-does-it-control-what-a-hos">What is an Activation Key and how does it control what a host gets when it registers to Satellite?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>An Activation Key (AK)</strong> is a pre-configured registration token that automatically applies settings to a host upon registration.<br/><br/><strong>What AK configures on registration:</strong><ul class="slow-flags"><li><strong>Organization</strong> — which org the host joins.</li><li><strong>Lifecycle Environment</strong> — which LCE the host is pinned to (e.g., PROD).</li><li><strong>Content View</strong> — which CV the host uses.</li><li><strong>Subscriptions</strong> — which Red Hat subscriptions are attached.</li><li><strong>Host Collections</strong> — which groups the host is added to (used for bulk job targeting).</li><li><strong>Enabled repositories</strong> — which repos are enabled by default.</li></ul><div class="cmd-block"># One-command registration — applies all AK settings
@@ -1855,7 +1893,7 @@ hammer activation-key create \
 <div class="la-topic" id="sat-q18">
 <div class="la-topic-header">
 <span class="la-topic-num">Q6</span>
-<h3 class="la-topic-title">Walk me through the complete end-to-end patching workflow in Red Hat Satellite — from CDN sync to applying patches to production servers.</h3>
+<h3 class="la-topic-title" id="walk-me-through-the-complete-end-to-end-patching-workflow-in">Walk me through the complete end-to-end patching workflow in Red Hat Satellite — from CDN sync to applying patches to production servers.</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Full enterprise patching workflow — the core L3 operational procedure:</strong><ol style="color:var(--text2);font-size:.9rem;line-height:1.9;padding-left:20px;margin-top:10px"><li><strong>CDN Sync:</strong> Satellite syncs latest packages and errata from Red Hat CDN.<br/><code>hammer repository synchronize --name 'RHEL8-BaseOS' --product 'RHEL8' --organization 'MyOrg'</code><br/>Confirm sync completes without errors in Content &gt; Sync Status.</li><li><strong>Review new errata:</strong> Content &gt; Errata — filter by "New" or by CVE. Identify applicable security/bugfix errata for the upcoming patch cycle.</li><li><strong>Update Content View:</strong> if CV has date-based filters, update the filter date to include new errata. Publish a new CV version with version notes (e.g., "March 2025 Patch Set").</li><li><strong>Promote to DEV:</strong> promote new CV version to DEV. Hosts in DEV now see new packages. Run <code>yum clean all</code> on DEV hosts to refresh metadata cache.</li><li><strong>Test in DEV:</strong> Hosts &gt; All Hosts &gt; filter LCE=DEV &gt; Schedule Remote Job &gt; "Apply Errata". Verify application health post-patch.</li><li><strong>Promote to UAT then PROD:</strong> after successful DEV validation (48–72hr), promote same CV version to UAT. After UAT sign-off, promote to PROD.</li><li><strong>Apply patches to PROD:</strong> Hosts &gt; select PROD hosts &gt; Schedule Remote Job &gt; Apply Errata. Schedule during change window. Use <code>yum update --security -y</code> for security-only updates.</li><li><strong>Verify:</strong> Hosts &gt; host detail &gt; Errata tab — should show 0 applicable errata. Generate compliance report.</li></ol></div>
@@ -1864,7 +1902,7 @@ hammer activation-key create \
 <div class="la-topic" id="sat-q19">
 <div class="la-topic-header">
 <span class="la-topic-num">Q7</span>
-<h3 class="la-topic-title">What is the difference between "Apply Errata" and "yum update" in the Satellite context? When do you use each?</h3>
+<h3 class="la-topic-title" id="what-is-the-difference-between-apply-errata-and-yum-update-i">What is the difference between "Apply Errata" and "yum update" in the Satellite context? When do you use each?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Method</th><th>What It Does</th><th>When to Use</th></tr></thead><tbody><tr><td>Apply Errata (Satellite REX)</td><td>Targets specific errata IDs (e.g., RHSA-2024:1234). Satellite installs only the affected packages. Gives precise, auditable control.</td><td>PROD — when you know exactly what is being changed. CVE-mandated patches.</td></tr><tr><td>yum update -y</td><td>Updates ALL installed packages to latest available in subscribed repositories. Less controlled — may update packages not covered by specific errata.</td><td>DEV environments or when you want full currency.</td></tr><tr><td>yum update --security</td><td>Updates only packages for which security errata exist.</td><td>Middle ground between errata-specific and full update.</td></tr><tr><td>REX — Package Update</td><td>Runs <code>yum update &lt;package-list&gt;</code> for specific packages.</td><td>When you need to update one specific package without touching others.</td></tr></tbody></table></div><div class="note"><strong>Errata visibility:</strong> Hosts &gt; host &gt; Errata tab shows exactly which errata are applicable, installable, and whether they are security/bugfix/enhancement. This data comes from Satellite cross-referencing installed packages against CDN errata metadata.</div></div>
@@ -1873,7 +1911,7 @@ hammer activation-key create \
 <div class="la-topic" id="sat-q20">
 <div class="la-topic-header">
 <span class="la-topic-num">Q8</span>
-<h3 class="la-topic-title">How do you use Host Collections in Satellite for bulk patching? What is the workflow?</h3>
+<h3 class="la-topic-title" id="how-do-you-use-host-collections-in-satellite-for-bulk-patchi">How do you use Host Collections in Satellite for bulk patching? What is the workflow?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Host Collections</strong> are static or dynamic groups of hosts used for bulk operations — the primary way to apply patches to sets of servers efficiently.<ul class="slow-flags"><li><strong>Creating Host Collections:</strong> Hosts &gt; Host Collections &gt; Create. Add hosts manually or via search filter (dynamic). Example collections: RHEL8-PROD-AppServers, RHEL8-PROD-DBServers.</li><li><strong>Bulk patching:</strong> Hosts &gt; Host Collections &gt; select collection &gt; Run Job &gt; Apply Errata &gt; select errata by type or ID &gt; Schedule.</li><li><strong>Remote Execution (REX):</strong> Satellite uses SSH-based REX to push commands. Hosts must have the satellite-capsule's public key in <code>/root/.ssh/authorized_keys</code>.</li><li><strong>Concurrency control — critical for production:</strong> set "Concurrency Level" in job settings. Never patch all production hosts simultaneously. Use time-delayed scheduling or staggered execution.</li><li><strong>Monitor job:</strong> Monitor &gt; Jobs — shows real-time status per host, stdout/stderr output, success/failure count.</li><li><strong>Post-job:</strong> run a compliance report — Hosts &gt; All Hosts &gt; filter collection &gt; check Errata count column — should be 0.</li></ul><div class="cmd-block"># Add hosts to collection
@@ -1887,7 +1925,7 @@ hammer job-invocation output --id &lt;job-id&gt;</div></div>
 <div class="la-topic" id="sat-q21">
 <div class="la-topic-header">
 <span class="la-topic-num">Q9</span>
-<h3 class="la-topic-title">How do you handle a Satellite-registered host that stops receiving yum metadata updates (host shows old package list in Satellite)?</h3>
+<h3 class="la-topic-title" id="how-do-you-handle-a-satellite-registered-host-that-stops-rec">How do you handle a Satellite-registered host that stops receiving yum metadata updates (host shows old package list in Satellite)?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Root cause candidates:</strong> katello-agent not running (deprecated in Satellite 6.7+), subscription-manager facts are stale, REX connection failing, host was re-installed without re-registering, certificate expired.<div class="cmd-block"># Step 1: Refresh entitlement certificates from Satellite
@@ -1914,7 +1952,7 @@ subscription-manager register --org='MyOrg' --activationkey='PROD-AK'</div><div 
 <div class="la-topic" id="sat-q22">
 <div class="la-topic-header">
 <span class="la-topic-num">Q10</span>
-<h3 class="la-topic-title">What is Hammer CLI and what are the most important commands an L3 admin must know?</h3>
+<h3 class="la-topic-title" id="what-is-hammer-cli-and-what-are-the-most-important-commands">What is Hammer CLI and what are the most important commands an L3 admin must know?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Hammer</strong> is Satellite's command-line interface — essential for scripting, automation, and bulk operations.<div class="cmd-block"># ── Organization &amp; Lifecycle Environments ──
@@ -1955,7 +1993,7 @@ foreman-rake katello:delete_orphaned_content</div></div>
 <div class="la-topic" id="sat-q23">
 <div class="la-topic-header">
 <span class="la-topic-num">Q11</span>
-<h3 class="la-topic-title">How does Satellite handle subscription management? What is the difference between Simple Content Access (SCA) and the traditional subscription-attach model?</h3>
+<h3 class="la-topic-title" id="how-does-satellite-handle-subscription-management-what-is-th">How does Satellite handle subscription management? What is the difference between Simple Content Access (SCA) and the traditional subscription-attach model?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><div class="tbl-wrap"><table><thead><tr><th>Aspect</th><th>Traditional Model</th><th>Simple Content Access (SCA)</th></tr></thead><tbody><tr><td>Host access</td><td>Each host must explicitly attach one or more Red Hat subscriptions</td><td>All hosts in the org can access all entitled content — no per-host attachment</td></tr><tr><td>Satellite enforcement</td><td>Tracks consumed vs entitled counts. Hosts exceeding count show as "Insufficient"</td><td>Tracks usage for reporting but does not enforce per-host count limits</td></tr><tr><td>Registration command</td><td><code>register</code> + separate <code>attach --auto</code> step</td><td><code>register</code> only — access via AK is immediate</td></tr><tr><td>Enable</td><td>N/A (default)</td><td>Satellite UI &gt; Subscriptions &gt; Manage Manifest &gt; Simple Content Access toggle. Or via Red Hat Customer Portal.</td></tr></tbody></table></div><div class="note"><strong>Common issue:</strong> manifest not refreshed after purchasing new subscription — hosts cannot access new product repos until manifest is re-imported.<br/><code>hammer subscription refresh-manifest --organization 'MyOrg'</code></div></div>
@@ -1964,7 +2002,7 @@ foreman-rake katello:delete_orphaned_content</div></div>
 <div class="la-topic" id="sat-q24">
 <div class="la-topic-header">
 <span class="la-topic-num">Q12</span>
-<h3 class="la-topic-title">What is a Capsule Server in Satellite and when is it required? How do you configure host registration to a Capsule?</h3>
+<h3 class="la-topic-title" id="what-is-a-capsule-server-in-satellite-and-when-is-it-require">What is a Capsule Server in Satellite and when is it required? How do you configure host registration to a Capsule?</h3>
 </div>
 <div class="la-topic-body">
 <div class="phc-a"><span class="phc-abadge">▸ ANSWER</span><strong>Satellite Capsule</strong> is a distributed Satellite component that reduces WAN bandwidth by caching synced content locally. It also provides local DHCP, DNS, TFTP for provisioning remote sites.<ul class="slow-flags"><li><strong>Required when:</strong> hosts are in remote sites with limited WAN to central Satellite, or when Satellite is in one datacenter and hosts are in another region.</li><li><strong>Capsule syncs from Satellite:</strong> Satellite &gt; Infrastructure &gt; Capsules &gt; select capsule &gt; Synchronize. Choose: optimize (incremental) or complete (full sync).</li><li><strong>Host registration to Capsule:</strong></li></ul><div class="cmd-block">subscription-manager register \
@@ -2028,7 +2066,7 @@ satellite-maintain service status
 <div class="la-topic" id="sat-ref">
 <div class="la-topic-header">
 <span class="la-topic-num">REF</span>
-<h3 class="la-topic-title">Satellite / Hammer CLI Quick Reference Cheat Sheet</h3>
+<h3 class="la-topic-title" id="satellite-hammer-cli-quick-reference-cheat-sheet">Satellite / Hammer CLI Quick Reference Cheat Sheet</h3>
 </div>
 <div class="la-topic-body">
 <div class="tbl-wrap"><table><thead><tr><th>Task</th><th>Hammer / satellite-maintain Command</th></tr></thead><tbody><tr><td>List orgs</td><td><code>hammer organization list</code></td></tr><tr><td>List lifecycle environments</td><td><code>hammer lifecycle-environment list --organization 'Org'</code></td></tr><tr><td>List content views</td><td><code>hammer content-view list --organization 'Org'</code></td></tr><tr><td>Publish content view</td><td><code>hammer content-view publish --name 'CV' --organization 'Org'</code></td></tr><tr><td>Promote CV to LCE</td><td><code>hammer content-view version promote --content-view 'CV' --to-lifecycle-environment 'PROD' --organization 'Org'</code></td></tr><tr><td>List host errata</td><td><code>hammer host errata list --host 'hostname'</code></td></tr><tr><td>Apply errata to host</td><td><code>hammer host errata apply --host 'hostname' --errata-ids RHSA-2024:1234</code></td></tr><tr><td>Sync a repository</td><td><code>hammer repository synchronize --name 'repo' --product 'RHEL8' --organization 'Org'</code></td></tr><tr><td>Register host</td><td><code>subscription-manager register --org='Org' --activationkey='AK'</code></td></tr><tr><td>Refresh host facts</td><td><code>subscription-manager facts --update</code></td></tr><tr><td>Refresh entitlements</td><td><code>subscription-manager refresh</code></td></tr><tr><td>Check Satellite services</td><td><code>satellite-maintain service status</code></td></tr><tr><td>Restart Pulp workers</td><td><code>satellite-maintain service restart --only=pulpcore-worker@*</code></td></tr><tr><td>Clean orphan content</td><td><code>foreman-rake katello:delete_orphaned_content</code></td></tr><tr><td>Check host compliance</td><td><code>hammer host list --organization 'Org' | grep -v 'fully updated'</code></td></tr><tr><td>Refresh manifest</td><td><code>hammer subscription refresh-manifest --organization 'MyOrg'</code></td></tr></tbody></table></div>
@@ -2036,19 +2074,38 @@ satellite-maintain service status
 </div>
 </div>
 
-  </main>
+  <!--rr:related--><aside class="rr-related" aria-labelledby="rr-rel-h"><h2 id="rr-rel-h">Related</h2><div class="rr-related-grid"><a class="rr-card" href="/rhel.html" style="--cat:#2F80ED"><h3>RHEL Study Guide</h3><p>Complete Red Hat Enterprise Linux administration reference for RHEL 6, 7, 8 and 9: users, LVM and RAID, SELinux, network…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/os-interview.html" style="--cat:#059669"><h3>OS Admin L3 Interview Prep</h3><p>150+ L3 operating-system administration interview questions with answers: patching, boot, LVM, security, performance, ne…</p><div class="meta"><span><span class="dot"></span>root_n_reels</span></div></a><a class="rr-card" href="/linux-guide/" style="--cat:#2F80ED"><h3>Linux Administration Guide</h3><p>A structured, hands-on Linux administration course: commands, users, systemd, storage, networking, security, performance…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/server-hardware.html" style="--cat:#64748B"><h3>Server Hardware Reference Guide</h3><p>HP ProLiant BL/C7000, iLO, Onboard Administrator, Virtual Connect, Dell PowerEdge, iDRAC, racadm, PERC and IBM MegaRAID …</p><div class="meta"><span><span class="dot"></span>Infrastructure</span></div></a></div></aside><!--/rr:related-->
+</main>
 
   <nav id="toc-nav"><div class="toc-head">Contents</div><a href="#s1" class="toc-link">💾 LVM & Filesystem Management</a><a href="#lvm1" class="toc-link h3">01 PV → VG → LV Creation Workflow</a><a href="#lvm2" class="toc-link h3">02 LV Extension Commands & Resize Scenarios</a><a href="#lvm3" class="toc-link h3">03 fstab Management & Mount Operations</a><a href="#s2" class="toc-link">🔌 SAN & Multipath Storage</a><a href="#san1" class="toc-link h3">01 SAN Pre/Post Check Commands</a><a href="#san2" class="toc-link h3">02 FC HBA Troubleshooting & Path Management</a><a href="#s3" class="toc-link">🗄️ Backup & NetBackup (Veritas)</a><a href="#nb1" class="toc-link h3">01 NetBackup Error 7641 — Certificate & Host Cache Fix</a><a href="#nb2" class="toc-link h3">02 Log Compression & Archival (find + gzip/bzip2)</a><a href="#s5" class="toc-link">⚙️ sed, awk & Shell Scripting</a><a href="#sed1" class="toc-link h3">01 sed — In-place File Editing Patterns</a><a href="#sed2" class="toc-link h3">02 Shell Loops — For Loops Over Server Lists</a><a href="#sed3" class="toc-link h3">03 ACL Management — setfacl / nfs4_setfacl</a><a href="#s7" class="toc-link">📊 Performance Monitoring & SAR</a><a href="#perf1" class="toc-link h3">01 SAR — System Activity Reporter Commands</a><a href="#perf2" class="toc-link h3">02 Reboot Reason Investigation</a><a href="#s8" class="toc-link">🔒 Security, SELinux & PAM</a><a href="#sec1" class="toc-link h3">01 SELinux Management</a><a href="#sec2" class="toc-link h3">02 PAM Configuration — Crontab Access Control</a><a href="#sec3" class="toc-link h3">03 RPM Database Rebuild Procedure</a><a href="#s9" class="toc-link">🔑 SSH Key Management & Kerberos Keytabs</a><a href="#ssh1" class="toc-link h3">01 SSH Key Conversion & Deployment</a><a href="#ssh2" class="toc-link h3">02 NSCD Troubleshooting — Name Service Cache Daemon</a><a href="#s10" class="toc-link">🧠 Kernel Parameters & System Configuration</a><a href="#kern1" class="toc-link h3">01 Kernel Parameter Tuning — sysctl</a><a href="#kern2" class="toc-link h3">02 GRUB2 — Boot Kernel Management (Dracut Issue Fix)</a><a href="#kern3" class="toc-link h3">03 VCS (Veritas Cluster Server) — Cluster Management</a><a href="#kern4" class="toc-link h3">04 Tanium Client Troubleshooting</a><a href="#s11" class="toc-link">🐢 Linux Server Running Slow? — Pro Level Diagnostic Guide</a><a href="#s12" class="toc-link">⚙️ kernel-devel — Linux Kernel Development Package</a><a href="#s13" class="toc-link">🛰️ Red Hat Satellite 6/7 — Lifecycle Environments & Patching</a></nav>
 </div>
 
 <button id="btt">↑</button>
 
-<footer id="site-footer">
-  <span>root_n_reels — Technical Reference Library</span>
-  <span>Built for L3 SysAdmin Interview Prep · All content from original guides</span>
-  <span>Vishal Sharma · <a href="mailto:admvishal24@gmail.com">admvishal24@gmail.com</a> · <a href="https://www.rootnreels.in">www.rootnreels.in</a></span>
-  <span><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram</a> · <a href="https://youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube</a></span>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
 </footer>
+<!--/rr:footer-->
 
 <script>
 // Progress + back-to-top

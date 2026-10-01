@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linux Disk Full: df vs du, Deleted-Open Files, Inodes, Safe Cleanup | root_n_reels</title>
+<!--rr:head-->
+<meta name="description" content="How to find what filled a Linux filesystem: df and du, deleted-but-open files, inode exhaustion, logs and journal, and safe cleanup steps.">
+<link rel="canonical" href="https://www.rootnreels.in/linux/disk-full/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="Linux Disk Full: df vs du, Deleted-Open Files, Inodes, Safe Cleanup | root_n_reels"><meta property="og:description" content="How to find what filled a Linux filesystem: df and du, deleted-but-open files, inode exhaustion, logs and journal, and safe cleanup steps.">
+<meta property="og:url" content="https://www.rootnreels.in/linux/disk-full/"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Linux Disk Full: df vs du, Deleted-Open Files, Inodes, Safe Cleanup | root_n_reels"><meta name="twitter:description" content="How to find what filled a Linux filesystem: df and du, deleted-but-open files, inode exhaustion, logs and journal, and safe cleanup steps."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"Linux & RHEL","item":"https://www.rootnreels.in/linux/"},{"@type":"ListItem","position":3,"name":"Filesystem 100% full: find what is eating the disk","item":"https://www.rootnreels.in/linux/disk-full/"}]},{"@type":"TechArticle","headline":"Filesystem 100% full: find what is eating the disk","description":"How to find what filled a Linux filesystem: df and du, deleted-but-open files, inode exhaustion, logs and journal, and safe cleanup steps.","url":"https://www.rootnreels.in/linux/disk-full/","mainEntityOfPage":"https://www.rootnreels.in/linux/disk-full/","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-10-01","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Beginner","dependencies":"RHEL 7 / 8 / 9"}]}</script>
+<!--/rr:head-->
+</head>
+<body class="rr rr-new" data-rr-new data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/" aria-current="page">Linux</a><a href="/unix/">Unix</a><a href="/networking/">Networking</a><a href="/devops/">DevOps</a><a href="/troubleshooting/">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header-->
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+<div class="site-body">
+<!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
+<main id="main-content">
+<nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/linux/">Linux &amp; RHEL</a></li><li aria-current="page">Filesystem 100% full: find what is eating the disk</li></ol></nav><header class="rr-page-head"><h1>Filesystem 100% full: find what is eating the disk</h1><p class="rr-lead">How to find what filled a Linux filesystem: df and du, deleted-but-open files, inode exhaustion, logs and journal, and safe cleanup steps.</p></header><div class="rr-meta"><span class="chip" style="--cat:#2F80ED"><span class="dot"></span>Linux &amp; RHEL</span><span class="chip">L1</span><span class="chip">Troubleshooting</span><span class="chip" title="Versions this page covers">Covers: RHEL 7 / 8 / 9</span><span>3 min read</span> <span>Updated <time datetime="2026-10-01">2026-10-01</time></span> <span>by Vishal Sharma</span><span class="acts"><button type="button" class="rr-act" data-rr-save aria-pressed="false"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Save</span></button><button type="button" class="rr-act" data-rr-share><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span class="lbl">Share</span></button><button type="button" class="rr-act" data-rr-print><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">Print</span></button></span></div><p class="rr-note-reel"><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">▶ Watch the 60-second version on Instagram</a></p><p class="rr-note-ib">Tip: you are in an in-app browser. Open this page in Chrome or Safari to keep your saved items.</p><div class="rr-prose" id="article"><div class="rr-callout quick"><div><span class="t">Quick answer</span>
+<p>Find the full filesystem with <code>df -hT</code>, then drill down with <code>du -xh --max-depth=1</code>. If <code>df</code> says full but <code>du</code> adds up to less, a deleted file is still held open (<code>lsof +L1</code>). If you get “No space left on device” while <code>df</code> shows free space, you are out of inodes (<code>df -i</code>).</p></div></div>
+
+<h2 id="symptoms">Symptoms</h2>
+<ul>
+<li><code>No space left on device</code> when writing or creating files</li>
+<li><code>df -h</code> shows 100% on <code>/</code>, <code>/var</code>, <code>/tmp</code> or an application mount</li>
+<li>Services crash, logins hang, or package updates fail</li>
+</ul>
+
+<h2 id="diagnose">Diagnose</h2>
+<pre>$ df -hT                                   # which filesystem, what type
+$ df -i                                    # inodes: IUse% at 100% means no new files
+$ sudo du -xh --max-depth=1 /var | sort -h | tail
+$ sudo du -xh --max-depth=1 /var/log | sort -h | tail
+$ sudo find /var -xdev -type f -size +500M -exec ls -lh {} \;</pre>
+<p><code>-x</code> keeps <code>du</code> on a single filesystem so the numbers line up with <code>df</code>. Repeat one level deeper until you reach the culprit.</p>
+<pre class="output">Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sda3      xfs    20G   20G   64K 100% /var
+$ sudo du -xh --max-depth=1 /var | sort -h | tail -3
+1.2G    /var/lib
+17G     /var/log
+18G     /var</pre>
+
+<h2 id="when-df-and-du-disagree-deleted-files-still-open">When df and du disagree: deleted files still open</h2>
+<p>A process keeps writing to a log that someone deleted, so the space is not released.</p>
+<pre>$ sudo lsof -nP +L1 | grep /var</pre>
+<p>Preferred fix: restart or reload the owning service so it closes the file. If you cannot restart it, you can truncate the open file through <code>/proc</code>:</p>
+<pre>$ sudo sh -c ': > /proc/PID/fd/FD'     # PID and FD come from the lsof output</pre>
+<div class="rr-callout danger"><div><span class="t">Be careful</span>
+<p>Do not truncate database files, journal files or anything you cannot identify. Confirm the file is a log first. Do not <code>rm</code> files under <code>/var/lib</code> to “make room”.</p></div></div>
+
+<h2 id="when-there-is-space-but-you-cannot-create-files-inodes">When there is space but you cannot create files: inodes</h2>
+<pre>$ df -i /var
+$ sudo find /var -xdev -printf '%h\n' | sort | uniq -c | sort -n | tail     # directories holding the most files</pre>
+<p>Millions of tiny files (session files, mail queue, cache) are the usual cause. Delete the junk by age, for example with <code>find DIR -type f -mtime +7 -delete</code> after reviewing the list.</p>
+
+<h2 id="safe-cleanup">Safe cleanup</h2>
+<pre><span class="cmt"># rotate and compress logs now</span>
+$ sudo logrotate -f /etc/logrotate.conf
+<span class="cmt"># systemd journal: keep only 200 MB</span>
+$ sudo journalctl --vacuum-size=200M
+<span class="cmt"># package caches (RHEL 8/9)</span>
+$ sudo dnf clean all
+<span class="cmt"># old kernels beyond installonly_limit</span>
+$ sudo dnf remove --oldinstallonly</pre>
+<p>Other places that hide space: reserved blocks on ext4 (<code>tune2fs -l DEVICE | grep -i reserved</code>), LVM snapshots and thin pools (<code>lvs -a</code>), container storage (<code>podman system df</code>) and core dumps in <code>/var/lib/systemd/coredump</code>.</p>
+
+<h2 id="fix-it-properly-grow-the-filesystem">Fix it properly: grow the filesystem</h2>
+<p>If the data is legitimate, extend it. With LVM and free space in the volume group:</p>
+<pre>$ sudo vgs
+$ sudo lvextend -r -L +5G /dev/vg01/lv_var     # -r also resizes the filesystem</pre>
+<p>Without <code>-r</code>, resize the filesystem yourself (<code>xfs_growfs /var</code> or <code>resize2fs DEVICE</code>). XFS can grow but not shrink. Details: <a href="/rhel.html#extending-lvm">Extending LVM</a>.</p>
+
+<h2 id="common-mistakes">Common mistakes</h2>
+<ul>
+<li>Deleting a big log with <code>rm</code> while the process still has it open: no space is freed.</li>
+<li>Running <code>du /</code> without <code>-x</code> and wandering into <code>/proc</code>, NFS mounts and other filesystems.</li>
+<li>Cleaning up and never fixing log rotation or monitoring, so it returns next week.</li>
+<li>Forgetting inodes when <code>df -h</code> looks fine.</li>
+</ul>
+
+<h2 id="production-considerations">Production considerations</h2>
+<div class="rr-callout prod"><div><span class="t">Production</span>
+<p>Free a little space safely first (rotate or vacuum logs) so the application can recover, then investigate. Record what grew and why, add an alert at 80% and 90%, and review the logrotate policy. For root or database volumes, plan the extension in a change window.</p></div></div>
+
+<h2 id="interview-questions">Interview questions</h2>
+<details class="rr-d"><summary>df shows 100% but du shows much less. Why?</summary><div>
+<p>Deleted files are still held open by a process (<code>lsof +L1</code>), or the space is used by something <code>du</code> cannot see: reserved blocks, snapshots, or data under a mountpoint hidden by another mount. Restart the process to release the space.</p></div></details>
+<details class="rr-d"><summary>“No space left on device” but df shows free space. What is wrong?</summary><div>
+<p>Inode exhaustion (<code>df -i</code>) is the classic cause. Also consider quota limits and a full thin pool.</p></div></details>
+<details class="rr-d"><summary>How do you extend /var online?</summary><div>
+<p>Add a PV or use free extents in the VG, then <code>lvextend -r -L +SIZE /dev/VG/LV</code>. XFS and ext4 can grow online.</p></div></details>
+<p>More: <a href="/os-interview.html#q-no-space-left-on-device-related-to-inodes">Inodes Q&amp;A</a> · <a href="/linux-guide/#backup-and-recovery">Backup and recovery</a>.</p>
+</div><aside class="rr-related" aria-labelledby="rr-rel-h"><h2 id="rr-rel-h">Related</h2><div class="rr-related-grid"><a class="rr-card" href="/linux/filesystem-read-only/" style="--cat:#2F80ED"><h3>Why Linux says “Read-only file system” and how to fix it</h3><p>The kernel remounted a filesystem read-only. Learn how to confirm it, find the cause (I/O errors, ext4/XFS errors, SAN/m…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/linux/high-load/" style="--cat:#2F80ED"><h3>High load average: is it CPU, memory or I/O?</h3><p>A fast triage for high load average on Linux: read uptime, separate CPU, I/O wait and memory pressure, and find the offe…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/linux-admin.html" style="--cat:#2F80ED"><h3>Linux Admin Interview Guide</h3><p>Practical Linux administration commands and real-world Q&amp;As: LVM, SAN and multipath, scripting, networking, security and…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/rhel.html" style="--cat:#2F80ED"><h3>RHEL Study Guide</h3><p>Complete Red Hat Enterprise Linux administration reference for RHEL 6, 7, 8 and 9: users, LVM and RAID, SELinux, network…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a></div><a class="rr-next" href="/linux/high-load/"><small>Next topic →</small><strong>High load average: is it CPU, memory or I/O?</strong></a></aside>
+</main>
+</div>
+<button id="btt" type="button" aria-label="Back to top" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
+</footer>
+<!--/rr:footer-->
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linux High Load Average: CPU vs I/O Wait vs Memory, with vmstat, iostat, top | root_n_reels</title>
+<!--rr:head-->
+<meta name="description" content="A fast triage for high load average on Linux: read uptime, separate CPU, I/O wait and memory pressure, and find the offending process.">
+<link rel="canonical" href="https://www.rootnreels.in/linux/high-load/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="Linux High Load Average: CPU vs I/O Wait vs Memory, with vmstat, iostat, top | root_n_reels"><meta property="og:description" content="A fast triage for high load average on Linux: read uptime, separate CPU, I/O wait and memory pressure, and find the offending process.">
+<meta property="og:url" content="https://www.rootnreels.in/linux/high-load/"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Linux High Load Average: CPU vs I/O Wait vs Memory, with vmstat, iostat, top | root_n_reels"><meta name="twitter:description" content="A fast triage for high load average on Linux: read uptime, separate CPU, I/O wait and memory pressure, and find the offending process."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"Linux & RHEL","item":"https://www.rootnreels.in/linux/"},{"@type":"ListItem","position":3,"name":"High load average: is it CPU, memory or I/O?","item":"https://www.rootnreels.in/linux/high-load/"}]},{"@type":"TechArticle","headline":"High load average: is it CPU, memory or I/O?","description":"A fast triage for high load average on Linux: read uptime, separate CPU, I/O wait and memory pressure, and find the offending process.","url":"https://www.rootnreels.in/linux/high-load/","mainEntityOfPage":"https://www.rootnreels.in/linux/high-load/","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-10-01","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Expert","dependencies":"RHEL 7 / 8 / 9"}]}</script>
+<!--/rr:head-->
+</head>
+<body class="rr rr-new" data-rr-new data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/" aria-current="page">Linux</a><a href="/unix/">Unix</a><a href="/networking/">Networking</a><a href="/devops/">DevOps</a><a href="/troubleshooting/">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header-->
+<div id="prog"></div>
+<div id="mob-ov" onclick="toggleNav()"></div>
+<div class="site-body">
+<!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
+<main id="main-content">
+<nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/linux/">Linux &amp; RHEL</a></li><li aria-current="page">High load average: is it CPU, memory or I/O?</li></ol></nav><header class="rr-page-head"><h1>High load average: is it CPU, memory or I/O?</h1><p class="rr-lead">A fast triage for high load average on Linux: read uptime, separate CPU, I/O wait and memory pressure, and find the offending process.</p></header><div class="rr-meta"><span class="chip" style="--cat:#2F80ED"><span class="dot"></span>Linux &amp; RHEL</span><span class="chip">L2</span><span class="chip">Troubleshooting</span><span class="chip" title="Versions this page covers">Covers: RHEL 7 / 8 / 9</span><span>3 min read</span> <span>Updated <time datetime="2026-10-01">2026-10-01</time></span> <span>by Vishal Sharma</span><span class="acts"><button type="button" class="rr-act" data-rr-save aria-pressed="false"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Save</span></button><button type="button" class="rr-act" data-rr-share><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span class="lbl">Share</span></button><button type="button" class="rr-act" data-rr-print><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">Print</span></button></span></div><p class="rr-note-reel"><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">▶ Watch the 60-second version on Instagram</a></p><p class="rr-note-ib">Tip: you are in an in-app browser. Open this page in Chrome or Safari to keep your saved items.</p><div class="rr-prose" id="article"><div class="rr-callout quick"><div><span class="t">Quick answer</span>
+<p>On Linux, load average counts tasks that are <em>runnable</em> plus tasks in <em>uninterruptible sleep</em> (usually waiting on disk or NFS). Compare it to the CPU count (<code>nproc</code>), then run <code>vmstat 1 5</code>: high <code>us/sy</code> means CPU-bound, high <code>wa</code> or <code>b</code> means I/O-bound, and <code>si/so</code> means memory pressure.</p></div></div>
+
+<h2 id="step-1-read-the-load-correctly">Step 1: read the load correctly</h2>
+<pre>$ uptime
+$ nproc</pre>
+<pre class="output"> 02:14:09 up 41 days,  3:12,  2 users,  load average: 18.40, 16.10, 9.73
+8</pre>
+<p>Load of 18 on 8 CPUs means tasks are queueing. The trend matters: 1, 5 and 15-minute averages tell you whether it is getting worse (18 → 16 → 9.7 here) or recovering.</p>
+
+<h2 id="step-2-separate-cpu-i-o-and-memory">Step 2: separate CPU, I/O and memory</h2>
+<pre>$ vmstat 1 5</pre>
+<pre class="output">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 2 14      0 214532  81220 912344    0    0  9120  4100 2210 3900  4  3 12 81  0</pre>
+<table>
+<tr><th>You see</th><th>Meaning</th><th>Next</th></tr>
+<tr><td><code>r</code> high, <code>us</code>+<code>sy</code> high, <code>id</code> low</td><td>CPU-bound</td><td><code>top</code>, <code>pidstat -u 1</code></td></tr>
+<tr><td><code>b</code> high, <code>wa</code> high</td><td>Waiting on disk/NFS (the example above)</td><td><code>iostat -xz 1</code>, <code>pidstat -d 1</code></td></tr>
+<tr><td><code>si</code>/<code>so</code> non-zero, <code>free</code> low</td><td>Memory pressure, swapping</td><td><code>free -h</code>, <code>ps --sort=-%mem</code></td></tr>
+<tr><td><code>st</code> high (VM)</td><td>Hypervisor is stealing CPU</td><td>Ask the virtualisation team</td></tr>
+</table>
+
+<h2 id="step-3-find-the-culprit">Step 3: find the culprit</h2>
+<pre><span class="cmt"># CPU: press 1 for per-core, P to sort by CPU, M to sort by memory</span>
+$ top
+$ pidstat -u 1 5
+<span class="cmt"># disk: await = latency in ms, %util near 100 = saturated</span>
+$ iostat -xz 1 5
+$ pidstat -d 1 5
+<span class="cmt"># processes stuck in D state (uninterruptible)</span>
+$ ps -eo state,pid,wchan:20,cmd | awk '$1=="D"'
+<span class="cmt"># history, if sysstat is collecting</span>
+$ sar -q -s 01:00:00 -e 03:00:00</pre>
+
+<h2 id="common-causes">Common causes</h2>
+<ul>
+<li>A runaway process or a tight loop (CPU).</li>
+<li>Backup, antivirus, a database checkpoint or a batch job (I/O).</li>
+<li>A slow or failing disk, a SAN path problem, or a hung NFS server (D-state processes).</li>
+<li>Too little RAM, causing swap storms (see <a href="/troubleshooting/#high-memory">high memory</a>).</li>
+<li>Many short-lived processes (fork storms) from cron or scripts.</li>
+</ul>
+
+<h2 id="common-mistakes">Common mistakes</h2>
+<ul>
+<li>Reading the load number without dividing by the CPU count.</li>
+<li>Assuming high load always means high CPU. A box can be 90% idle with a load of 30 because everything is blocked on I/O.</li>
+<li>Trying to <code>kill -9</code> D-state processes. They cannot be killed until the I/O returns; fix the storage.</li>
+<li>Restarting the application before capturing evidence.</li>
+</ul>
+
+<h2 id="production-considerations">Production considerations</h2>
+<div class="rr-callout prod"><div><span class="t">Production</span>
+<p>Capture first, then act: <code>top -b -n1 &gt; /tmp/top.txt</code>, <code>vmstat 1 10</code>, <code>iostat -xz 1 5</code>, <code>ps -efL</code> and the time. Check what changed (deploy, patch, new cron job, backup window). If you must restart something, do it on one node of a pool first.</p></div></div>
+
+<details class="rr-d"><summary>Advanced: why uninterruptible tasks raise load</summary><div>
+<p>Linux includes tasks in <code>TASK_UNINTERRUPTIBLE</code> (state D) in the load average, unlike many Unix systems that count only runnable tasks. That is why NFS and storage stalls show up as load even when the CPUs are idle.</p></div></details>
+
+<h2 id="interview-questions">Interview questions</h2>
+<details class="rr-d"><summary>What does a load average of 10 mean on a 4-core server?</summary><div>
+<p>On average about 10 tasks were runnable or blocked in uninterruptible sleep, 2.5 per core. It is overloaded or blocked on something. Check vmstat and iostat to see whether it is CPU or I/O.</p></div></details>
+<details class="rr-d"><summary>CPU is 90% idle but load is 25. How?</summary><div>
+<p>Many processes are in D state, waiting for storage or NFS. Look at <code>iostat -xz</code>, <code>wa</code> in vmstat and the D-state process list.</p></div></details>
+<p>More: <a href="/linux-admin.html#performance-monitoring-sar">Performance monitoring and SAR</a> · <a href="/linux-admin.html#q-perf1c">What iostat -xm tells you</a> · <a href="/solaris.html#q-how-would-you-troubleshoot-high-load-average">High load on Solaris</a>.</p>
+</div><aside class="rr-related" aria-labelledby="rr-rel-h"><h2 id="rr-rel-h">Related</h2><div class="rr-related-grid"><a class="rr-card" href="/linux/disk-full/" style="--cat:#2F80ED"><h3>Filesystem 100% full: find what is eating the disk</h3><p>How to find what filled a Linux filesystem: df and du, deleted-but-open files, inode exhaustion, logs and journal, and s…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/linux-admin.html" style="--cat:#2F80ED"><h3>Linux Admin Interview Guide</h3><p>Practical Linux administration commands and real-world Q&amp;As: LVM, SAN and multipath, scripting, networking, security and…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/rhel.html" style="--cat:#2F80ED"><h3>RHEL Study Guide</h3><p>Complete Red Hat Enterprise Linux administration reference for RHEL 6, 7, 8 and 9: users, LVM and RAID, SELinux, network…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a><a class="rr-card" href="/os-interview.html" style="--cat:#059669"><h3>OS Admin L3 Interview Prep</h3><p>150+ L3 operating-system administration interview questions with answers: patching, boot, LVM, security, performance, ne…</p><div class="meta"><span><span class="dot"></span>root_n_reels</span></div></a></div><a class="rr-next" href="/linux/service-wont-start/"><small>Next topic →</small><strong>systemd service will not start: a step-by-step check</strong></a></aside>
+</main>
+</div>
+<button id="btt" type="button" aria-label="Back to top" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
+</footer>
+<!--/rr:footer-->
+</body>
+</html>

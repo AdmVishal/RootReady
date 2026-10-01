@@ -1,0 +1,186 @@
+[
+ {
+  "id": "beginner",
+  "icon": "🌱",
+  "title": "Linux beginner",
+  "for": "New to Linux. Build the foundation, one chapter at a time.",
+  "steps": [
+   {
+    "t": "Linux basics and commands",
+    "u": "/linux-guide/#ch-02"
+   },
+   {
+    "t": "Files and folders",
+    "u": "/linux-guide/#ch-04"
+   },
+   {
+    "t": "Users and groups",
+    "u": "/linux-guide/#ch-05"
+   },
+   {
+    "t": "systemd services",
+    "u": "/linux-guide/#ch-07"
+   },
+   {
+    "t": "Cheat sheets",
+    "u": "/cheat-sheets.html"
+   },
+   {
+    "t": "Practice labs",
+    "u": "/labs.html"
+   }
+  ]
+ },
+ {
+  "id": "admin",
+  "icon": "🐧",
+  "title": "Linux administrator",
+  "for": "You run Linux servers. Go deeper on storage, network, security and performance.",
+  "steps": [
+   {
+    "t": "RHEL: LVM & RAID",
+    "u": "/rhel.html#rhel-lvm-raid"
+   },
+   {
+    "t": "RHEL: network & troubleshooting",
+    "u": "/rhel.html#rhel-network-configuration-troubleshooting"
+   },
+   {
+    "t": "RHEL: SELinux",
+    "u": "/rhel.html#rhel-managing-selinux"
+   },
+   {
+    "t": "SAN & multipath",
+    "u": "/linux-admin.html#san-multipath-storage"
+   },
+   {
+    "t": "Performance & SAR",
+    "u": "/linux-admin.html#performance-monitoring-sar"
+   },
+   {
+    "t": "Podman containers",
+    "u": "/podman.html"
+   }
+  ]
+ },
+ {
+  "id": "senior",
+  "icon": "🏛️",
+  "title": "Senior sysadmin / L3",
+  "for": "Enterprise Unix and Linux, clustering, hardware and operations.",
+  "steps": [
+   {
+    "t": "Linux Admin guide",
+    "u": "/linux-admin.html"
+   },
+   {
+    "t": "Oracle Solaris",
+    "u": "/solaris.html"
+   },
+   {
+    "t": "HP-UX & Common Ops",
+    "u": "/hpux.html"
+   },
+   {
+    "t": "Server hardware",
+    "u": "/server-hardware.html"
+   },
+   {
+    "t": "ITIL & Unix operations",
+    "u": "/itil.html"
+   },
+   {
+    "t": "OS Admin L3 interview",
+    "u": "/os-interview.html"
+   }
+  ]
+ },
+ {
+  "id": "devops",
+  "icon": "♾️",
+  "title": "DevOps engineer",
+  "for": "Automation, containers and the toolchain around Linux.",
+  "steps": [
+   {
+    "t": "Podman",
+    "u": "/podman.html"
+   },
+   {
+    "t": "Ansible Automation Platform lab",
+    "u": "/ansible.html"
+   },
+   {
+    "t": "DevOps Bible",
+    "u": "/devops-bible.html"
+   },
+   {
+    "t": "CCNA networking basics",
+    "u": "/ccna.html"
+   },
+   {
+    "t": "Security & hardening",
+    "u": "/phc.html"
+   }
+  ]
+ },
+ {
+  "id": "interview",
+  "icon": "🎯",
+  "title": "Interview preparation",
+  "for": "Practice answering out loud, not just reading.",
+  "steps": [
+   {
+    "t": "Interview hub & practice mode",
+    "u": "/interview/"
+   },
+   {
+    "t": "OS Admin L3 questions",
+    "u": "/os-interview.html"
+   },
+   {
+    "t": "Linux Admin Q&A",
+    "u": "/linux-admin.html"
+   },
+   {
+    "t": "Solaris Q&A",
+    "u": "/solaris.html"
+   },
+   {
+    "t": "Troubleshooting scenarios",
+    "u": "/troubleshooting/"
+   }
+  ]
+ },
+ {
+  "id": "oncall",
+  "icon": "🚨",
+  "title": "On-call & troubleshooting",
+  "for": "Something is broken right now.",
+  "steps": [
+   {
+    "t": "Troubleshoot by symptom",
+    "u": "/troubleshooting/"
+   },
+   {
+    "t": "Disk full",
+    "u": "/linux/disk-full/"
+   },
+   {
+    "t": "High load",
+    "u": "/linux/high-load/"
+   },
+   {
+    "t": "Service won't start",
+    "u": "/linux/service-wont-start/"
+   },
+   {
+    "t": "Filesystem read-only",
+    "u": "/linux/filesystem-read-only/"
+   },
+   {
+    "t": "Cheat sheets",
+    "u": "/cheat-sheets.html"
+   }
+  ]
+ }
+]

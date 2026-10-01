@@ -1,0 +1,200 @@
+[
+ {
+  "cmd": "ss -tulpn",
+  "what": "Show listening TCP/UDP sockets and the process that owns each one.",
+  "tip": "Add -4 or -6 to limit the IP family. Needs root to see other users' processes.",
+  "u": "/cheat-sheets.html#cs-network"
+ },
+ {
+  "cmd": "df -hT",
+  "what": "Filesystem usage in human units, plus the filesystem type.",
+  "tip": "First command for “disk full”. Follow with df -i to check inodes.",
+  "u": "/cheat-sheets.html#cs-filesystem"
+ },
+ {
+  "cmd": "du -xh --max-depth=1 /var | sort -h",
+  "what": "Size of each top-level directory, staying on one filesystem.",
+  "tip": "-x stops du crossing into other mounts, so the numbers match df.",
+  "u": "/cheat-sheets.html#cs-filesystem"
+ },
+ {
+  "cmd": "lsof +L1",
+  "what": "List open files that have been deleted (link count below 1).",
+  "tip": "Explains why df shows full but du does not. Restart the holding process to free the space.",
+  "u": "/cheat-sheets.html#cs-filesystem"
+ },
+ {
+  "cmd": "lsblk -f",
+  "what": "Block devices with filesystem type, label, UUID and mountpoint.",
+  "tip": "Use it before touching any disk to confirm what is what.",
+  "u": "/cheat-sheets.html#cs-storage"
+ },
+ {
+  "cmd": "findmnt --verify",
+  "what": "Check /etc/fstab for mistakes without rebooting.",
+  "tip": "Run it after every fstab edit. A bad entry can drop a server to emergency mode.",
+  "u": "/cheat-sheets.html#cs-filesystem"
+ },
+ {
+  "cmd": "systemctl --failed",
+  "what": "List every unit that failed since boot.",
+  "tip": "A quick health check after a reboot or patching window.",
+  "u": "/cheat-sheets.html#cs-systemd"
+ },
+ {
+  "cmd": "journalctl -p err -b",
+  "what": "Show errors and worse from the current boot.",
+  "tip": "Add -u SERVICE to focus on one unit, or --since '1 hour ago'.",
+  "u": "/cheat-sheets.html#cs-systemd"
+ },
+ {
+  "cmd": "vmstat 1 5",
+  "what": "Five one-second samples of CPU, memory, swap and I/O.",
+  "tip": "Read r (runnable), b (blocked), si/so (swap) and wa (I/O wait). Ignore the first line.",
+  "u": "/cheat-sheets.html#cs-perf"
+ },
+ {
+  "cmd": "iostat -xz 1 3",
+  "what": "Per-device I/O: utilisation, latency (await) and queue size.",
+  "tip": "From the sysstat package. High await with high %util means a saturated device.",
+  "u": "/cheat-sheets.html#cs-perf"
+ },
+ {
+  "cmd": "ps -eo pid,ppid,stat,%cpu,%mem,cmd --sort=-%mem | head",
+  "what": "Top memory consumers with their state and parent.",
+  "tip": "Swap -%mem for -%cpu to rank by CPU.",
+  "u": "/cheat-sheets.html#cs-process"
+ },
+ {
+  "cmd": "ip -br addr",
+  "what": "Brief one-line-per-interface view of addresses and link state.",
+  "tip": "Pair with ip route and ip -s link for counters.",
+  "u": "/cheat-sheets.html#cs-network"
+ },
+ {
+  "cmd": "ip route get 8.8.8.8",
+  "what": "Which interface, gateway and source IP would be used to reach an address.",
+  "tip": "Great for debugging multi-homed servers and policy routing.",
+  "u": "/cheat-sheets.html#cs-network"
+ },
+ {
+  "cmd": "nmcli device status",
+  "what": "State of every NetworkManager-managed interface.",
+  "tip": "Then nmcli connection show NAME for the full profile.",
+  "u": "/cheat-sheets.html#cs-network"
+ },
+ {
+  "cmd": "getenforce",
+  "what": "Print the SELinux mode: Enforcing, Permissive or Disabled.",
+  "tip": "sestatus gives more detail, including the loaded policy.",
+  "u": "/cheat-sheets.html#cs-selinux"
+ },
+ {
+  "cmd": "ausearch -m avc -ts recent",
+  "what": "Recent SELinux denials from the audit log.",
+  "tip": "Pipe into audit2why to see a plain-language reason.",
+  "u": "/cheat-sheets.html#cs-selinux"
+ },
+ {
+  "cmd": "restorecon -Rv /path",
+  "what": "Reset SELinux file contexts to the policy default, verbosely.",
+  "tip": "The fix for most “permission denied but modes look right” cases after moving files.",
+  "u": "/cheat-sheets.html#cs-selinux"
+ },
+ {
+  "cmd": "lvs -o +devices",
+  "what": "Logical volumes together with the physical devices they use.",
+  "tip": "Shows at a glance which LV sits on which disk.",
+  "u": "/cheat-sheets.html#cs-lvm"
+ },
+ {
+  "cmd": "multipath -ll",
+  "what": "Multipath topology: maps, path groups and each path's state.",
+  "tip": "Look for failed or faulty paths and the active/enabled grouping.",
+  "u": "/cheat-sheets.html#cs-lvm"
+ },
+ {
+  "cmd": "dmesg -T --level=err,warn",
+  "what": "Kernel warnings and errors with human-readable timestamps.",
+  "tip": "First stop for disk, NIC and driver problems.",
+  "u": "/cheat-sheets.html#cs-logs"
+ },
+ {
+  "cmd": "last -x | head",
+  "what": "Recent logins, reboots and shutdowns.",
+  "tip": "Answers “when did this server last reboot, and who was on?”.",
+  "u": "/cheat-sheets.html#cs-users"
+ },
+ {
+  "cmd": "chage -l USER",
+  "what": "Password aging details for an account.",
+  "tip": "Shows expiry, last change and the warning window.",
+  "u": "/cheat-sheets.html#cs-users"
+ },
+ {
+  "cmd": "visudo -c",
+  "what": "Syntax-check sudoers files without opening an editor.",
+  "tip": "A broken sudoers locks you out of sudo; always check after edits.",
+  "u": "/cheat-sheets.html#cs-users"
+ },
+ {
+  "cmd": "sshd -t",
+  "what": "Test sshd_config for errors before restarting the daemon.",
+  "tip": "Prevents locking yourself out over SSH.",
+  "u": "/cheat-sheets.html#cs-network"
+ },
+ {
+  "cmd": "tar -tzf archive.tgz | head",
+  "what": "List the start of an archive without extracting.",
+  "tip": "Use -tjf for .bz2 and -tJf for .xz.",
+  "u": "/cheat-sheets.html#cs-filesystem"
+ },
+ {
+  "cmd": "rsync -avh --progress SRC/ DST/",
+  "what": "Copy a directory tree preserving permissions and times, with progress.",
+  "tip": "A trailing slash on SRC copies its contents, not the directory itself. Add -n for a dry run.",
+  "u": "/cheat-sheets.html#cs-filesystem"
+ },
+ {
+  "cmd": "watch -n 2 'df -h /var'",
+  "what": "Re-run a command every two seconds and show the output in place.",
+  "tip": "Handy while a log or backup is growing.",
+  "u": "/cheat-sheets.html#cs-process"
+ },
+ {
+  "cmd": "cat /proc/PID/limits",
+  "what": "See the resource limits (open files, processes) applied to one process.",
+  "tip": "More accurate than ulimit -a, which shows only your shell.",
+  "u": "/cheat-sheets.html#cs-process"
+ },
+ {
+  "cmd": "strace -c -p PID",
+  "what": "Summarise the system calls a running process makes (Ctrl-C to stop).",
+  "tip": "Add -f to follow children. Expect overhead; use briefly on busy production processes.",
+  "u": "/cheat-sheets.html#cs-process"
+ },
+ {
+  "cmd": "systemd-analyze blame",
+  "what": "List units by how long they took to start at boot.",
+  "tip": "Pair with systemd-analyze critical-chain.",
+  "u": "/cheat-sheets.html#cs-systemd"
+ },
+ {
+  "cmd": "chronyc tracking",
+  "what": "How far the clock is from its time source and how it is being corrected.",
+  "tip": "Large offsets break Kerberos, TLS and log correlation.",
+  "u": "/cheat-sheets.html#cs-network"
+ },
+ {
+  "cmd": "free -h",
+  "what": "Memory and swap usage. Read the “available” column.",
+  "tip": "“free” being small is normal on Linux; the kernel uses spare RAM for cache.",
+  "u": "/cheat-sheets.html#cs-perf"
+ },
+ {
+  "cmd": "uptime",
+  "what": "Uptime and the 1, 5 and 15-minute load averages.",
+  "tip": "Compare load with nproc. Load above the CPU count means tasks are waiting.",
+  "u": "/cheat-sheets.html#cs-perf"
+ }
+]

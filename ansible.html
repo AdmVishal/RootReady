@@ -3,21 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
-<meta name="theme-color" content="#12161c">
-<meta name="description" content="Ansible Automation Platform (Tower/AWX) Lab Guide — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Ansible Automation Platform (Tower/AWX) Lab Guide — root_n_reels">
-<meta property="og:description" content="Ansible Automation Platform (Tower/AWX) Lab Guide — a practical, hands-on technical reference and lab guide from root_n_reels, by Vishal Sharma.">
-<meta property="og:image" content="https://www.rootnreels.in/assets/logo-lockup.png">
-<meta property="og:url" content="https://www.rootnreels.in/ansible.html">
-<meta name="twitter:card" content="summary_large_image">
-<title>Ansible Automation Platform (Tower/AWX) Lab Guide — root_n_reels</title>
+<title>Ansible Automation Platform Lab: Controller, Inventories, Job Templates, Workflows, RBAC | root_n_reels</title>
 <link rel="stylesheet" href="studyhub.css?v=20260911">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <style>
 :root{--topbar-h:58px;--sidebar-w:240px}
 body{display:flex;flex-direction:column;min-height:100vh}
@@ -83,40 +70,87 @@ body{display:flex;flex-direction:column;min-height:100vh}
 @media(max-width:1100px){#toc-nav{display:none}}
 @media(max-width:768px){#site-nav{position:fixed;left:0;top:var(--topbar-h);bottom:0;transform:translateX(-100%);z-index:8900;transition:transform .25s cubic-bezier(.4,0,.2,1)}#site-nav.open{transform:translateX(0)}#menu-btn{display:block}.page-title-bar{display:none}#main-content{padding:20px 16px}}
 </style>
-</head>
-<body>
-<div id="site-topbar">
-  <a href="index.html" class="logo"><img src="assets/logo-icon.png" alt="root_n_reels" class="logo-img">root<span>_n_</span>reels</a>
-  <span class="page-title-bar">Ansible Automation Platform · Tower/AWX · Controller Hands-On Lab</span>
-  <div class="topbar-spacer"></div>
-  <button id="menu-btn" onclick="toggleNav()">☰</button>
-</div>
-<div id="prog"></div>
+<!--rr:head-->
+<meta name="description" content="Hands-on Ansible Automation Platform (Controller/AWX) lab: inventories, credentials, projects, job templates, surveys, workflows, approvals, RBAC, notifications and REST API.">
+<link rel="canonical" href="https://www.rootnreels.in/ansible.html">
+<meta property="og:type" content="article"><meta property="og:site_name" content="root_n_reels">
+<meta property="og:title" content="Ansible Automation Platform Lab: Controller, Inventories, Job Templates, Workflows, RBAC | root_n_reels"><meta property="og:description" content="Hands-on Ansible Automation Platform (Controller/AWX) lab: inventories, credentials, projects, job templates, surveys, workflows, approvals, RBAC, notifications and REST API.">
+<meta property="og:url" content="https://www.rootnreels.in/ansible.html"><meta property="og:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="root_n_reels: Linux and Unix knowledge for people who run servers">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Ansible Automation Platform Lab: Controller, Inventories, Job Templates, Workflows, RBAC | root_n_reels"><meta name="twitter:description" content="Hands-on Ansible Automation Platform (Controller/AWX) lab: inventories, credentials, projects, job templates, surveys, workflows, approvals, RBAC, notifications and REST API."><meta name="twitter:image" content="https://www.rootnreels.in/assets/img/og-default.png">
+<meta name="theme-color" content="#14315C">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png"><link rel="manifest" href="/manifest.json">
+<script>window.RR={v:"77712669"};try{var t=JSON.parse(localStorage.getItem("rr:theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=77712669">
+<script defer src="/assets/js/app.js?v=77712669"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.rootnreels.in/"},{"@type":"ListItem","position":2,"name":"DevOps","item":"https://www.rootnreels.in/devops/"},{"@type":"ListItem","position":3,"name":"Ansible Automation Platform (Tower/AWX) Lab Guide","item":"https://www.rootnreels.in/ansible.html"}]},{"@type":"TechArticle","headline":"Ansible Automation Platform (Tower/AWX) Lab Guide","description":"Hands-on Ansible Automation Platform (Controller/AWX) lab: inventories, credentials, projects, job templates, surveys, workflows, approvals, RBAC, notifications and REST API.","url":"https://www.rootnreels.in/ansible.html","mainEntityOfPage":"https://www.rootnreels.in/ansible.html","inLanguage":"en","author":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"publisher":{"@type":"Person","name":"Vishal Sharma","url":"https://www.rootnreels.in/about.html","sameAs":["https://www.instagram.com/root_n_reels","https://www.youtube.com/@root_n_reels","https://github.com/AdmVishal/RootReady"]},"dateModified":"2026-09-24","image":"https://www.rootnreels.in/assets/img/og-default.png","proficiencyLevel":"Expert","dependencies":"AAP Controller / AWX"}]}</script>
+<!--/rr:head--></head>
+<body class="rr" data-rr-article>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<!--rr:header--><header id="site-topbar" class="rr-header">
+  <a href="/" class="logo" aria-label="root_n_reels home"><img src="/assets/logo-icon-64.png" alt="" width="28" height="28" class="logo-img">root<span>_n_</span>reels</a>
+  <nav class="rr-topnav" aria-label="Primary"><a href="/linux/">Linux</a><a href="/unix/">Unix</a><a href="/networking/">Networking</a><a href="/devops/" aria-current="page">DevOps</a><a href="/troubleshooting/">Troubleshoot</a><a href="/interview/">Interview</a><a href="/cheat-sheets.html">Cheat sheets</a></nav>
+  <div class="rr-header-actions">
+    <button type="button" class="rr-search-btn" data-rr-search aria-label="Search (press / or Ctrl+K)">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="lbl">Search</span><kbd class="lbl">/</kbd>
+    </button>
+    <a class="rr-icon-btn" href="/saved/" aria-label="Saved and recent"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    <button type="button" class="rr-icon-btn rr-theme" data-rr-theme aria-label="Toggle light or dark theme">
+      <svg class="rr-ico i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="rr-ico i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button type="button" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" onclick="toggleNav()">
+      <svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+<!--/rr:header--><div id="prog"></div>
 <div id="mob-ov"></div>
 <div class="site-body">
-  <nav id="site-nav">
-    <div class="nav-sec">Navigation</div>
-<a href="youtube.html" class="nav-link">📺 YouTube Tutorials</a>
-    <a href="index.html" class="nav-link ">🏠 Home</a>
-<a href="rhel.html" class="nav-link ">🐧 RHEL</a>
-<a href="linux-admin.html" class="nav-link ">💻 Linux Admin</a>
-<a href="solaris.html" class="nav-link ">🌞 Solaris</a>
-<a href="hpux.html" class="nav-link ">🟧 HP-UX</a>
-<a href="os-interview.html" class="nav-link ">🎯 OS Interview</a>
-<a href="itil.html" class="nav-link ">⚙️ ITIL</a>
-<a href="ccna.html" class="nav-link ">🌐 CCNA</a>
-<a href="network-ref.html" class="nav-link ">📡 Network Ref</a>
-<a href="nutanix.html" class="nav-link ">☁️ Nutanix</a>
-<a href="phc.html" class="nav-link ">🛡️ PHC Guide</a>
-<a href="server-hardware.html" class="nav-link ">🖥️ Server Hardware</a>
-<a href="podman.html" class="nav-link ">🦭 Podman</a>
-<a href="ansible.html" class="nav-link active">🤖 Ansible AAP</a>
-<a href="devops-bible.html" class="nav-link">♾️ DevOps Bible</a>
-<a href="index.html#contact" class="nav-link ">✉️ Contact</a>
-
-
-  </nav>
+  <!--rr:nav--><nav id="site-nav" aria-label="Site">
+<a href="/" class="nav-link"><span class="e" aria-hidden="true">🏠</span>Home</a>
+<div class="nav-sec">Learn</div>
+<a href="/start-here.html" class="nav-link"><span class="e" aria-hidden="true">🚀</span>Start Here</a>
+<a href="/troubleshooting/" class="nav-link"><span class="e" aria-hidden="true">🛠️</span>Troubleshoot</a>
+<a href="/interview/" class="nav-link"><span class="e" aria-hidden="true">🎯</span>Interview Prep</a>
+<a href="/os-interview.html" class="nav-link"><span class="e" aria-hidden="true">🎯</span>OS Admin L3 Interview</a>
+<a href="/cheat-sheets.html" class="nav-link"><span class="e" aria-hidden="true">📄</span>Cheat Sheets</a>
+<a href="/labs.html" class="nav-link"><span class="e" aria-hidden="true">🧪</span>Practice Labs</a>
+<div class="nav-sec">Linux &amp; RHEL</div>
+<a href="/rhel.html" class="nav-link"><span class="e" aria-hidden="true">🐧</span>RHEL Guide</a>
+<a href="/linux-admin.html" class="nav-link"><span class="e" aria-hidden="true">💻</span>Linux Admin</a>
+<a href="/linux-guide/" class="nav-link"><span class="e" aria-hidden="true">📘</span>Linux Guide (28 chapters)</a>
+<a href="/linux/filesystem-read-only/" class="nav-link"><span class="e" aria-hidden="true">🔒</span>Filesystem read-only</a>
+<a href="/linux/disk-full/" class="nav-link"><span class="e" aria-hidden="true">💾</span>Disk full</a>
+<a href="/linux/high-load/" class="nav-link"><span class="e" aria-hidden="true">📈</span>High load</a>
+<a href="/linux/service-wont-start/" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>Service won&#x27;t start</a>
+<div class="nav-sec">Unix</div>
+<a href="/solaris.html" class="nav-link"><span class="e" aria-hidden="true">🌞</span>Solaris</a>
+<a href="/hpux.html" class="nav-link"><span class="e" aria-hidden="true">🟧</span>HP-UX</a>
+<div class="nav-sec">Networking</div>
+<a href="/ccna.html" class="nav-link"><span class="e" aria-hidden="true">🌐</span>CCNA</a>
+<a href="/network-ref.html" class="nav-link"><span class="e" aria-hidden="true">📡</span>Network Reference</a>
+<div class="nav-sec">Infrastructure</div>
+<a href="/nutanix.html" class="nav-link"><span class="e" aria-hidden="true">☁️</span>Nutanix</a>
+<a href="/server-hardware.html" class="nav-link"><span class="e" aria-hidden="true">🖥️</span>Server Hardware</a>
+<div class="nav-sec">DevOps</div>
+<a href="/podman.html" class="nav-link"><span class="e" aria-hidden="true">🦭</span>Podman</a>
+<a href="/ansible.html" class="nav-link active" aria-current="page"><span class="e" aria-hidden="true">🤖</span>Ansible AAP</a>
+<a href="/devops-bible.html" class="nav-link"><span class="e" aria-hidden="true">♾️</span>DevOps Bible</a>
+<div class="nav-sec">Security</div>
+<a href="/phc.html" class="nav-link"><span class="e" aria-hidden="true">🛡️</span>PHC / Hardening</a>
+<div class="nav-sec">Operations</div>
+<a href="/itil.html" class="nav-link"><span class="e" aria-hidden="true">⚙️</span>ITIL &amp; Ops</a>
+<div class="nav-sec">More</div>
+<a href="/youtube.html" class="nav-link"><span class="e" aria-hidden="true">📺</span>YouTube</a>
+<a href="/about.html" class="nav-link"><span class="e" aria-hidden="true">ℹ️</span>About</a>
+<a href="/saved/" class="nav-link"><span class="e" aria-hidden="true">★</span>Saved</a>
+</nav><!--/rr:nav-->
   <main id="main-content">
+<!--rr:crumbs--><nav class="rr-crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/devops/">DevOps</a></li><li aria-current="page">Ansible Automation Platform (Tower/AWX) Lab Guide</li></ol></nav><!--/rr:crumbs-->
 
 <div class="page-hero">
   <h1>🤖 Ansible Automation Platform (Tower/AWX) Lab Guide</h1>
@@ -126,10 +160,11 @@ body{display:flex;flex-direction:column;min-height:100vh}
     <span class="badge badge-gold">14 Task Sets · L1→L3</span><span class="badge badge-purple">Task + Solution Format</span>
   </div>
 </div>
+<!--rr:meta--><div class="rr-meta"><span class="chip" style="--cat:#7C3AED"><span class="dot"></span>DevOps</span><span class="chip">L2–L3</span><span class="chip">Lab</span><span class="chip" title="Versions this page covers">Covers: AAP Controller / AWX</span><span>21 min read</span> <span>Updated <time datetime="2026-09-24">2026-09-24</time></span> <span>by Vishal Sharma</span><span class="acts"><button type="button" class="rr-act" data-rr-save aria-pressed="false"><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Save</span></button><button type="button" class="rr-act" data-rr-share><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span class="lbl">Share</span></button><button type="button" class="rr-act" data-rr-print><svg class="rr-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">Print</span></button></span></div><!--/rr:meta-->
 
 <div class="content-section la-section" id="an-s0">
-<div class="la-section-header"><div class="la-section-icon">🗺️</div><div><h2 class="la-section-title">0. Your Lab Topology & Naming</h2><p class="la-section-desc">Reference used throughout every task below — keep this open in a second tab</p></div></div>
-<div class="la-topic" id="an-lab"><div class="la-topic-header"><span class="la-topic-num">L1-00</span><h3 class="la-topic-title">Lab Inventory Reference</h3></div><div class="la-topic-body">
+<div class="la-section-header"><div class="la-section-icon">🗺️</div><div><h2 class="la-section-title" id="0-your-lab-topology-naming">0. Your Lab Topology & Naming</h2><p class="la-section-desc">Reference used throughout every task below — keep this open in a second tab</p></div></div>
+<div class="la-topic" id="an-lab"><div class="la-topic-header"><span class="la-topic-num">L1-00</span><h3 class="la-topic-title" id="lab-inventory-reference">Lab Inventory Reference</h3></div><div class="la-topic-body">
 <div class="tbl-wrap"><table><thead><tr><th>Hostname</th><th>Role</th><th>OS</th><th>Notes</th></tr></thead><tbody>
 <tr><td><code>app.local.lab</code></td><td>Controller node (Tower/AWX/AAP)</td><td>RHEL 10.2</td><td>Runs the web UI, API, execution engine</td></tr>
 <tr><td><code>node01.local.lab</code></td><td>Managed node</td><td>RHEL 10.2</td><td>Same major OS as controller — good "happy path" node</td></tr>
@@ -146,9 +181,9 @@ done</div>
 </div>
 
 <div class="content-section la-section" id="an-s1">
-<div class="la-section-header"><div class="la-section-icon">🏗️</div><div><h2 class="la-section-title">1. Organizations, Users & Base Setup</h2><p class="la-section-desc">The container objects everything else lives inside</p></div></div>
-<div class="la-topic" id="an-t1"><div class="la-topic-header"><span class="la-topic-num">L1-01</span><h3 class="la-topic-title">Task 1 — Create an Organization and a non-admin User</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-section-header"><div class="la-section-icon">🏗️</div><div><h2 class="la-section-title" id="1-organizations-users-base-setup">1. Organizations, Users & Base Setup</h2><p class="la-section-desc">The container objects everything else lives inside</p></div></div>
+<div class="la-topic" id="an-t1"><div class="la-topic-header"><span class="la-topic-num">L1-01</span><h3 class="la-topic-title" id="task-1-create-an-organization-and-a-non-admin-user">Task 1 — Create an Organization and a non-admin User</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task">Task</h4>
 <p class="body-text">Create an Organization called <code>LocalLab</code>. Inside it, create a user <code>opuser</code> (non-superuser) who will later be granted limited permissions. Do this both via the UI and via the CLI/API so you understand both paths.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -168,10 +203,10 @@ awx organizations associate_user LocalLab opuser</div>
 </div>
 
 <div class="content-section la-section" id="an-s2">
-<div class="la-section-header"><div class="la-section-icon">📋</div><div><h2 class="la-section-title">2. Inventories, Groups & Host Variables</h2><p class="la-section-desc">Static inventory, groups by OS, per-host variables, ad-hoc commands</p></div></div>
+<div class="la-section-header"><div class="la-section-icon">📋</div><div><h2 class="la-section-title" id="2-inventories-groups-host-variables">2. Inventories, Groups & Host Variables</h2><p class="la-section-desc">Static inventory, groups by OS, per-host variables, ad-hoc commands</p></div></div>
 
-<div class="la-topic" id="an-t2"><div class="la-topic-header"><span class="la-topic-num">L1-02</span><h3 class="la-topic-title">Task 2 — Build a Static Inventory with OS-based Groups</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t2"><div class="la-topic-header"><span class="la-topic-num">L1-02</span><h3 class="la-topic-title" id="task-2-build-a-static-inventory-with-os-based-groups">Task 2 — Build a Static Inventory with OS-based Groups</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-2">Task</h4>
 <p class="body-text">Create Inventory <code>local_lab</code>. Add both nodes as Hosts. Create two Groups: <code>rhel10</code> containing <code>node01.local.lab</code>, and <code>rhel8</code> containing <code>node02.local.lab</code>. Set host variable <code>ansible_host</code> if your DNS is unreliable.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -188,8 +223,8 @@ ansible_user: ansible</div>
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t3"><div class="la-topic-header"><span class="la-topic-num">L1-03</span><h3 class="la-topic-title">Task 3 — Fix Python Interpreter Mismatch (RHEL 8 vs RHEL 10)</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t3"><div class="la-topic-header"><span class="la-topic-num">L1-03</span><h3 class="la-topic-title" id="task-3-fix-python-interpreter-mismatch-rhel-8-vs-rhel-10">Task 3 — Fix Python Interpreter Mismatch (RHEL 8 vs RHEL 10)</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-3">Task</h4>
 <p class="body-text">RHEL 8.10's default <code>python3</code> may resolve differently than RHEL 10.2's. Force the correct interpreter on <code>node02</code> using a group variable instead of editing playbooks.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -203,8 +238,8 @@ python3 --version</div>
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t4"><div class="la-topic-header"><span class="la-topic-num">L1-04</span><h3 class="la-topic-title">Task 4 — Smart Inventory Filtered by Facts</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t4"><div class="la-topic-header"><span class="la-topic-num">L1-04</span><h3 class="la-topic-title" id="task-4-smart-inventory-filtered-by-facts">Task 4 — Smart Inventory Filtered by Facts</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-4">Task</h4>
 <p class="body-text">Create a Smart Inventory <code>rhel10_only</code> that automatically includes any host where <code>ansible_distribution_major_version</code> equals <code>10</code>, sourced from <code>local_lab</code>.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -217,10 +252,10 @@ python3 --version</div>
 </div>
 
 <div class="content-section la-section" id="an-s3">
-<div class="la-section-header"><div class="la-section-icon">🔑</div><div><h2 class="la-section-title">3. Credentials</h2><p class="la-section-desc">Machine, Become, Vault, and testing failure modes</p></div></div>
+<div class="la-section-header"><div class="la-section-icon">🔑</div><div><h2 class="la-section-title" id="3-credentials">3. Credentials</h2><p class="la-section-desc">Machine, Become, Vault, and testing failure modes</p></div></div>
 
-<div class="la-topic" id="an-t5"><div class="la-topic-header"><span class="la-topic-num">L1-05</span><h3 class="la-topic-title">Task 5 — Machine Credential with SSH Key</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t5"><div class="la-topic-header"><span class="la-topic-num">L1-05</span><h3 class="la-topic-title" id="task-5-machine-credential-with-ssh-key">Task 5 — Machine Credential with SSH Key</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-5">Task</h4>
 <p class="body-text">Generate an SSH key pair on <code>app.local.lab</code>, distribute the public key to both nodes, then create a Machine Credential in Controller and validate it with an ad-hoc <code>ping</code>.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -232,8 +267,8 @@ ssh-copy-id -i ~/.ssh/aap_lab.pub ansible@node02.local.lab</div>
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t6"><div class="la-topic-header"><span class="la-topic-num">L1-06</span><h3 class="la-topic-title">Task 6 — Become (sudo) Credential + Deliberate Failure Practice</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t6"><div class="la-topic-header"><span class="la-topic-num">L1-06</span><h3 class="la-topic-title" id="task-6-become-sudo-credential-deliberate-failure-practice">Task 6 — Become (sudo) Credential + Deliberate Failure Practice</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-6">Task</h4>
 <p class="body-text">Add a Become password to the credential (or a separate credential) and run a privileged ad-hoc command. Then deliberately break it three ways and record the exact error each time: (a) wrong username, (b) wrong SSH key, (c) become password omitted while target requires one.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -250,8 +285,8 @@ ssh-copy-id -i ~/.ssh/aap_lab.pub ansible@node02.local.lab</div>
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t7"><div class="la-topic-header"><span class="la-topic-num">L2-07</span><h3 class="la-topic-title">Task 7 — Vault Credential for Encrypted Variables</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t7"><div class="la-topic-header"><span class="la-topic-num">L2-07</span><h3 class="la-topic-title" id="task-7-vault-credential-for-encrypted-variables">Task 7 — Vault Credential for Encrypted Variables</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-7">Task</h4>
 <p class="body-text">Encrypt a secret string with <code>ansible-vault</code>, reference it from a playbook, and run it in Controller using a Vault credential attached to the Job Template.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -277,9 +312,9 @@ ssh-copy-id -i ~/.ssh/aap_lab.pub ansible@node02.local.lab</div>
 </div>
 
 <div class="content-section la-section" id="an-s4">
-<div class="la-section-header"><div class="la-section-icon">📁</div><div><h2 class="la-section-title">4. Projects (SCM Integration)</h2><p class="la-section-desc">Git-backed playbook source, auto-sync, branches</p></div></div>
-<div class="la-topic" id="an-t8"><div class="la-topic-header"><span class="la-topic-num">L1-08</span><h3 class="la-topic-title">Task 8 — Git-backed Project with SCM Update on Launch</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-section-header"><div class="la-section-icon">📁</div><div><h2 class="la-section-title" id="4-projects-scm-integration">4. Projects (SCM Integration)</h2><p class="la-section-desc">Git-backed playbook source, auto-sync, branches</p></div></div>
+<div class="la-topic" id="an-t8"><div class="la-topic-header"><span class="la-topic-num">L1-08</span><h3 class="la-topic-title" id="task-8-git-backed-project-with-scm-update-on-launch">Task 8 — Git-backed Project with SCM Update on Launch</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-8">Task</h4>
 <p class="body-text">Push a folder of playbooks (see Task 9) to a Git repo (GitHub, GitLab, or a local bare repo). Create a Project in Controller pointing at it, with "Update Revision on Launch" enabled.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -296,10 +331,10 @@ git add . && git commit -m "initial lab playbooks" && git push origin main</div>
 </div>
 
 <div class="content-section la-section" id="an-s5">
-<div class="la-section-header"><div class="la-section-icon">▶️</div><div><h2 class="la-section-title">5. Job Templates & Core Playbooks</h2><p class="la-section-desc">The playbooks referenced throughout this guide — copy these into your project</p></div></div>
+<div class="la-section-header"><div class="la-section-icon">▶️</div><div><h2 class="la-section-title" id="5-job-templates-core-playbooks">5. Job Templates & Core Playbooks</h2><p class="la-section-desc">The playbooks referenced throughout this guide — copy these into your project</p></div></div>
 
-<div class="la-topic" id="an-t9"><div class="la-topic-header"><span class="la-topic-num">L1-09</span><h3 class="la-topic-title">Task 9 — Basic Job Template: Server Discovery</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t9"><div class="la-topic-header"><span class="la-topic-num">L1-09</span><h3 class="la-topic-title" id="task-9-basic-job-template-server-discovery">Task 9 — Basic Job Template: Server Discovery</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-9">Task</h4>
 <p class="body-text">Write <code>discovery.yml</code> that reports hostname, OS, kernel, CPU, memory and IP for every host. Create a Job Template <code>Server Discovery</code> using it and review the Job Output panes (Details, Output, Recap).</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -323,8 +358,8 @@ git add . && git commit -m "initial lab playbooks" && git push origin main</div>
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t10"><div class="la-topic-header"><span class="la-topic-num">L1-10</span><h3 class="la-topic-title">Task 10 — Idempotent Package Install + Service Management</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t10"><div class="la-topic-header"><span class="la-topic-num">L1-10</span><h3 class="la-topic-title" id="task-10-idempotent-package-install-service-management">Task 10 — Idempotent Package Install + Service Management</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-10">Task</h4>
 <p class="body-text">Write a playbook that installs and starts <code>httpd</code> on all hosts. Run it twice and confirm the second run shows 0 "changed" tasks (idempotency). Then manually stop the service on a node and re-run to prove Controller restores desired state.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -353,8 +388,8 @@ ssh ansible@node01.local.lab 'sudo systemctl stop httpd'
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t11"><div class="la-topic-header"><span class="la-topic-num">L2-11</span><h3 class="la-topic-title">Task 11 — Survey: Prompt for Package + Choice List</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t11"><div class="la-topic-header"><span class="la-topic-num">L2-11</span><h3 class="la-topic-title" id="task-11-survey-prompt-for-package-choice-list">Task 11 — Survey: Prompt for Package + Choice List</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-11">Task</h4>
 <p class="body-text">Add a Survey to a "Package Manager" Job Template with: a required text field <code>package_name</code>, a multiple-choice field <code>package_action</code> (install/remove) with default <code>install</code>. Playbook should act on the survey answers via <code>extra_vars</code>.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -380,8 +415,8 @@ ssh ansible@node01.local.lab 'sudo systemctl stop httpd'
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t12"><div class="la-topic-header"><span class="la-topic-num">L2-12</span><h3 class="la-topic-title">Task 12 — Jinja2 Template Deployment (per-host config)</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t12"><div class="la-topic-header"><span class="la-topic-num">L2-12</span><h3 class="la-topic-title" id="task-12-jinja2-template-deployment-per-host-config">Task 12 — Jinja2 Template Deployment (per-host config)</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-12">Task</h4>
 <p class="body-text">Deploy a per-host config file <code>/opt/lab/app.conf</code> using a Jinja2 template, driven by group variables (<code>environment</code> differs per group) and gathered facts.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -418,8 +453,8 @@ MANAGED_BY=AAP-Controller</div>
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t13"><div class="la-topic-header"><span class="la-topic-num">L2-13</span><h3 class="la-topic-title">Task 13 — Conditionals for OS-specific Logic (RHEL8 vs RHEL10)</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t13"><div class="la-topic-header"><span class="la-topic-num">L2-13</span><h3 class="la-topic-title" id="task-13-conditionals-for-os-specific-logic-rhel8-vs-rhel10">Task 13 — Conditionals for OS-specific Logic (RHEL8 vs RHEL10)</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-13">Task</h4>
 <p class="body-text">Using your two real OS versions, write one playbook that installs <code>httpd</code> on RHEL 10 hosts and <code>nginx</code> on RHEL 8 hosts, using <code>when:</code> conditions against <code>ansible_distribution_major_version</code>.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -449,8 +484,8 @@ MANAGED_BY=AAP-Controller</div>
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t14"><div class="la-topic-header"><span class="la-topic-num">L2-14</span><h3 class="la-topic-title">Task 14 — Loops, Handlers & Roles Refactor</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t14"><div class="la-topic-header"><span class="la-topic-num">L2-14</span><h3 class="la-topic-title" id="task-14-loops-handlers-roles-refactor">Task 14 — Loops, Handlers & Roles Refactor</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-14">Task</h4>
 <p class="body-text">Create three local users via a loop, then convert the whole "web server" playbook into a proper role: <code>roles/webserver/{tasks,handlers,templates,defaults,vars,meta}</code>.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -501,10 +536,10 @@ tree roles/webserver
 </div>
 
 <div class="content-section la-section" id="an-s6">
-<div class="la-section-header"><div class="la-section-icon">🎚️</div><div><h2 class="la-section-title">6. Extra Vars, Tags & Check Mode</h2><p class="la-section-desc">Prompt-on-launch behavior, dry runs, selective execution</p></div></div>
+<div class="la-section-header"><div class="la-section-icon">🎚️</div><div><h2 class="la-section-title" id="6-extra-vars-tags-check-mode">6. Extra Vars, Tags & Check Mode</h2><p class="la-section-desc">Prompt-on-launch behavior, dry runs, selective execution</p></div></div>
 
-<div class="la-topic" id="an-t15"><div class="la-topic-header"><span class="la-topic-num">L2-15</span><h3 class="la-topic-title">Task 15 — Prompt on Launch: Extra Variables</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t15"><div class="la-topic-header"><span class="la-topic-num">L2-15</span><h3 class="la-topic-title" id="task-15-prompt-on-launch-extra-variables">Task 15 — Prompt on Launch: Extra Variables</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-15">Task</h4>
 <p class="body-text">Write <code>motd.yml</code> that writes a custom message to <code>/etc/motd</code> from an <code>extra_vars</code> var <code>motd_message</code>. Enable "Prompt on Launch" for Variables on the Job Template and supply a different value at each launch.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -527,8 +562,8 @@ tree roles/webserver
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t16"><div class="la-topic-header"><span class="la-topic-num">L2-16</span><h3 class="la-topic-title">Task 16 — Tags: Split Install / Configure / Validate</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t16"><div class="la-topic-header"><span class="la-topic-num">L2-16</span><h3 class="la-topic-title" id="task-16-tags-split-install-configure-validate">Task 16 — Tags: Split Install / Configure / Validate</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-16">Task</h4>
 <p class="body-text">Tag tasks as <code>install</code>, <code>configure</code>, <code>validate</code>. Create three Job Templates from the same playbook, each using <code>--tags</code> to run only one phase, plus a fourth "Full Deployment" template with no tag filter.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -560,8 +595,8 @@ tree roles/webserver
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t17"><div class="la-topic-header"><span class="la-topic-num">L2-17</span><h3 class="la-topic-title">Task 17 — Check Mode (Dry Run) and Diff Mode</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t17"><div class="la-topic-header"><span class="la-topic-num">L2-17</span><h3 class="la-topic-title" id="task-17-check-mode-dry-run-and-diff-mode">Task 17 — Check Mode (Dry Run) and Diff Mode</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-17">Task</h4>
 <p class="body-text">Launch any Job Template with "Show Changes" (diff mode) and check-mode both enabled, and compare output to a normal run.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -573,10 +608,10 @@ tree roles/webserver
 </div>
 
 <div class="content-section la-section" id="an-s7">
-<div class="la-section-header"><div class="la-section-icon">🔀</div><div><h2 class="la-section-title">7. Workflow Templates</h2><p class="la-section-desc">Chaining jobs, branching on success/failure, approval gates</p></div></div>
+<div class="la-section-header"><div class="la-section-icon">🔀</div><div><h2 class="la-section-title" id="7-workflow-templates">7. Workflow Templates</h2><p class="la-section-desc">Chaining jobs, branching on success/failure, approval gates</p></div></div>
 
-<div class="la-topic" id="an-t18"><div class="la-topic-header"><span class="la-topic-num">L2-18</span><h3 class="la-topic-title">Task 18 — Linear Workflow: Precheck → Patch → Postcheck</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t18"><div class="la-topic-header"><span class="la-topic-num">L2-18</span><h3 class="la-topic-title" id="task-18-linear-workflow-precheck-patch-postcheck">Task 18 — Linear Workflow: Precheck → Patch → Postcheck</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-18">Task</h4>
 <p class="body-text">Create three Job Templates: <code>Precheck</code> (facts + disk space check), <code>Patch</code> (<code>dnf update</code>), <code>Postcheck</code> (re-check facts). Chain them in a Workflow Template so each only runs "on success" of the previous.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -614,8 +649,8 @@ tree roles/webserver
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t19"><div class="la-topic-header"><span class="la-topic-num">L3-19</span><h3 class="la-topic-title">Task 19 — Failure Branch + Notification Job</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t19"><div class="la-topic-header"><span class="la-topic-num">L3-19</span><h3 class="la-topic-title" id="task-19-failure-branch-notification-job">Task 19 — Failure Branch + Notification Job</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-19">Task</h4>
 <p class="body-text">Add a 4th node <code>Failure Alert</code> that only runs "On Failure" of Precheck. Force Precheck to fail (target a nonexistent host or add a failing <code>assert</code>) and confirm the branch fires while Patch/Postcheck are skipped.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -632,8 +667,8 @@ tree roles/webserver
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t20"><div class="la-topic-header"><span class="la-topic-num">L3-20</span><h3 class="la-topic-title">Task 20 — Approval Node Before Patching</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t20"><div class="la-topic-header"><span class="la-topic-num">L3-20</span><h3 class="la-topic-title" id="task-20-approval-node-before-patching">Task 20 — Approval Node Before Patching</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-20">Task</h4>
 <p class="body-text">Insert an Approval node between <code>Precheck</code> and <code>Patch</code> with a timeout of 10 minutes. Confirm the workflow pauses and requires a human click to continue, and that it fails-safe on timeout.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -644,10 +679,10 @@ tree roles/webserver
 </div>
 
 <div class="content-section la-section" id="an-s8">
-<div class="la-section-header"><div class="la-section-icon">👥</div><div><h2 class="la-section-title">8. RBAC: Organizations, Teams, Roles</h2><p class="la-section-desc">Least-privilege access — the #1 real-world admin skill</p></div></div>
+<div class="la-section-header"><div class="la-section-icon">👥</div><div><h2 class="la-section-title" id="8-rbac-organizations-teams-roles">8. RBAC: Organizations, Teams, Roles</h2><p class="la-section-desc">Least-privilege access — the #1 real-world admin skill</p></div></div>
 
-<div class="la-topic" id="an-t21"><div class="la-topic-header"><span class="la-topic-num">L2-21</span><h3 class="la-topic-title">Task 21 — Execute-Only User vs Admin User</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t21"><div class="la-topic-header"><span class="la-topic-num">L2-21</span><h3 class="la-topic-title" id="task-21-execute-only-user-vs-admin-user">Task 21 — Execute-Only User vs Admin User</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-21">Task</h4>
 <p class="body-text">Give <code>opuser</code> (from Task 1) the <strong>Execute</strong> role only on the <code>Server Discovery</code> Job Template — not Admin. Log in as <code>opuser</code> and confirm they can launch it but cannot edit its playbook path, delete it, or see Credentials details.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -661,8 +696,8 @@ tree roles/webserver
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t22"><div class="la-topic-header"><span class="la-topic-num">L2-22</span><h3 class="la-topic-title">Task 22 — Teams and Delegated Inventory Access</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t22"><div class="la-topic-header"><span class="la-topic-num">L2-22</span><h3 class="la-topic-title" id="task-22-teams-and-delegated-inventory-access">Task 22 — Teams and Delegated Inventory Access</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-22">Task</h4>
 <p class="body-text">Create a Team <code>OpsTeam</code> under <code>LocalLab</code>, add <code>opuser</code> to it, and grant the Team <strong>Use</strong> role on the <code>local_lab</code> Inventory and Credential (but not Admin), so team members can build their own Job Templates against your lab without touching Credential secrets.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -673,10 +708,10 @@ tree roles/webserver
 </div>
 
 <div class="content-section la-section" id="an-s9">
-<div class="la-section-header"><div class="la-section-icon">🔔</div><div><h2 class="la-section-title">9. Scheduling & Notifications</h2><p class="la-section-desc">Recurring jobs and alerting on success/failure</p></div></div>
+<div class="la-section-header"><div class="la-section-icon">🔔</div><div><h2 class="la-section-title" id="9-scheduling-notifications">9. Scheduling & Notifications</h2><p class="la-section-desc">Recurring jobs and alerting on success/failure</p></div></div>
 
-<div class="la-topic" id="an-t23"><div class="la-topic-header"><span class="la-topic-num">L1-23</span><h3 class="la-topic-title">Task 23 — Schedule a Recurring Job</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t23"><div class="la-topic-header"><span class="la-topic-num">L1-23</span><h3 class="la-topic-title" id="task-23-schedule-a-recurring-job">Task 23 — Schedule a Recurring Job</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-23">Task</h4>
 <p class="body-text">Schedule <code>Server Discovery</code> to run every 15 minutes. Review the Schedules tab and confirm job history builds up automatically without manual launches.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -687,8 +722,8 @@ tree roles/webserver
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t24"><div class="la-topic-header"><span class="la-topic-num">L2-24</span><h3 class="la-topic-title">Task 24 — Notification on Job Failure</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t24"><div class="la-topic-header"><span class="la-topic-num">L2-24</span><h3 class="la-topic-title" id="task-24-notification-on-job-failure">Task 24 — Notification on Job Failure</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-24">Task</h4>
 <p class="body-text">Create a Webhook Notification Template pointing to a local test receiver (e.g. <code>webhook.site</code>, or a small local HTTP listener), attach it to a Job Template for the <strong>Failure</strong> event, then trigger a real failure (target a nonexistent host) and confirm delivery.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -702,10 +737,10 @@ tree roles/webserver
 </div>
 
 <div class="content-section la-section" id="an-s10">
-<div class="la-section-header"><div class="la-section-icon">📦</div><div><h2 class="la-section-title">10. Execution Environments & Job Slicing</h2><p class="la-section-desc">Container-based runtimes and horizontal scale-out</p></div></div>
+<div class="la-section-header"><div class="la-section-icon">📦</div><div><h2 class="la-section-title" id="10-execution-environments-job-slicing">10. Execution Environments & Job Slicing</h2><p class="la-section-desc">Container-based runtimes and horizontal scale-out</p></div></div>
 
-<div class="la-topic" id="an-t25"><div class="la-topic-header"><span class="la-topic-num">L3-25</span><h3 class="la-topic-title">Task 25 — Inspect and Assign an Execution Environment</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t25"><div class="la-topic-header"><span class="la-topic-num">L3-25</span><h3 class="la-topic-title" id="task-25-inspect-and-assign-an-execution-environment">Task 25 — Inspect and Assign an Execution Environment</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-25">Task</h4>
 <p class="body-text">Identify which Execution Environment (EE) your Job Templates use by default, and explicitly pin the <code>Server Discovery</code> template to a specific EE image.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -715,8 +750,8 @@ tree roles/webserver
 </div>
 </div></div>
 
-<div class="la-topic" id="an-t26"><div class="la-topic-header"><span class="la-topic-num">L3-26</span><h3 class="la-topic-title">Task 26 — Job Slicing (simulated with your 2 nodes)</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-topic" id="an-t26"><div class="la-topic-header"><span class="la-topic-num">L3-26</span><h3 class="la-topic-title" id="task-26-job-slicing-simulated-with-your-2-nodes">Task 26 — Job Slicing (simulated with your 2 nodes)</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-26">Task</h4>
 <p class="body-text">Set <code>Job Slicing</code> to <code>2</code> on a Job Template running against <code>local_lab</code> (2 hosts) and observe that Controller splits the run into 2 separate jobs under one workflow-style job, one per slice.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -727,9 +762,9 @@ tree roles/webserver
 </div>
 
 <div class="content-section la-section" id="an-s11">
-<div class="la-section-header"><div class="la-section-icon">🌐</div><div><h2 class="la-section-title">11. REST API Automation</h2><p class="la-section-desc">Driving Controller from curl / Python instead of the UI</p></div></div>
-<div class="la-topic" id="an-t27"><div class="la-topic-header"><span class="la-topic-num">L3-27</span><h3 class="la-topic-title">Task 27 — Launch a Job Template and Poll Status via API</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-section-header"><div class="la-section-icon">🌐</div><div><h2 class="la-section-title" id="11-rest-api-automation">11. REST API Automation</h2><p class="la-section-desc">Driving Controller from curl / Python instead of the UI</p></div></div>
+<div class="la-topic" id="an-t27"><div class="la-topic-header"><span class="la-topic-num">L3-27</span><h3 class="la-topic-title" id="task-27-launch-a-job-template-and-poll-status-via-api">Task 27 — Launch a Job Template and Poll Status via API</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-27">Task</h4>
 <p class="body-text">Authenticate to the API, list Job Templates, launch <code>Server Discovery</code> by ID, and poll until it completes — all with <code>curl</code>.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -756,9 +791,9 @@ done</div>
 </div>
 
 <div class="content-section la-section" id="an-s12">
-<div class="la-section-header"><div class="la-section-icon">🏆</div><div><h2 class="la-section-title">12. Capstone Project — Self-Service Patch Portal</h2><p class="la-section-desc">Combine every feature above into one real workflow</p></div></div>
-<div class="la-topic" id="an-t28"><div class="la-topic-header"><span class="la-topic-num">L3-28</span><h3 class="la-topic-title">Task 28 — Build the Full Patch Workflow</h3></div><div class="la-topic-body">
-<div class="task-card"><h4>Task</h4>
+<div class="la-section-header"><div class="la-section-icon">🏆</div><div><h2 class="la-section-title" id="12-capstone-project-self-service-patch-portal">12. Capstone Project — Self-Service Patch Portal</h2><p class="la-section-desc">Combine every feature above into one real workflow</p></div></div>
+<div class="la-topic" id="an-t28"><div class="la-topic-header"><span class="la-topic-num">L3-28</span><h3 class="la-topic-title" id="task-28-build-the-full-patch-workflow">Task 28 — Build the Full Patch Workflow</h3></div><div class="la-topic-body">
+<div class="task-card"><h4 id="task-28">Task</h4>
 <p class="body-text">Build a single Workflow Template a non-admin can self-launch that: (1) shows a Survey for a maintenance window comment, (2) runs Precheck (facts + disk + service status), (3) waits for Approval, (4) runs Patch (<code>dnf update</code>), (5) reboots if the kernel changed, (6) runs Postcheck, (7) sends a success or failure Notification, all restricted via RBAC so <code>opuser</code> can launch but not edit.</p>
 </div>
 <span class="sol-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Show Solution</span>
@@ -805,8 +840,8 @@ Success Notification</div>
 </div>
 
 <div class="content-section la-section" id="an-s13">
-<div class="la-section-header"><div class="la-section-icon">🎯</div><div><h2 class="la-section-title">13. Interview Q&A</h2><p class="la-section-desc">Concept checks tied directly to the tasks above</p></div></div>
-<div class="la-topic" id="an-qa"><div class="la-topic-header"><span class="la-topic-num">Q&A</span><h3 class="la-topic-title">Core Concepts</h3></div><div class="la-topic-body">
+<div class="la-section-header"><div class="la-section-icon">🎯</div><div><h2 class="la-section-title" id="13-interview-q-a">13. Interview Q&A</h2><p class="la-section-desc">Concept checks tied directly to the tasks above</p></div></div>
+<div class="la-topic" id="an-qa"><div class="la-topic-header"><span class="la-topic-num">Q&A</span><h3 class="la-topic-title" id="core-concepts">Core Concepts</h3></div><div class="la-topic-body">
 <div class="qa-item"><div class="qa-q">Q1. What's the difference between Ansible Tower, AWX, and Ansible Automation Platform (AAP) Controller?</div><div class="qa-a">Tower was the original commercial product name from Red Hat. AWX is the open-source upstream project (same codebase, faster release cadence, no official support). AAP Controller is the current commercial component name — Tower was rebranded into it. Concepts (Inventories, Projects, Job/Workflow Templates, Credentials) are identical across all three.</div></div>
 <div class="qa-item"><div class="qa-q">Q2. Why use a Project pointing at Git instead of playbooks stored locally on the Controller?</div><div class="qa-a">Version control, audit trail, rollback, and multi-admin collaboration. "Update Revision on Launch" also guarantees every job run uses the exact latest committed playbook, avoiding drift between what's on disk and what's tracked in source control.</div></div>
 <div class="qa-item"><div class="qa-q">Q3. How does Controller keep secrets like SSH keys and vault passwords out of playbooks?</div><div class="qa-a">Via the Credentials object — secrets are injected at runtime into the execution environment and never written into the Project's Git repo or exposed to users with only Execute/Use roles. Vault credentials similarly decrypt <code>ansible-vault</code> files transparently at job launch.</div></div>
@@ -819,8 +854,8 @@ Success Notification</div>
 </div>
 
 <div class="content-section la-section" id="an-s14">
-<div class="la-section-header"><div class="la-section-icon">📋</div><div><h2 class="la-section-title">14. Quick Reference</h2><p class="la-section-desc">Object hierarchy and common CLI/API one-liners</p></div></div>
-<div class="la-topic" id="an-ref"><div class="la-topic-header"><span class="la-topic-num">REF</span><h3 class="la-topic-title">Command & Concept Cheatsheet</h3></div><div class="la-topic-body">
+<div class="la-section-header"><div class="la-section-icon">📋</div><div><h2 class="la-section-title" id="14-quick-reference">14. Quick Reference</h2><p class="la-section-desc">Object hierarchy and common CLI/API one-liners</p></div></div>
+<div class="la-topic" id="an-ref"><div class="la-topic-header"><span class="la-topic-num">REF</span><h3 class="la-topic-title" id="command-concept-cheatsheet">Command & Concept Cheatsheet</h3></div><div class="la-topic-body">
 <div class="cmd-label">Object hierarchy (build in this order)</div>
 <div class="cmd-block">Organization
   └── Inventory (Hosts, Groups, Smart Inventories)
@@ -843,7 +878,8 @@ Success Notification</div>
 </div></div>
 </div>
 
-  </main>
+  <!--rr:related--><aside class="rr-related" aria-labelledby="rr-rel-h"><h2 id="rr-rel-h">Related</h2><div class="rr-related-grid"><a class="rr-card" href="/podman.html" style="--cat:#7C3AED"><h3>Podman Containers Deep Dive</h3><p>RHCSA-focused Podman deep dive for RHEL 10: images, containers, volumes, rootless mode, pods, registries, networking, Qu…</p><div class="meta"><span><span class="dot"></span>DevOps</span></div></a><a class="rr-card" href="/devops-bible.html" style="--cat:#7C3AED"><h3>DevOps Bible</h3><p>A broad DevOps handbook: Linux, networking, Git, cloud, Terraform, Ansible, Docker, Kubernetes, CI/CD, GitOps, SRE, DevS…</p><div class="meta"><span><span class="dot"></span>DevOps</span></div></a><a class="rr-card" href="/rhel.html" style="--cat:#2F80ED"><h3>RHEL Study Guide</h3><p>Complete Red Hat Enterprise Linux administration reference for RHEL 6, 7, 8 and 9: users, LVM and RAID, SELinux, network…</p><div class="meta"><span><span class="dot"></span>Linux &amp; RHEL</span></div></a></div></aside><!--/rr:related-->
+</main>
   <nav id="toc-nav"><div class="toc-head">Contents</div>
 <a href="#an-s0" class="toc-link">🗺️ 0. Lab Topology</a>
 <a href="#an-s1" class="toc-link">🏗️ 1. Orgs & Users</a>
@@ -863,12 +899,30 @@ Success Notification</div>
 </nav>
 </div>
 <button id="btt">↑</button>
-<footer id="site-footer">
-  <span>root_n_reels — Technical Reference Library</span>
-  <span>L3 SysAdmin Interview Prep</span>
-  <span>Vishal Sharma · <a href="mailto:admvishal24@gmail.com">admvishal24@gmail.com</a> · <a href="https://www.rootnreels.in">www.rootnreels.in</a></span>
-  <span><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram</a> · <a href="https://youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube</a></span>
+<!--rr:footer--><footer id="site-footer" class="rr-footer">
+  <div class="rr-footgrid">
+    <div class="rr-footbrand">
+      <a class="logo" href="/">root<span>_n_</span>reels</a>
+      <p>Practical knowledge for people who run servers. Linux, Unix, networking and DevOps references, built by Vishal Sharma.</p>
+    </div>
+    <div><h2>Topics</h2><ul><li><a href="/linux/">Linux &amp; RHEL</a></li><li><a href="/unix/">Unix</a></li><li><a href="/networking/">Networking</a></li><li><a href="/infrastructure/">Infrastructure</a></li><li><a href="/devops/">DevOps</a></li><li><a href="/security/">Security</a></li><li><a href="/operations/">Operations</a></li></ul></div>
+    <div><h2>Learn</h2><ul>
+      <li><a href="/start-here.html">Start here</a></li><li><a href="/troubleshooting/">Troubleshooting</a></li>
+      <li><a href="/interview/">Interview prep</a></li><li><a href="/cheat-sheets.html">Cheat sheets</a></li>
+      <li><a href="/labs.html">Practice labs</a></li><li><a href="/saved/">Saved &amp; recent</a></li></ul></div>
+    <div><h2>Project</h2><ul>
+      <li><a href="/about.html">About</a></li><li><a href="/about.html#contact">Contact</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady/issues" target="_blank" rel="noopener">Report an error</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+    <div><h2>Follow</h2><ul>
+      <li><a href="https://www.instagram.com/root_n_reels" target="_blank" rel="noopener">Instagram @root_n_reels</a></li>
+      <li><a href="https://www.youtube.com/@root_n_reels" target="_blank" rel="noopener">YouTube @root_n_reels</a></li>
+      <li><a href="https://github.com/AdmVishal/RootReady" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+  </div>
+  <div class="rr-footbottom"><span>© 2026 Vishal Sharma · root_n_reels</span><span>Site updated 2026-10-01</span>
+    <span>Test commands in a lab before production use.</span></div>
 </footer>
+<!--/rr:footer-->
 <script>
 const pr=document.getElementById('prog'),bt=document.getElementById('btt');
 addEventListener('scroll',function(){const h=document.documentElement,s=h.scrollTop||document.body.scrollTop,m=(h.scrollHeight||document.body.scrollHeight)-h.clientHeight;if(pr)pr.style.width=(m>0?Math.min(s/m*100,100):0)+'%';if(bt)bt.classList.toggle('vis',s>280);},{passive:true});

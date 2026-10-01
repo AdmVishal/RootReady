@@ -1,0 +1,260 @@
+<p class="rr-lead">Copy-ready commands grouped by task. Run as root or with <code>sudo</code> where needed, and test in a lab before production. Press <kbd>/</kbd> to search the whole site.</p>
+<div data-rr-widget="cheats">
+<label class="sr-only" for="cs-filter">Filter commands</label>
+<input id="cs-filter" class="rr-cs-filter" type="search" placeholder="Filter this page (e.g. lvm, systemctl, tar)…" autocomplete="off">
+<p id="cs-count" class="rr-empty" aria-live="polite"></p>
+<nav class="rr-cs-nav" aria-label="Cheat sheet sections">
+<a class="rr-chip" href="#cs-filesystem">Files &amp; filesystems</a><a class="rr-chip" href="#cs-storage">Disks</a><a class="rr-chip" href="#cs-lvm">LVM &amp; multipath</a>
+<a class="rr-chip" href="#cs-systemd">systemd</a><a class="rr-chip" href="#cs-logs">Logs</a><a class="rr-chip" href="#cs-process">Processes</a><a class="rr-chip" href="#cs-perf">Performance</a>
+<a class="rr-chip" href="#cs-network">Networking</a><a class="rr-chip" href="#cs-selinux">SELinux</a><a class="rr-chip" href="#cs-users">Users &amp; sudo</a><a class="rr-chip" href="#cs-text">Text tools</a>
+<a class="rr-chip" href="#cs-packages">Packages</a><a class="rr-chip" href="#cs-solaris">Solaris</a><a class="rr-chip" href="#cs-podman">Podman</a><a class="rr-chip" href="#cs-ansible">Ansible</a><a class="rr-chip" href="#cs-git">Git</a>
+</nav>
+
+<section class="rr-cs" id="cs-filesystem"><h2>Files &amp; filesystems</h2>
+<pre># usage and type
+df -hT
+df -i                                   # inodes
+du -xh --max-depth=1 /var | sort -h     # biggest directories, one filesystem
+find / -xdev -type f -size +500M        # big files
+lsof +L1                                # deleted files still open
+findmnt                                 # mount tree
+findmnt --verify                        # validate /etc/fstab
+mount -o remount,rw /mountpoint         # remount read-write
+# permissions
+ls -lZ file                             # mode, owner and SELinux context
+chmod 640 file; chmod -R g+rX dir
+chown user:group file
+setfacl -m u:alice:rwx dir; getfacl dir
+# archives and copy
+tar -czf out.tgz dir/; tar -xzf out.tgz -C /dest; tar -tzf out.tgz | head
+rsync -avh --progress src/ dst/         # add -n for a dry run</pre></section>
+
+<section class="rr-cs" id="cs-storage"><h2>Disks &amp; partitions</h2>
+<pre># inspect (safe)
+lsblk -f
+blkid
+fdisk -l
+parted -l
+smartctl -H /dev/sdX                     # smartmontools
+# make a filesystem (destructive: check the device twice)
+mkfs.xfs /dev/sdb1
+mkfs.ext4 /dev/sdb1
+# mount permanently: add a UUID line to /etc/fstab, then test
+mount -a
+# grow a filesystem
+xfs_growfs /mountpoint                   # XFS (mounted)
+resize2fs /dev/mapper/vg-lv              # ext4
+# repair (unmounted only)
+xfs_repair -n /dev/sdb1                  # dry run first
+fsck -f /dev/sdb1
+# rescan for new SCSI/SAN disks
+echo "- - -" | tee /sys/class/scsi_host/host*/scan</pre></section>
+
+<section class="rr-cs" id="cs-lvm"><h2>LVM &amp; multipath</h2>
+<pre># overview
+pvs; vgs; lvs
+lvs -o +devices
+# create
+pvcreate /dev/sdb
+vgcreate vg01 /dev/sdb
+lvcreate -n lv_data -L 20G vg01
+mkfs.xfs /dev/vg01/lv_data
+# extend (online); -r also grows the filesystem
+vgextend vg01 /dev/sdc
+lvextend -r -L +5G /dev/vg01/lv_data
+lvextend -r -l +100%FREE /dev/vg01/lv_data
+# snapshot
+lvcreate -s -n snap1 -L 2G /dev/vg01/lv_data
+# remove (destructive)
+lvremove /dev/vg01/snap1
+# multipath
+multipath -ll
+multipathd show paths
+multipath -r                              # reload maps</pre></section>
+
+<section class="rr-cs" id="cs-systemd"><h2>systemd</h2>
+<pre>systemctl status SERVICE -l --no-pager
+systemctl start|stop|restart|reload SERVICE
+systemctl enable --now SERVICE
+systemctl disable --now SERVICE
+systemctl is-active SERVICE; systemctl is-enabled SERVICE
+systemctl --failed
+systemctl list-units --type=service --state=running
+systemctl cat SERVICE                     # unit file plus drop-ins
+systemctl edit SERVICE                    # create a drop-in override
+systemctl daemon-reload                   # after changing unit files
+systemctl reset-failed SERVICE
+systemctl list-dependencies SERVICE
+systemctl get-default; systemctl set-default multi-user.target
+systemctl rescue                          # single-user maintenance (disruptive)
+systemd-analyze blame; systemd-analyze critical-chain</pre></section>
+
+<section class="rr-cs" id="cs-logs"><h2>Logs</h2>
+<pre>journalctl -xe
+journalctl -u SERVICE --since "1 hour ago" --no-pager
+journalctl -p err -b
+journalctl -k                             # kernel messages
+journalctl -f                             # follow
+journalctl --disk-usage; journalctl --vacuum-size=200M
+dmesg -T | tail -50
+dmesg -T --level=err,warn
+tail -f /var/log/messages                 # /var/log/syslog on Debian family
+tail -f /var/log/secure                   # auth log on RHEL
+last -x | head; lastb | head
+ausearch -m avc -ts recent               # SELinux denials</pre></section>
+
+<section class="rr-cs" id="cs-process"><h2>Processes</h2>
+<pre>ps -ef --forest
+ps -eo pid,ppid,stat,%cpu,%mem,cmd --sort=-%cpu | head
+top                                       # 1 per-core, P sort CPU, M sort memory, k kill
+pgrep -a nginx; pidof sshd
+kill PID; kill -9 PID                     # -9 is a last resort
+pkill -f pattern
+nice -n 10 cmd; renice -n 5 -p PID
+lsof -p PID; lsof -i :80
+ss -ltnp | grep PID
+cat /proc/PID/limits; cat /proc/PID/status
+strace -c -p PID                          # syscall summary (Ctrl-C to stop)
+ps -eo pid,ppid,stat,cmd | awk '$3 ~ /^[ZD]/'   # zombie and D-state
+fuser -vm /mountpoint                     # who is using a mount</pre></section>
+
+<section class="rr-cs" id="cs-perf"><h2>Performance</h2>
+<pre>uptime; nproc                             # load vs CPU count
+free -h                                   # read "available"
+vmstat 1 5                                # r b si so us sy id wa st
+iostat -xz 1 5                            # await, %util (sysstat)
+pidstat -u 1 5; pidstat -d 1 5; pidstat -r 1 5
+mpstat -P ALL 1 3
+sar -u 1 5; sar -q; sar -r; sar -d
+sar -u -f /var/log/sa/sa01                # history
+top -b -n1 | head -20 > /tmp/top.txt      # capture evidence
+dmesg -T | grep -i -E 'out of memory|oom'
+ulimit -a</pre></section>
+
+<section class="rr-cs" id="cs-network"><h2>Networking</h2>
+<pre>ip -br addr; ip -br link; ip route
+ip route get 8.8.8.8
+ip -s link show eth0                      # errors and drops
+nmcli device status; nmcli connection show
+nmcli connection modify "eth0" ipv4.addresses 10.0.0.10/24 ipv4.gateway 10.0.0.1 ipv4.method manual
+nmcli connection up "eth0"
+ss -tulpn                                 # listening sockets
+ss -s
+ping -c3 HOST; traceroute HOST; mtr -rw HOST
+dig example.com; dig +short -x 8.8.8.8; getent hosts example.com
+curl -I https://example.com
+tcpdump -ni eth0 port 53 -c 20
+firewall-cmd --list-all
+firewall-cmd --permanent --add-service=http && firewall-cmd --reload
+sshd -t                                   # test sshd config before restart
+chronyc tracking; chronyc sources -v
+hostnamectl; timedatectl</pre></section>
+
+<section class="rr-cs" id="cs-selinux"><h2>SELinux</h2>
+<pre>getenforce; sestatus
+setenforce 0|1                            # runtime only; for diagnosis, then set back to 1
+ls -lZ /path; ps -eZ | grep SERVICE
+restorecon -Rv /path                      # reset to policy default
+semanage fcontext -a -t httpd_sys_content_t "/web(/.*)?"; restorecon -Rv /web
+semanage port -l | grep http; semanage port -a -t http_port_t -p tcp 8081
+getsebool -a | grep httpd; setsebool -P httpd_can_network_connect on
+ausearch -m avc -ts recent | audit2why
+sealert -a /var/log/audit/audit.log      # setroubleshoot-server</pre></section>
+
+<section class="rr-cs" id="cs-users"><h2>Users, groups &amp; sudo</h2>
+<pre>id user; groups user
+useradd -m -s /bin/bash -G wheel alice
+passwd alice; chage -l alice; chage -M 90 alice
+usermod -aG docker alice; usermod -L alice     # add to group; lock
+userdel -r alice                               # removes the home directory
+visudo; visudo -c                              # edit and syntax-check sudoers
+sudo -l -U alice
+who; w; last | head
+getent passwd alice
+umask; umask 027</pre></section>
+
+<section class="rr-cs" id="cs-text"><h2>Text tools</h2>
+<pre>grep -rn "pattern" /etc/ --include="*.conf"
+grep -E "a|b" file; grep -v "^#" file | grep -v "^$"
+awk '{print $1, $NF}' file
+awk -F: '$3 >= 1000 {print $1}' /etc/passwd
+sed -n '10,20p' file
+sed -i.bak 's/old/new/g' file                 # keeps file.bak
+cut -d: -f1 /etc/passwd
+sort file | uniq -c | sort -nr | head
+xargs -n1 -P4 cmd < list.txt
+tee -a file
+column -t file
+diff -u a b; cmp a b
+wc -l file; head -n 20 file; tail -n 20 file</pre></section>
+
+<section class="rr-cs" id="cs-packages"><h2>Packages (RHEL family)</h2>
+<pre>dnf search NAME; dnf info NAME
+dnf install NAME; dnf remove NAME
+dnf check-update; dnf update --security
+dnf history; dnf history undo ID
+dnf provides /path/to/file
+dnf repolist; dnf clean all
+rpm -qa | grep NAME; rpm -qi NAME; rpm -ql NAME; rpm -qf /path
+rpm -V NAME                                    # verify files
+yum ...                                        # RHEL 7: same verbs as dnf
+subscription-manager status; subscription-manager repos --list-enabled
+needs-restarting -r                            # reboot required?</pre></section>
+
+<section class="rr-cs" id="cs-solaris"><h2>Solaris</h2>
+<pre># services (SMF)
+svcs -a; svcs -xv
+svcadm enable|disable|restart FMRI
+svcs -l FMRI
+# ZFS
+zpool status -x; zpool list
+zfs list; zfs list -t snapshot
+zfs snapshot rpool/data@pre-change
+zfs rollback rpool/data@pre-change             # discards later changes
+zpool scrub tank
+# zones and LDOMs
+zoneadm list -cv; zlogin ZONE
+ldm list; ldm list-bindings
+# system
+prtconf | head; prtdiag -v | head
+iostat -xn 1 5; mpstat 1 5; vmstat 1 5; prstat -a 5 1
+ifconfig -a; dladm show-link; ipadm show-addr
+pkg update; pkg list; pkg info NAME            # Solaris 11 IPS</pre></section>
+
+<section class="rr-cs" id="cs-podman"><h2>Podman</h2>
+<pre>podman pull registry.access.redhat.com/ubi9/ubi
+podman images; podman ps -a
+podman run -d --name web -p 8080:80 docker.io/library/nginx
+podman exec -it web sh
+podman logs -f web
+podman stop web; podman rm web; podman rmi IMAGE
+podman volume create data; podman run -v data:/var/lib/app:Z IMAGE   # :Z relabels for SELinux
+podman system df; podman system prune                    # prune deletes unused data
+podman generate systemd --new --files --name web        # or use Quadlet (.container files)
+loginctl enable-linger $USER                             # rootless services after logout
+podman pod create --name mypod -p 8080:80</pre></section>
+
+<section class="rr-cs" id="cs-ansible"><h2>Ansible</h2>
+<pre>ansible all -i inventory -m ping
+ansible webservers -i inventory -b -m dnf -a "name=httpd state=present"
+ansible-playbook -i inventory site.yml --check --diff     # dry run
+ansible-playbook -i inventory site.yml -l web01 -t config -vv
+ansible-inventory -i inventory --graph
+ansible-doc -l | grep dnf; ansible-doc ansible.builtin.dnf
+ansible-vault create secrets.yml; ansible-vault edit secrets.yml
+ansible-galaxy collection install community.general
+ansible-lint site.yml</pre></section>
+
+<section class="rr-cs" id="cs-git"><h2>Git</h2>
+<pre>git status -sb; git log --oneline --graph -15
+git diff; git diff --staged
+git add -p; git commit -m "message"
+git switch -c feature/x; git switch main
+git pull --rebase; git push -u origin HEAD
+git stash; git stash pop
+git restore file                                # discard working-tree changes to file
+git revert COMMIT                               # safe undo (new commit)
+git reset --hard COMMIT                         # destructive: loses uncommitted work
+git blame file; git log -p -- file
+git remote -v; git fetch --all --prune</pre></section>
+</div>

@@ -1,0 +1,45 @@
+<p class="rr-callout warn" style="display:block"><span class="t">Lab safety</span>Run these on a disposable VM, not on a production server.</p>
+<div class="rr-prose">
+<details class="rr-d" id="lab-disk"><summary>1. A filesystem is 95% full and growing</summary><div>
+<p><strong>Task:</strong> find what is growing, free space safely and prevent a repeat.</p>
+<pre>df -hT; df -i
+du -xh --max-depth=1 /var | sort -h | tail
+lsof +L1
+journalctl --vacuum-size=200M</pre>
+<p>Check deleted-open files, inodes and log rotation; extend the volume if the data is legitimate. <a href="/linux/disk-full/">Full walkthrough →</a></p></div></details>
+<details class="rr-d" id="lab-service"><summary>2. A service is not responding after a change</summary><div>
+<p><strong>Task:</strong> find out why it will not start or answer, without guessing.</p>
+<pre>systemctl status SERVICE -l --no-pager
+journalctl -xeu SERVICE --no-pager | tail -40
+ss -ltnp
+SERVICE_BINARY -t         # config test where supported</pre>
+<p>Look at the exit status, port conflicts, permissions, SELinux and dependencies. <a href="/linux/service-wont-start/">Full walkthrough →</a></p></div></details>
+<details class="rr-d" id="lab-load"><summary>3. Load average is high but the CPU looks idle</summary><div>
+<p><strong>Task:</strong> decide whether it is CPU, I/O or memory, and find the process.</p>
+<pre>uptime; nproc
+vmstat 1 5
+iostat -xz 1 5
+ps -eo state,pid,wchan:20,cmd | awk '$1=="D"'</pre>
+<p>High <code>wa</code>/<code>b</code> and D-state processes point at storage or NFS. <a href="/linux/high-load/">Full walkthrough →</a></p></div></details>
+<details class="rr-d" id="lab-ro"><summary>4. An application suddenly cannot write: “Read-only file system”</summary><div>
+<p><strong>Task:</strong> confirm what is read-only and decide whether it is safe to remount.</p>
+<pre>findmnt -no TARGET,OPTIONS /data
+dmesg -T | grep -i -E 'remount|I/O error|EXT4-fs|XFS'
+lsblk -o NAME,RO,MOUNTPOINT</pre>
+<p>Look for storage errors before repairing. <a href="/linux/filesystem-read-only/">Full walkthrough →</a></p></div></details>
+<details class="rr-d" id="lab-ssh"><summary>5. You cannot SSH to a server (connection refused)</summary><div>
+<p><strong>Task:</strong> work out which layer is at fault from another host and from the console.</p>
+<pre>nc -vz HOST 22                  # from the client: refused vs timeout
+systemctl status sshd           # on the server (console)
+ss -ltnp | grep ':22'
+firewall-cmd --list-all
+sshd -t</pre>
+<p>Refused means a host replied; a timeout usually means a firewall or routing drop. <a href="/troubleshooting/#ssh-refused">More →</a></p></div></details>
+<details class="rr-d" id="lab-lvm"><summary>6. Extend /var by 10 GB online</summary><div>
+<p><strong>Task:</strong> add space to a mounted LVM logical volume without downtime.</p>
+<pre>vgs; lvs; lsblk
+vgextend vg01 /dev/sdc          # only if the VG has no free space
+lvextend -r -L +10G /dev/vg01/lv_var
+df -h /var</pre>
+<p>Check <code>vgs</code> first. <a href="/rhel.html#extending-lvm">Extending LVM →</a></p></div></details>
+</div>

@@ -1,0 +1,65 @@
+<div class="rr-callout quick"><div><span class="t">Quick answer</span>
+<p>On Linux, load average counts tasks that are <em>runnable</em> plus tasks in <em>uninterruptible sleep</em> (usually waiting on disk or NFS). Compare it to the CPU count (<code>nproc</code>), then run <code>vmstat 1 5</code>: high <code>us/sy</code> means CPU-bound, high <code>wa</code> or <code>b</code> means I/O-bound, and <code>si/so</code> means memory pressure.</p></div></div>
+
+<h2>Step 1: read the load correctly</h2>
+<pre>$ uptime
+$ nproc</pre>
+<pre class="output"> 02:14:09 up 41 days,  3:12,  2 users,  load average: 18.40, 16.10, 9.73
+8</pre>
+<p>Load of 18 on 8 CPUs means tasks are queueing. The trend matters: 1, 5 and 15-minute averages tell you whether it is getting worse (18 → 16 → 9.7 here) or recovering.</p>
+
+<h2>Step 2: separate CPU, I/O and memory</h2>
+<pre>$ vmstat 1 5</pre>
+<pre class="output">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 2 14      0 214532  81220 912344    0    0  9120  4100 2210 3900  4  3 12 81  0</pre>
+<table>
+<tr><th>You see</th><th>Meaning</th><th>Next</th></tr>
+<tr><td><code>r</code> high, <code>us</code>+<code>sy</code> high, <code>id</code> low</td><td>CPU-bound</td><td><code>top</code>, <code>pidstat -u 1</code></td></tr>
+<tr><td><code>b</code> high, <code>wa</code> high</td><td>Waiting on disk/NFS (the example above)</td><td><code>iostat -xz 1</code>, <code>pidstat -d 1</code></td></tr>
+<tr><td><code>si</code>/<code>so</code> non-zero, <code>free</code> low</td><td>Memory pressure, swapping</td><td><code>free -h</code>, <code>ps --sort=-%mem</code></td></tr>
+<tr><td><code>st</code> high (VM)</td><td>Hypervisor is stealing CPU</td><td>Ask the virtualisation team</td></tr>
+</table>
+
+<h2>Step 3: find the culprit</h2>
+<pre># CPU: press 1 for per-core, P to sort by CPU, M to sort by memory
+$ top
+$ pidstat -u 1 5
+# disk: await = latency in ms, %util near 100 = saturated
+$ iostat -xz 1 5
+$ pidstat -d 1 5
+# processes stuck in D state (uninterruptible)
+$ ps -eo state,pid,wchan:20,cmd | awk '$1=="D"'
+# history, if sysstat is collecting
+$ sar -q -s 01:00:00 -e 03:00:00</pre>
+
+<h2>Common causes</h2>
+<ul>
+<li>A runaway process or a tight loop (CPU).</li>
+<li>Backup, antivirus, a database checkpoint or a batch job (I/O).</li>
+<li>A slow or failing disk, a SAN path problem, or a hung NFS server (D-state processes).</li>
+<li>Too little RAM, causing swap storms (see <a href="/troubleshooting/#high-memory">high memory</a>).</li>
+<li>Many short-lived processes (fork storms) from cron or scripts.</li>
+</ul>
+
+<h2>Common mistakes</h2>
+<ul>
+<li>Reading the load number without dividing by the CPU count.</li>
+<li>Assuming high load always means high CPU. A box can be 90% idle with a load of 30 because everything is blocked on I/O.</li>
+<li>Trying to <code>kill -9</code> D-state processes. They cannot be killed until the I/O returns; fix the storage.</li>
+<li>Restarting the application before capturing evidence.</li>
+</ul>
+
+<h2>Production considerations</h2>
+<div class="rr-callout prod"><div><span class="t">Production</span>
+<p>Capture first, then act: <code>top -b -n1 &gt; /tmp/top.txt</code>, <code>vmstat 1 10</code>, <code>iostat -xz 1 5</code>, <code>ps -efL</code> and the time. Check what changed (deploy, patch, new cron job, backup window). If you must restart something, do it on one node of a pool first.</p></div></div>
+
+<details class="rr-d"><summary>Advanced: why uninterruptible tasks raise load</summary><div>
+<p>Linux includes tasks in <code>TASK_UNINTERRUPTIBLE</code> (state D) in the load average, unlike many Unix systems that count only runnable tasks. That is why NFS and storage stalls show up as load even when the CPUs are idle.</p></div></details>
+
+<h2>Interview questions</h2>
+<details class="rr-d"><summary>What does a load average of 10 mean on a 4-core server?</summary><div>
+<p>On average about 10 tasks were runnable or blocked in uninterruptible sleep, 2.5 per core. It is overloaded or blocked on something. Check vmstat and iostat to see whether it is CPU or I/O.</p></div></details>
+<details class="rr-d"><summary>CPU is 90% idle but load is 25. How?</summary><div>
+<p>Many processes are in D state, waiting for storage or NFS. Look at <code>iostat -xz</code>, <code>wa</code> in vmstat and the D-state process list.</p></div></details>
+<p>More: <a href="/linux-admin.html#performance-monitoring-sar">Performance monitoring and SAR</a> · <a href="/linux-admin.html#q-perf1c">What iostat -xm tells you</a> · <a href="/solaris.html#q-how-would-you-troubleshoot-high-load-average">High load on Solaris</a>.</p>
