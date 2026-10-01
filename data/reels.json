@@ -1,6 +1,150 @@
 {
-  "filesystem-read-only": {"instagram": "", "youtube": ""},
-  "disk-full": {"instagram": "", "youtube": ""},
-  "high-load": {"instagram": "", "youtube": ""},
-  "service-wont-start": {"instagram": "", "youtube": ""}
+ "filesystem-read-only": {
+  "instagram": "https://www.instagram.com/reel/Dd4C4E6hSBp/",
+  "youtube": ""
+ },
+ "disk-full": {
+  "instagram": "https://www.instagram.com/reel/Ddorhg0z_D6/",
+  "youtube": ""
+ },
+ "high-load": {
+  "instagram": "https://www.instagram.com/reel/Dd1ZCN3BnIx/",
+  "youtube": ""
+ },
+ "service-wont-start": {
+  "instagram": "https://www.instagram.com/reel/Dc8ioS5hhJB/",
+  "youtube": ""
+ },
+ "_all": [
+  {
+   "url": "https://www.instagram.com/reel/Dcv3PzkhBYe/",
+   "title": "Linux in 60 seconds: kernel, distributions and “everything is a file”",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DcxenCxBglf/",
+   "title": "There is no C: drive: the single root /",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dcz41VdBHi_/",
+   "title": "What is your UID? Users and the id command",
+   "page": "/rhel.html"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dc03qnVhX82/",
+   "title": "Linux file permissions: the chmod numbers to avoid",
+   "page": "/rhel.html"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dc6ZSD-hZ82/",
+   "title": "sudo vs su: which to use on servers",
+   "page": "/rhel.html"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dc8ioS5hhJB/",
+   "title": "start vs enable: why a service did not survive reboot",
+   "page": "/linux/service-wont-start/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dc_Z1PRhnFo/",
+   "title": "A rogue app is eating all your RAM: find it and stop it",
+   "page": "/linux/high-load/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdCJUAKB3B3/",
+   "title": "EP08: LVM, expand storage with zero downtime",
+   "page": "/rhel.html"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdEiN2-Bq3a/",
+   "title": "EP09: SELinux enforcing vs permissive",
+   "page": "/rhel.html"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdHHa2AoWxZ/",
+   "title": "EP10: System logs and tail -f",
+   "page": "/rhel.html"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdJuCOVBbD_/",
+   "title": "EP11: How package managers work",
+   "page": "/rhel.html"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdMP5W2hmyN/",
+   "title": "EP12: The PATH variable",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdRUPCozx7p/",
+   "title": "The pipe |: chain commands together",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdUG2sTz299/",
+   "title": "Filter logs with grep -i",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdWk70WT1ks/",
+   "title": "Hidden files and ls -la",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdeIltiT8Hf/",
+   "title": "kill is not always dead: SIGTERM vs SIGKILL",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdgxTWnT06x/",
+   "title": "PID 1: the first process",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdjWzhlTC15/",
+   "title": "Zombie processes: dead but still listed",
+   "page": "/linux-guide/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Ddl_LVcTErR/",
+   "title": "Who is slowing down your server? Start with top",
+   "page": "/linux/high-load/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Ddorhg0z_D6/",
+   "title": "Deleted the file but the disk is still full (lsof +L1)",
+   "page": "/linux/disk-full/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdtlSJDB-K-/",
+   "title": "Slow server? Check vmstat",
+   "page": "/linux/high-load/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/DdyvKzkBxyd/",
+   "title": "Slow disk? Find the bottleneck with iostat",
+   "page": "/linux/high-load/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dd1ZCN3BnIx/",
+   "title": "CPU 30% but load HIGH: load average is not CPU",
+   "page": "/linux/high-load/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dd4C4E6hSBp/",
+   "title": "Filesystem read-only: why it happens and what to check",
+   "page": "/linux/filesystem-read-only/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dd6js2pozAh/",
+   "title": "“No space left on device” but df shows space: inodes",
+   "page": "/linux/disk-full/"
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dd9FZAABriZ/",
+   "title": "What rm -rf / really does (and why never to run it)",
+   "page": "/linux-guide/"
+  }
+ ]
 }

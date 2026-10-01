@@ -1,6 +1,6 @@
 /* root_n_reels service worker. VERSION is rewritten by tools/build.py when assets or the search index change.
    Strategy: HTML = network-first (fresh content, cached fallback offline); static assets and JSON = stale-while-revalidate. */
-const VERSION = 'rr-77712669-abea5a';
+const VERSION = 'rr-77712669-4ece18';
 const PRECACHE = ['/', '/assets/css/site.css', '/assets/js/app.js', '/assets/fonts/jetbrains-mono-latin-400-normal.woff2', '/manifest.json'];
 
 self.addEventListener('install', (e) => {

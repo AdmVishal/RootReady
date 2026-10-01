@@ -483,6 +483,8 @@ def fragment_page(p, st):
     frag = rd('content/' + p['fragment'])
     if '{{paths}}' in frag:
         frag = frag.replace('{{paths}}', paths_html())
+    if '{{reels}}' in frag:
+        frag = frag.replace('{{reels}}', reels_html())
     frag = add_ids(frag)
     frag = comment_spans(frag)
     words = words_of(frag)
@@ -500,6 +502,12 @@ def fragment_page(p, st):
     else:
         body = crumbs_html(p) + frag
     return shell(p, body, article=bool(p.get('article')))
+
+
+def reels_html():
+    items = jload('reels.json', {}).get('_all', [])
+    cards = ''.join('<a class="rr-card" href="%s" target="_blank" rel="noopener"><h3>▶ %s</h3><p>Watch on Instagram ↗</p></a>' % (E(x['url']), E(x['title'])) for x in reversed(items))
+    return '<div class="rr-grid">%s</div>' % cards
 
 
 def paths_html():
